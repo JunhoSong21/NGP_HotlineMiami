@@ -19,6 +19,12 @@
     <Filter Include="소스 파일\Core">
       <UniqueIdentifier>{0266d47c-0062-461e-812f-1c783feeb992}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Player">
+      <UniqueIdentifier>{8dc1af3e-98be-4c3b-8b17-5f983934173e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Timer">
+      <UniqueIdentifier>{fed36486-5e27-4561-ad66-d3f52b7cc4c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -27,13 +33,28 @@
     <ClCompile Include="GameLoop.cpp">
       <Filter>소스 파일\GameLoop</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일\Timer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameLoop.h">
+      <Filter>소스 파일\GameLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Player</Filter>
+    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>소스 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="GameLoop.h">
-      <Filter>소스 파일\GameLoop</Filter>
+    <ClInclude Include="Timer.h">
+      <Filter>소스 파일\Timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

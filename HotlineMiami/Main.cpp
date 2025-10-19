@@ -1,10 +1,11 @@
 #include "pch.h"
+#include "GameLoop.h"
 
 HINSTANCE hInst;
 LPCTSTR IpszClass = L"Hotline Miami";
 LPCTSTR IpszWindowName = L"Hotline Miami.exe";
 
-void GameLoop();
+GameLoop* gameLoop = nullptr;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
@@ -30,10 +31,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	RegisterClassEx(&WndClass);
 
 	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW,
-		0, 0, 1280, 800,
-		NULL, (HMENU)NULL, hInstance, NULL);
+						0, 0,
+						1280, 800,
+						NULL, (HMENU)NULL, hInstance, NULL);
 	if (!hWnd)
 		return false;
+
+	gameLoop = new GameLoop();
+	gameLoop->Init(hWnd);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -47,7 +52,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 			DispatchMessageW(&msg);
 		}
 		else {
-			GameLoop();
+			if (gameLoop) {
+				gameLoop->Update();
+				gameLoop->Render();
+			}
+
 			Sleep(1);
 		}
 	}
@@ -55,19 +64,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	return msg.wParam;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM IParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hDC;
+	if (gameLoop)
+		gameLoop->InputProcessing(iMessage, wParam, lParam);
 
 	switch (iMessage) {
+	case WM_CREATE:
+		break;
 	case WM_PAINT:
-		hDC = BeginPaint(hWnd, &ps);
-		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	}
-	return (DefWindowProc(hWnd, iMessage, wParam, IParam));
+	return (DefWindowProc(hWnd, iMessage, wParam, lParam));
 }
