@@ -5,7 +5,8 @@ Player::Player(POINT initPosition) :
 	hWnd(nullptr),
 	hBitmap(nullptr),
 	playerPosition(initPosition),
-	playerMoveState("Idle")
+	playerMoveState("Idle"),
+	playerSpriteFrameNum(0)
 {
 }
 
@@ -52,7 +53,7 @@ void Player::Render(HWND hWnd, HDC hDC)
 
 	float radianAngle = atan2f(static_cast<float>(mousePos.y - playerPosition.y),
 							static_cast<float>(mousePos.x - playerPosition.x));
-
+	
 	XFORM xForm;
 	XFORM oldXForm;
 
@@ -62,8 +63,8 @@ void Player::Render(HWND hWnd, HDC hDC)
 
 	float centerX = static_cast<float>(scaleWidth) / 2.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
-	float newCenterX = playerPosition.x - (scaleWidth / 2.0f);
-	float newCenterY = playerPosition.y - (scaleHeight / 2.0f);
+	float newCenterX = static_cast<float>(playerPosition.x);
+	float newCenterY = static_cast<float>(playerPosition.y);
 
 	ModifyWorldTransform(hDC, NULL, MWT_IDENTITY);
 	xForm = { 1.0f, 0.0f,
@@ -111,6 +112,6 @@ void Player::InputProcessing(WPARAM wParam)
 	}
 
 	// 최종 이동 적용 (deltaTime 활용)
-	playerPosition.x += moveX * deltaTime;
-	playerPosition.y += moveY * deltaTime;
+	//playerPosition.x += moveX * deltaTime;
+	//playerPosition.y += moveY * deltaTime;
 }

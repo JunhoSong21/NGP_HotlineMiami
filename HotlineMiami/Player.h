@@ -4,11 +4,12 @@
 
 class Player {
 private:
-	HWND hWnd;
-	HBITMAP hBitmap;
+	HWND		hWnd;
+	HBITMAP		hBitmap;
 
-	POINT playerPosition;
+	POINT		playerPosition;
 	std::string playerMoveState;
+	int			playerSpriteFrameNum;
 
 public:
 	Player(POINT initPosition);
