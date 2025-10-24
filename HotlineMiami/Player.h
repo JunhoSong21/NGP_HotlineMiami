@@ -7,16 +7,26 @@ private:
 	HWND		hWnd;
 	HBITMAP		hBitmap;
 
-	POINT		playerPosition;
+	POINT		playerPos;
 	std::string playerMoveState;
 	int			playerSpriteFrameNum;
+	int			spriteOriginWidth;
+	int			spriteOriginHeight;
+	int			spriteScaleMag;
+	float		vectorX;
+	float		vectorY;
+	float		playerSpeed;
+	float		frameTimeAccumulate;
 
 public:
-	Player(POINT initPosition);
+	Player(POINT initPos);
 	~Player();
 
 	bool Init();
 	void Update(float deltaTime);
 	void Render(HWND hWnd, HDC hDC);
-	void InputProcessing(WPARAM wParam);
+	void InputProcessing(UINT Msg, WPARAM wParam);
+
+	void spriteDivideAndRotateRender(HWND hWnd, HDC hDC);
+	float CalculateAtan2MouseAtPos(HWND hWnd, POINT playerPos);
 };

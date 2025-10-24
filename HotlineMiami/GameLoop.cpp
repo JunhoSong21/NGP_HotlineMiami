@@ -4,9 +4,11 @@
 #include "Timer.h"
 #include "Player.h"
 
-GameLoop::GameLoop()
-	:	hWnd(nullptr),
-		player(nullptr)
+GameLoop::GameLoop() :
+	hWnd(nullptr),
+	timer(nullptr),
+	player(nullptr),
+	deltaTime(0.0f)
 {
 }
 
@@ -31,7 +33,6 @@ void GameLoop::Init(HWND hwnd)
 
 void GameLoop::Update()
 {
-	float deltaTime;
 	if (timer)deltaTime = timer->getDeltaTime();
 	if (player) player->Update(deltaTime);
 }
@@ -59,16 +60,30 @@ void GameLoop::Render()
 	ReleaseDC(this->hWnd, hDC);
 }
 
-void GameLoop::InputProcessing(UINT iMsg, WPARAM wParam, LPARAM lParam)
+void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (wParam) {
-	case VK_UP:
-	case VK_DOWN:
-	case VK_LEFT:
-	case VK_RIGHT:
-		player->InputProcessing(wParam);
-		break;
-	default:
-		break;
+	switch (Msg) {
+	case WM_KEYDOWN:
+		switch (wParam) {
+		case 'W':
+		case 'S':
+		case 'A':
+		case 'D':
+			player->InputProcessing(Msg, wParam);
+			break;
+		default:
+			break;
+		}
+	case WM_KEYUP:
+		switch (wParam) {
+		case 'W':
+		case 'S':
+		case 'A':
+		case 'D':
+			player->InputProcessing(Msg, wParam);
+			break;
+		default:
+			break;
+		}
 	}
 }

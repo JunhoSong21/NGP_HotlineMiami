@@ -10,6 +10,7 @@ private:
 
 	Timer* timer;
 	Player* player;
+	float deltaTime;
 	
 public:
 	GameLoop();
@@ -18,5 +19,5 @@ public:
 	void Init(HWND hwnd);
 	void Update();
 	void Render();
-	void InputProcessing(UINT iMsg, WPARAM wParam, LPARAM lParam);
+	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
 };

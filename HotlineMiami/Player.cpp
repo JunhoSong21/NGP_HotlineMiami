@@ -1,12 +1,19 @@
 #include "pch.h"
 #include "Player.h"
 
-Player::Player(POINT initPosition) :
+Player::Player(POINT initPos) :
 	hWnd(nullptr),
 	hBitmap(nullptr),
-	playerPosition(initPosition),
+	playerPos(initPos),
 	playerMoveState("Idle"),
-	playerSpriteFrameNum(0)
+	playerSpriteFrameNum(0),
+	spriteOriginWidth(32),
+	spriteOriginHeight(32),
+	spriteScaleMag(2),
+	vectorX(0.0f),
+	vectorY(0.0f),
+	playerSpeed(1.0f),
+	frameTimeAccumulate(0.0f)
 {
 }
 
@@ -24,13 +31,69 @@ bool Player::Init()
 
 void Player::Update(float deltaTime)
 {
-	
+	frameTimeAccumulate += deltaTime * 10.0f;
+	if (frameTimeAccumulate >= 1.0f) {
+		++playerSpriteFrameNum;
+		if (8 == playerSpriteFrameNum)
+			playerSpriteFrameNum = 0;
+
+		frameTimeAccumulate -= 1.0f;
+	}
+
+	playerPos.x += vectorX * deltaTime * playerSpeed;
+	playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
 void Player::Render(HWND hWnd, HDC hDC)
 {
-	int scaleWidth = 64;
-	int scaleHeight = 64;
+	spriteDivideAndRotateRender(hWnd, hDC);
+}
+
+void Player::InputProcessing(UINT Msg, WPARAM wParam)
+{
+	switch (Msg) {
+	case WM_KEYDOWN: {
+		switch (wParam) {
+		case 'W':
+			vectorY = -1.0f;
+			break;
+		case 'S':
+			vectorY = 1.0f;
+			break;
+		case 'A':
+			vectorX = -1.0f;
+			break;
+		case 'D':
+			vectorX = 1.0f;
+			break;
+		}
+		break;
+	}
+
+	case WM_KEYUP: {
+		switch (wParam) {
+		case 'W':
+			if (vectorY < 0) vectorY = 0.0f;
+			break;
+		case 'S':
+			if (vectorY > 0) vectorY = 0.0f;
+			break;
+		case 'A':
+			if (vectorX < 0) vectorX = 0.0f;
+			break;
+		case 'D':
+			if (vectorX > 0) vectorX = 0.0f;
+			break;
+		}
+		break;
+	}
+	}
+}
+
+void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
+{
+	int scaleWidth = spriteOriginWidth * spriteScaleMag;
+	int scaleHeight = spriteOriginHeight * spriteScaleMag;
 
 	HDC originDC = CreateCompatibleDC(hDC);
 	HBITMAP oldOriginBitmap = (HBITMAP)SelectObject(originDC, hBitmap);
@@ -41,19 +104,15 @@ void Player::Render(HWND hWnd, HDC hDC)
 
 	BITMAP bm;
 	GetObject(hBitmap, sizeof(BITMAP), &bm);
+	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
 	StretchBlt(scaleDC, 0, 0, scaleWidth, scaleHeight,
-		originDC, 0, 0, 32, bm.bmHeight, SRCCOPY);
+		originDC, frameNum, 0, spriteOriginWidth, spriteOriginHeight, SRCCOPY);
 
 	SelectObject(originDC, oldOriginBitmap);
 	DeleteDC(originDC);
 	//////////////////////////////////////////////////////////
-	POINT mousePos;
-	GetCursorPos(&mousePos);
-	ScreenToClient(hWnd, &mousePos);
+	float radianAngle = CalculateAtan2MouseAtPos(hWnd, playerPos);
 
-	float radianAngle = atan2f(static_cast<float>(mousePos.y - playerPosition.y),
-							static_cast<float>(mousePos.x - playerPosition.x));
-	
 	XFORM xForm;
 	XFORM oldXForm;
 
@@ -63,8 +122,8 @@ void Player::Render(HWND hWnd, HDC hDC)
 
 	float centerX = static_cast<float>(scaleWidth) / 2.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
-	float newCenterX = static_cast<float>(playerPosition.x);
-	float newCenterY = static_cast<float>(playerPosition.y);
+	float newCenterX = static_cast<float>(playerPos.x);
+	float newCenterY = static_cast<float>(playerPos.y);
 
 	ModifyWorldTransform(hDC, NULL, MWT_IDENTITY);
 	xForm = { 1.0f, 0.0f,
@@ -76,7 +135,7 @@ void Player::Render(HWND hWnd, HDC hDC)
 			-sinf(radianAngle), cosf(radianAngle),
 			0.0f, 0.0f };
 	ModifyWorldTransform(hDC, &xForm, MWT_LEFTMULTIPLY);
-	
+
 	xForm = { 1.0f, 0.0f,
 			0.0f, 1.0f,
 			-centerX, -centerY };
@@ -93,25 +152,14 @@ void Player::Render(HWND hWnd, HDC hDC)
 	DeleteDC(scaleDC);
 }
 
-void Player::InputProcessing(WPARAM wParam)
+float Player::CalculateAtan2MouseAtPos(HWND hWnd, POINT playerPos)
 {
-	float moveX = 0.0f;
-	float moveY = 0.0f;
+	POINT mousePos;
+	GetCursorPos(&mousePos);
+	ScreenToClient(hWnd, &mousePos);
 
-	// 각 키 상태 확인 및 이동 벡터 업데이트
-	if (GetAsyncKeyState(VK_UP) & 0x8000) moveY -= 1.0f;
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000) moveY += 1.0f;
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000) moveX -= 1.0f;
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000) moveX += 1.0f;
+	float radianAngle = atan2f(static_cast<float>(mousePos.y - playerPos.y),
+								static_cast<float>(mousePos.x - playerPos.x));
 
-	// 대각선 이동 시 속도 정규화 (선택사항)
-	if (moveX != 0.0f && moveY != 0.0f) {
-		float length = sqrt(moveX * moveX + moveY * moveY);
-		moveX /= length;
-		moveY /= length;
-	}
-
-	// 최종 이동 적용 (deltaTime 활용)
-	//playerPosition.x += moveX * deltaTime;
-	//playerPosition.y += moveY * deltaTime;
+	return radianAngle;
 }
