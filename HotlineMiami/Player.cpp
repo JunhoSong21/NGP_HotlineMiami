@@ -23,7 +23,7 @@ Player::~Player()
 
 bool Player::Init()
 {
-	hBitmap = (HBITMAP)LoadImageW(NULL, L"Jacket.bmp",
+	hBitmap = (HBITMAP)LoadImageW(NULL, L"Resource\\Sprite\\Jacket.bmp",
 		IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
 	return true;
@@ -49,45 +49,15 @@ void Player::Render(HWND hWnd, HDC hDC)
 	spriteDivideAndRotateRender(hWnd, hDC);
 }
 
-void Player::InputProcessing(UINT Msg, WPARAM wParam)
+void Player::InputProcessing()
 {
-	switch (Msg) {
-	case WM_KEYDOWN: {
-		switch (wParam) {
-		case 'W':
-			vectorY = -1.0f;
-			break;
-		case 'S':
-			vectorY = 1.0f;
-			break;
-		case 'A':
-			vectorX = -1.0f;
-			break;
-		case 'D':
-			vectorX = 1.0f;
-			break;
-		}
-		break;
-	}
+	vectorX = 0.0f;
+	vectorY = 0.0f;
 
-	case WM_KEYUP: {
-		switch (wParam) {
-		case 'W':
-			if (vectorY < 0) vectorY = 0.0f;
-			break;
-		case 'S':
-			if (vectorY > 0) vectorY = 0.0f;
-			break;
-		case 'A':
-			if (vectorX < 0) vectorX = 0.0f;
-			break;
-		case 'D':
-			if (vectorX > 0) vectorX = 0.0f;
-			break;
-		}
-		break;
-	}
-	}
+	if (GetAsyncKeyState('W') & 0x8000) vectorY -= 1.0f;
+	if (GetAsyncKeyState('S') & 0x8000) vectorY += 1.0f;
+	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
+	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
 }
 
 void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
@@ -146,7 +116,7 @@ void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 
 	SetWorldTransform(hDC, &oldXForm);
 	SetGraphicsMode(hDC, oldGraphicMode);
-
+	
 	SelectObject(scaleDC, oldScaleBitmap);
 	DeleteObject(scaleBitmap);
 	DeleteDC(scaleDC);

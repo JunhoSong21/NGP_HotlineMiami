@@ -25,7 +25,7 @@ public:
 	bool Init();
 	void Update(float deltaTime);
 	void Render(HWND hWnd, HDC hDC);
-	void InputProcessing(UINT Msg, WPARAM wParam);
+	void InputProcessing();
 
 	void spriteDivideAndRotateRender(HWND hWnd, HDC hDC);
 	float CalculateAtan2MouseAtPos(HWND hWnd, POINT playerPos);

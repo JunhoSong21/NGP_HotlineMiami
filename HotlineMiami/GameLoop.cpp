@@ -62,28 +62,5 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (Msg) {
-	case WM_KEYDOWN:
-		switch (wParam) {
-		case 'W':
-		case 'S':
-		case 'A':
-		case 'D':
-			player->InputProcessing(Msg, wParam);
-			break;
-		default:
-			break;
-		}
-	case WM_KEYUP:
-		switch (wParam) {
-		case 'W':
-		case 'S':
-		case 'A':
-		case 'D':
-			player->InputProcessing(Msg, wParam);
-			break;
-		default:
-			break;
-		}
-	}
+	if (player) player->InputProcessing();
 }
