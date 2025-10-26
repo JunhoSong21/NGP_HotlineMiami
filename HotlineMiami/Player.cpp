@@ -40,8 +40,8 @@ void Player::Update(float deltaTime)
 		frameTimeAccumulate -= 1.0f;
 	}
 
-	playerPos.x += vectorX * deltaTime * playerSpeed;
-	playerPos.y += vectorY * deltaTime * playerSpeed;
+	//playerPos.x += vectorX * deltaTime * playerSpeed;
+	//playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
 void Player::Render(HWND hWnd, HDC hDC)
@@ -49,15 +49,17 @@ void Player::Render(HWND hWnd, HDC hDC)
 	spriteDivideAndRotateRender(hWnd, hDC);
 }
 
-void Player::InputProcessing()
+void Player::InputProcessing(float deltaTime)
 {
-	vectorX = 0.0f;
-	vectorY = 0.0f;
 
-	if (GetAsyncKeyState('W') & 0x8000) vectorY -= 1.0f;
-	if (GetAsyncKeyState('S') & 0x8000) vectorY += 1.0f;
-	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
-	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
+	if (GetAsyncKeyState('W') & 0x8000)
+		playerPos.x += vectorX * deltaTime * playerSpeed;
+	if (GetAsyncKeyState('S') & 0x8000)
+		playerPos.x += vectorX * deltaTime * playerSpeed;
+	if (GetAsyncKeyState('A') & 0x8000)
+		playerPos.y += vectorY * deltaTime * playerSpeed;
+	if (GetAsyncKeyState('D') & 0x8000)
+		playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
 void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)

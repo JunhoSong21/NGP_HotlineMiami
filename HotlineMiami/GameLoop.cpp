@@ -33,8 +33,9 @@ void GameLoop::Init(HWND hwnd)
 
 void GameLoop::Update()
 {
-	if (timer)deltaTime = timer->getDeltaTime();
+	if (timer) deltaTime = timer->getDeltaTime();
 	if (player) player->Update(deltaTime);
+	if (player) player->InputProcessing(deltaTime);
 }
 
 void GameLoop::Render()
@@ -62,5 +63,5 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	if (player) player->InputProcessing();
+	//if (player) player->InputProcessing();
 }
