@@ -66,8 +66,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
-	/*if (gameLoop)
-		gameLoop->InputProcessing(iMessage, wParam, lParam);*/
+	if (gameLoop)
+		gameLoop->InputProcessing(iMessage, wParam, lParam);
 
 	switch (iMessage) {
 	case WM_CREATE:

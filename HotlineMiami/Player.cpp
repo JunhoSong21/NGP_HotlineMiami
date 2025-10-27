@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "Player.h"
 
-Player::Player(POINT initPos) :
+Player::Player() :
 	hWnd(nullptr),
 	hBitmap(nullptr),
-	playerPos(initPos),
+	playerPos{0.0f, 0.0f},
 	playerMoveState("Idle"),
 	playerSpriteFrameNum(0),
 	spriteOriginWidth(32),
@@ -12,7 +12,7 @@ Player::Player(POINT initPos) :
 	spriteScaleMag(2),
 	vectorX(0.0f),
 	vectorY(0.0f),
-	playerSpeed(1.0f),
+	playerSpeed(10.0f),
 	frameTimeAccumulate(0.0f)
 {
 }
@@ -40,8 +40,7 @@ void Player::Update(float deltaTime)
 		frameTimeAccumulate -= 1.0f;
 	}
 
-	//playerPos.x += vectorX * deltaTime * playerSpeed;
-	//playerPos.y += vectorY * deltaTime * playerSpeed;
+	InputProcessing(deltaTime);
 }
 
 void Player::Render(HWND hWnd, HDC hDC)
@@ -51,15 +50,16 @@ void Player::Render(HWND hWnd, HDC hDC)
 
 void Player::InputProcessing(float deltaTime)
 {
+	vectorX = 0.0f;
+	vectorY = 0.0f;
 
-	if (GetAsyncKeyState('W') & 0x8000)
-		playerPos.x += vectorX * deltaTime * playerSpeed;
-	if (GetAsyncKeyState('S') & 0x8000)
-		playerPos.x += vectorX * deltaTime * playerSpeed;
-	if (GetAsyncKeyState('A') & 0x8000)
-		playerPos.y += vectorY * deltaTime * playerSpeed;
-	if (GetAsyncKeyState('D') & 0x8000)
-		playerPos.y += vectorY * deltaTime * playerSpeed;
+	if (GetAsyncKeyState('W') & 0x8000) vectorY -= 1.0f;
+	if (GetAsyncKeyState('S') & 0x8000) vectorY += 1.0f;
+	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
+	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
+
+	playerPos.x += vectorX * deltaTime * playerSpeed;
+	playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
 void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
@@ -94,13 +94,11 @@ void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 
 	float centerX = static_cast<float>(scaleWidth) / 2.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
-	float newCenterX = static_cast<float>(playerPos.x);
-	float newCenterY = static_cast<float>(playerPos.y);
 
 	ModifyWorldTransform(hDC, NULL, MWT_IDENTITY);
 	xForm = { 1.0f, 0.0f,
 			0.0f, 1.0f,
-			newCenterX, newCenterY };
+			playerPos.x, playerPos.y };
 	ModifyWorldTransform(hDC, &xForm, MWT_LEFTMULTIPLY);
 
 	xForm = { cosf(radianAngle), sinf(radianAngle),
@@ -124,14 +122,14 @@ void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 	DeleteDC(scaleDC);
 }
 
-float Player::CalculateAtan2MouseAtPos(HWND hWnd, POINT playerPos)
+float Player::CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos)
 {
 	POINT mousePos;
 	GetCursorPos(&mousePos);
 	ScreenToClient(hWnd, &mousePos);
 
-	float radianAngle = atan2f(static_cast<float>(mousePos.y - playerPos.y),
-								static_cast<float>(mousePos.x - playerPos.x));
+	float radianAngle = atan2f(static_cast<float>(mousePos.y) - playerPos.y,
+								static_cast<float>(mousePos.x) - playerPos.x);
 
 	return radianAngle;
 }

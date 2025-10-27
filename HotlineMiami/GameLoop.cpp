@@ -26,8 +26,7 @@ void GameLoop::Init(HWND hwnd)
 
 	timer = new Timer();
 
-	POINT playerPosition{ 500, 500 };
-	player = new Player(playerPosition);
+	player = new Player();
 	player->Init();
 }
 
@@ -35,7 +34,6 @@ void GameLoop::Update()
 {
 	if (timer) deltaTime = timer->getDeltaTime();
 	if (player) player->Update(deltaTime);
-	if (player) player->InputProcessing(deltaTime);
 }
 
 void GameLoop::Render()
@@ -63,5 +61,4 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	//if (player) player->InputProcessing();
 }
