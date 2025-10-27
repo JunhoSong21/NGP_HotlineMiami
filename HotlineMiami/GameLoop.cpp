@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "GameLoop.h"
 
+#include "BackGround.h"
 #include "Timer.h"
 #include "Player.h"
 
 GameLoop::GameLoop() :
 	hWnd(nullptr),
+	backGround(nullptr),
 	timer(nullptr),
 	player(nullptr),
 	deltaTime(0.0f)
@@ -24,6 +26,8 @@ void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
 
+	backGround = new BackGround();
+
 	timer = new Timer();
 
 	player = new Player();
@@ -32,6 +36,7 @@ void GameLoop::Init(HWND hwnd)
 
 void GameLoop::Update()
 {
+	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
 	if (player) player->Update(deltaTime);
 }
@@ -49,6 +54,7 @@ void GameLoop::Render()
 	HBITMAP hBitmap = CreateCompatibleBitmap(hDC, width, height);
 	HBITMAP oldBitmap = (HBITMAP)SelectObject(memoryDC, hBitmap);
 
+	if (backGround) backGround->Render(hWnd, memoryDC);
 	if (player) player->Render(hWnd, memoryDC);
 
 	BitBlt(hDC, 0, 0, width, height, memoryDC, 0, 0, SRCCOPY);

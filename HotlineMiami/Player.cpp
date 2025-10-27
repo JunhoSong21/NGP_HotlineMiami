@@ -12,7 +12,7 @@ Player::Player() :
 	spriteScaleMag(2),
 	vectorX(0.0f),
 	vectorY(0.0f),
-	playerSpeed(10.0f),
+	playerSpeed(100.0f),
 	frameTimeAccumulate(0.0f)
 {
 }

@@ -17,6 +17,9 @@
     <Filter Include="소스 파일\Timer">
       <UniqueIdentifier>{fed36486-5e27-4561-ad66-d3f52b7cc4c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\BackGround">
+      <UniqueIdentifier>{a60d7013-a1f5-45be-b3af-d0a47ca193cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -34,6 +37,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일\Timer</Filter>
     </ClCompile>
+    <ClCompile Include="BackGround.cpp">
+      <Filter>소스 파일\BackGround</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLoop.h">
@@ -47,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>소스 파일\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="BackGround.h">
+      <Filter>소스 파일\BackGround</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
