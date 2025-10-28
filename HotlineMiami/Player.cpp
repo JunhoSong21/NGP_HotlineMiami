@@ -75,21 +75,22 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 	int scaleWidth = spriteOriginWidth * spriteScaleMag;
 	int scaleHeight = spriteOriginHeight * spriteScaleMag;
 
-	HDC originDC = CreateCompatibleDC(hDC);
-	HBITMAP oldOriginBitmap = (HBITMAP)SelectObject(originDC, hBitmap);
+	//HDC originDC = CreateCompatibleDC(hDC);
+	//HBITMAP oldOriginBitmap = (HBITMAP)SelectObject(originDC, hBitmap);
 
 	HDC scaleDC = CreateCompatibleDC(hDC);
-	HBITMAP scaleBitmap = CreateCompatibleBitmap(hDC, scaleWidth, scaleHeight);
-	HBITMAP oldScaleBitmap = (HBITMAP)SelectObject(scaleDC, scaleBitmap);
+	//HBITMAP scaleBitmap = CreateCompatibleBitmap(hDC, scaleWidth, scaleHeight);
+	//HBITMAP oldScaleBitmap = (HBITMAP)SelectObject(scaleDC, scaleBitmap);
 
-	BITMAP bm;
-	GetObject(hBitmap, sizeof(BITMAP), &bm);
+	//BITMAP bm;
+	//GetObject(hBitmap, sizeof(BITMAP), &bm);
 	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
-	StretchBlt(scaleDC, 0, 0, scaleWidth, scaleHeight,
-		originDC, frameNum, 0, spriteOriginWidth, spriteOriginHeight, SRCCOPY);
-
-	SelectObject(originDC, oldOriginBitmap);
-	DeleteDC(originDC);
+	//StretchBlt(scaleDC, 0, 0, scaleWidth, scaleHeight,
+	//	originDC, frameNum, 0, spriteOriginWidth, spriteOriginHeight, SRCCOPY);
+	currentImage->AlphaBlend(scaleDC, 0, 0, scaleWidth, scaleHeight,
+							frameNum, 0, spriteOriginWidth, spriteOriginHeight);
+	//SelectObject(originDC, oldOriginBitmap);
+	//DeleteDC(originDC);
 	//////////////////////////////////////////////////////////
 	float radianAngle = CalculateAtan2MouseAtPos(hWnd, playerPos);
 
@@ -124,9 +125,9 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 
 	SetWorldTransform(hDC, &oldXForm);
 	SetGraphicsMode(hDC, oldGraphicMode);
-	
-	SelectObject(scaleDC, oldScaleBitmap);
-	DeleteObject(scaleBitmap);
+
+	//SelectObject(scaleDC, oldScaleBitmap);
+	//DeleteObject(scaleBitmap);
 	DeleteDC(scaleDC);
 }
 
