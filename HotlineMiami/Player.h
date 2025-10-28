@@ -1,6 +1,8 @@
 #pragma once
 #include <math.h>
 #include <string>
+#include <atlimage.h>
+#include <map>
 
 class Player {
 private:
@@ -12,7 +14,11 @@ private:
 		float	y;
 	};
 	Position playerPos;
-	std::string playerMoveState;
+
+	std::string playerState;
+	std::map<std::string, CImage> playerImages;
+	CImage* currentImage;
+	
 	int			playerSpriteFrameNum;
 	int			spriteOriginWidth;
 	int			spriteOriginHeight;
@@ -31,6 +37,7 @@ public:
 	void Render(HWND hWnd, HDC hDC);
 	void InputProcessing(float deltaTime);
 
-	void spriteDivideAndRotateRender(HWND hWnd, HDC hDC);
+	void LoadPlayerImages();
+	void SpriteDivideAndRotateRender(HWND hWnd, HDC hDC);
 	float CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos);
 };

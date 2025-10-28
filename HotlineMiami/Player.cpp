@@ -5,7 +5,8 @@ Player::Player() :
 	hWnd(nullptr),
 	hBitmap(nullptr),
 	playerPos{0.0f, 0.0f},
-	playerMoveState("Idle"),
+	playerState("Idle"),
+	currentImage(nullptr),
 	playerSpriteFrameNum(0),
 	spriteOriginWidth(32),
 	spriteOriginHeight(32),
@@ -45,7 +46,7 @@ void Player::Update(float deltaTime)
 
 void Player::Render(HWND hWnd, HDC hDC)
 {
-	spriteDivideAndRotateRender(hWnd, hDC);
+	SpriteDivideAndRotateRender(hWnd, hDC);
 }
 
 void Player::InputProcessing(float deltaTime)
@@ -62,7 +63,14 @@ void Player::InputProcessing(float deltaTime)
 	playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
-void Player::spriteDivideAndRotateRender(HWND hWnd, HDC hDC)
+void Player::LoadPlayerImages()
+{
+	playerImages["Idle"].Load(L"Resource\\Sprite\\Jacket.bmp");
+
+	currentImage = &playerImages.find("Idle")->second;
+}
+
+void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 {
 	int scaleWidth = spriteOriginWidth * spriteScaleMag;
 	int scaleHeight = spriteOriginHeight * spriteScaleMag;
