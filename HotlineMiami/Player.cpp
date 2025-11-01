@@ -26,6 +26,7 @@ bool Player::Init()
 {
 	hBitmap = (HBITMAP)LoadImageW(NULL, L"Resource\\Sprite\\Jacket.bmp",
 		IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	LoadPlayerImages();
 
 	return true;
 }
@@ -65,7 +66,7 @@ void Player::InputProcessing(float deltaTime)
 
 void Player::LoadPlayerImages()
 {
-	playerImages["Idle"].Load(L"Resource\\Sprite\\Jacket.bmp");
+	playerImages["Idle"].Load(L"Resource\\Sprite\\JacketWalk.png");
 
 	currentImage = &playerImages.find("Idle")->second;
 }
@@ -79,14 +80,15 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 	//HBITMAP oldOriginBitmap = (HBITMAP)SelectObject(originDC, hBitmap);
 
 	HDC scaleDC = CreateCompatibleDC(hDC);
-	//HBITMAP scaleBitmap = CreateCompatibleBitmap(hDC, scaleWidth, scaleHeight);
-	//HBITMAP oldScaleBitmap = (HBITMAP)SelectObject(scaleDC, scaleBitmap);
+	HBITMAP scaleBitmap = CreateCompatibleBitmap(hDC, scaleWidth, scaleHeight);
+	HBITMAP oldScaleBitmap = (HBITMAP)SelectObject(scaleDC, scaleBitmap);
 
 	//BITMAP bm;
 	//GetObject(hBitmap, sizeof(BITMAP), &bm);
 	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
 	//StretchBlt(scaleDC, 0, 0, scaleWidth, scaleHeight,
 	//	originDC, frameNum, 0, spriteOriginWidth, spriteOriginHeight, SRCCOPY);
+	BitBlt(scaleDC, 0, 0, scaleWidth, scaleHeight, NULL, 0, 0, BLACKNESS);
 	currentImage->AlphaBlend(scaleDC, 0, 0, scaleWidth, scaleHeight,
 							frameNum, 0, spriteOriginWidth, spriteOriginHeight);
 	//SelectObject(originDC, oldOriginBitmap);
@@ -126,8 +128,8 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 	SetWorldTransform(hDC, &oldXForm);
 	SetGraphicsMode(hDC, oldGraphicMode);
 
-	//SelectObject(scaleDC, oldScaleBitmap);
-	//DeleteObject(scaleBitmap);
+	SelectObject(scaleDC, oldScaleBitmap);
+	DeleteObject(scaleBitmap);
 	DeleteDC(scaleDC);
 }
 
