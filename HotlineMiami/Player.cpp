@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Player.h"
 
+#include <atlimage.h>
+
 Player::Player() :
 	hWnd(nullptr),
 	hBitmap(nullptr),
@@ -73,27 +75,18 @@ void Player::LoadPlayerImages()
 
 void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 {
-	int scaleWidth = spriteOriginWidth * spriteScaleMag;
+	/*int scaleWidth = spriteOriginWidth * spriteScaleMag;
 	int scaleHeight = spriteOriginHeight * spriteScaleMag;
-
-	//HDC originDC = CreateCompatibleDC(hDC);
-	//HBITMAP oldOriginBitmap = (HBITMAP)SelectObject(originDC, hBitmap);
 
 	HDC scaleDC = CreateCompatibleDC(hDC);
 	HBITMAP scaleBitmap = CreateCompatibleBitmap(hDC, scaleWidth, scaleHeight);
 	HBITMAP oldScaleBitmap = (HBITMAP)SelectObject(scaleDC, scaleBitmap);
 
-	//BITMAP bm;
-	//GetObject(hBitmap, sizeof(BITMAP), &bm);
-	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
-	//StretchBlt(scaleDC, 0, 0, scaleWidth, scaleHeight,
-	//	originDC, frameNum, 0, spriteOriginWidth, spriteOriginHeight, SRCCOPY);
+	
 	BitBlt(scaleDC, 0, 0, scaleWidth, scaleHeight, NULL, 0, 0, BLACKNESS);
 	currentImage->AlphaBlend(scaleDC, 0, 0, scaleWidth, scaleHeight,
 							frameNum, 0, spriteOriginWidth, spriteOriginHeight);
-	//SelectObject(originDC, oldOriginBitmap);
-	//DeleteDC(originDC);
-	//////////////////////////////////////////////////////////
+	
 	float radianAngle = CalculateAtan2MouseAtPos(hWnd, playerPos);
 
 	XFORM xForm;
@@ -130,7 +123,20 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
 
 	SelectObject(scaleDC, oldScaleBitmap);
 	DeleteObject(scaleBitmap);
-	DeleteDC(scaleDC);
+	DeleteDC(scaleDC);*/
+
+	HBITMAP hBitmapFromCImage = (HBITMAP)currentImage;
+	Gdiplus::Bitmap* GdiplusBitmapPtr = Gdiplus::Bitmap::FromHBITMAP(hBitmapFromCImage, NULL);
+
+	Gdiplus::Graphics graphics(hDC);
+	graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+	graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+
+	Gdiplus::Matrix originMatrix;
+	graphics.GetTransform(&originMatrix);
+
+	float radianAngle = CalculateAtan2MouseAtPos(hWnd, playerPos);
+	float degreeAngle = radianAngle * 180.0f / 3.14;
 }
 
 float Player::CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos)
