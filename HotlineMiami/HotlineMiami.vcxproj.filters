@@ -20,6 +20,9 @@
     <Filter Include="소스 파일\BackGround">
       <UniqueIdentifier>{a60d7013-a1f5-45be-b3af-d0a47ca193cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ImageManager">
+      <UniqueIdentifier>{60e1bec9-1f85-4a41-b1ac-1e48be929353}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -40,6 +43,9 @@
     <ClCompile Include="BackGround.cpp">
       <Filter>소스 파일\BackGround</Filter>
     </ClCompile>
+    <ClCompile Include="ImageManager.cpp">
+      <Filter>소스 파일\ImageManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLoop.h">
@@ -56,6 +62,9 @@
     </ClInclude>
     <ClInclude Include="BackGround.h">
       <Filter>소스 파일\BackGround</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageManager.h">
+      <Filter>소스 파일\ImageManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

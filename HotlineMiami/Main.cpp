@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "GameLoop.h"
-#include <gdiplus.h>
 
-ULONG_PTR gdiplusToken;
+ULONG_PTR gdiplusToken = 0;
 
 HINSTANCE hInst;
 LPCTSTR IpszClass = L"Hotline Miami";
@@ -14,6 +13,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdParam, int nCmdShow)
 {
+	Gdiplus::GdiplusStartupInput gdiplusStartUpInput;
+	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartUpInput, NULL);
+
 	HWND hWnd;
 	MSG msg;
 	WNDCLASSEX WndClass;
@@ -40,9 +42,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	if (!hWnd)
 		return false;
 
-	Gdiplus::GdiplusStartupInput gdiplusStartUpInput;
-	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartUpInput, NULL);
-
 	gameLoop = new GameLoop();
 	gameLoop->Init(hWnd);
 
@@ -63,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 				gameLoop->Render();
 			}
 
-			Sleep(1);
+			Sleep(16); // 60 FPS
 		}
 	}
 

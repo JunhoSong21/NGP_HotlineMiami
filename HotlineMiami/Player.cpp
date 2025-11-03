@@ -62,7 +62,7 @@ void Player::InputProcessing(float deltaTime)
 	playerPos.y += vectorY * deltaTime * playerSpeed;
 }
 
-void Player::LoadPlayerImages()
+void Player::LoadPlayerImages(ImageManager& imgManager)
 {
 	HRESULT result;
 	result = playerImages["Idle"].Load(L"Resource\\Sprite\\JacketWalk.png");
@@ -71,7 +71,7 @@ void Player::LoadPlayerImages()
 	currentImage = &playerImages.find("Idle")->second;
 }
 
-void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC)
+void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgManager)
 {
 	if(!currentImage || currentImage->IsNull())
 		DEBUG_MSG(L"currentImage nullptr")

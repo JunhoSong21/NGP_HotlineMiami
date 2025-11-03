@@ -1,13 +1,15 @@
 #pragma once
 #include <math.h>
 #include <string>
-#include <atlimage.h>
 #include <map>
+
+#include "ImageManager.h"
 
 class Player {
 private:
-	HWND		hWnd;
-	HBITMAP		hBitmap;
+	std::wstring playerState;
+	std::map<std::string, CImage> playerImages;
+	CImage* currentImage;
 
 	struct Position {
 		float	x;
@@ -15,10 +17,6 @@ private:
 	};
 	Position playerPos;
 
-	std::string playerState;
-	std::map<std::string, CImage> playerImages;
-	CImage* currentImage;
-	
 	int			playerSpriteFrameNum;
 	int			spriteOriginWidth;
 	int			spriteOriginHeight;
@@ -27,6 +25,9 @@ private:
 	float		vectorY;
 	float		playerSpeed;
 	float		frameTimeAccumulate;
+
+	HWND		hWnd;
+	HBITMAP		hBitmap;
 
 public:
 	Player();
@@ -37,7 +38,9 @@ public:
 	void Render(HWND hWnd, HDC hDC);
 	void InputProcessing(float deltaTime);
 
-	void LoadPlayerImages();
-	void SpriteDivideAndRotateRender(HWND hWnd, HDC hDC);
+	void LoadPlayerImages(ImageManager& imgManager);
+	void SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgManager);
 	float CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos);
+
+	Gdiplus::PointF GetPlayerPos();
 };
