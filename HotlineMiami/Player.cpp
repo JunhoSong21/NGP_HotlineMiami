@@ -2,9 +2,9 @@
 #include "Player.h"
 
 Player::Player() :
+	playerState(L"IDLE"),
+	currentImageKey{},
 	playerPos{0.0f, 0.0f},
-	playerState("Idle"),
-	currentImage(nullptr),
 	playerSpriteFrameNum(0),
 	spriteOriginWidth(50),
 	spriteOriginHeight(32),
@@ -24,7 +24,7 @@ Player::~Player()
 
 bool Player::Init()
 {
-	LoadPlayerImages();
+	LoadPlayerImages(imgManager);
 
 	return true;
 }
@@ -64,11 +64,7 @@ void Player::InputProcessing(float deltaTime)
 
 void Player::LoadPlayerImages(ImageManager& imgManager)
 {
-	HRESULT result;
-	result = playerImages["Idle"].Load(L"Resource\\Sprite\\JacketWalk.png");
-	if (FAILED(result))
-		DEBUG_MSG(L"JacketWalk.png 파일 로드 실패");
-	currentImage = &playerImages.find("Idle")->second;
+	imgManager.LoadImageW(L"Resource/Sprite/JacketWalk.png", L"PLAYER_IDLE");
 }
 
 void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgManager)
