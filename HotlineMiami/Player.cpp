@@ -2,8 +2,6 @@
 #include "Player.h"
 
 Player::Player() :
-	hWnd(nullptr),
-	hBitmap(nullptr),
 	playerPos{0.0f, 0.0f},
 	playerState("Idle"),
 	currentImage(nullptr),
@@ -14,7 +12,9 @@ Player::Player() :
 	vectorX(0.0f),
 	vectorY(0.0f),
 	playerSpeed(100.0f),
-	frameTimeAccumulate(0.0f)
+	frameTimeAccumulate(0.0f),
+	hWnd(nullptr),
+	hBitmap(nullptr)
 {
 }
 

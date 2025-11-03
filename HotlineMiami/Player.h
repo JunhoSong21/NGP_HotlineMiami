@@ -8,8 +8,7 @@
 class Player {
 private:
 	std::wstring playerState;
-	std::map<std::string, CImage> playerImages;
-	CImage* currentImage;
+	//std::map<std::string, CImage> playerImages;
 
 	struct Position {
 		float	x;
