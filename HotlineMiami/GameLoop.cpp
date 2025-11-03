@@ -25,7 +25,7 @@ GameLoop::~GameLoop()
 void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
-
+	// 객체 클래스 Init, 이미지 불러오기
 	backGround = new BackGround();
 
 	timer = new Timer();
@@ -68,6 +68,7 @@ void GameLoop::Render()
 		memoryGraphics.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 		memoryGraphics.Clear(Gdiplus::Color(0, 0, 0, 0));
 
+		// 각 객체 Render할 공간
 		if (backGround) backGround->Render(hWnd, memoryGraphics);
 		if (player) player->Render(hWnd, memoryGraphics, imgManager);
 	}

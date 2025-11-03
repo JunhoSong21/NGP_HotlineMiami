@@ -61,6 +61,8 @@ void Player::InputProcessing(float deltaTime)
 
 void Player::LoadPlayerImages(ImageManager& imgManager)
 {
+	// Player의 스프라이트 이미지 불러오는 함수
+	// 2번째 인자로 key값을 넣어 해당 key와 playerState가 같으면 해당 스프라이트 사용
 	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"PLAYER_IDLE");
 }
 
