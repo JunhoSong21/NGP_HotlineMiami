@@ -2,8 +2,7 @@
 #include "Player.h"
 
 Player::Player() :
-	playerState(L"IDLE"),
-	currentImageKey{},
+	playerState(L"PLAYER_IDLE"),
 	playerPos{0.0f, 0.0f},
 	playerSpriteFrameNum(0),
 	spriteOriginWidth(50),
@@ -24,8 +23,6 @@ Player::~Player()
 
 bool Player::Init()
 {
-	LoadPlayerImages(imgManager);
-
 	return true;
 }
 
@@ -43,9 +40,9 @@ void Player::Update(float deltaTime)
 	InputProcessing(deltaTime);
 }
 
-void Player::Render(HWND hWnd, HDC hDC)
+void Player::Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
-	SpriteDivideAndRotateRender(hWnd, hDC);
+	SpriteDivideAndRotateRender(hWnd, graphics, imgManager);
 }
 
 void Player::InputProcessing(float deltaTime)
@@ -58,32 +55,24 @@ void Player::InputProcessing(float deltaTime)
 	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
 	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
 
-	playerPos.x += vectorX * deltaTime * playerSpeed;
-	playerPos.y += vectorY * deltaTime * playerSpeed;
+	playerPos.X += vectorX * deltaTime * playerSpeed;
+	playerPos.Y += vectorY * deltaTime * playerSpeed;
 }
 
 void Player::LoadPlayerImages(ImageManager& imgManager)
 {
-	imgManager.LoadImageW(L"Resource/Sprite/JacketWalk.png", L"PLAYER_IDLE");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"PLAYER_IDLE");
 }
 
-void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgManager)
+void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
-	if(!currentImage || currentImage->IsNull())
-		DEBUG_MSG(L"currentImage nullptr")
-
-	HBITMAP hBitmapFromCImage = (HBITMAP)*currentImage;
-	Gdiplus::Bitmap* gdiplusBitmapPtr = Gdiplus::Bitmap::FromHBITMAP(hBitmapFromCImage, NULL);
-
-	Gdiplus::Graphics graphics(hDC);
-	graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-	graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+	Gdiplus::Bitmap* currentBitmap = imgManager.GetImage(playerState);
 
 	Gdiplus::Matrix originMatrix;
 	graphics.GetTransform(&originMatrix);
 
-	float radianAngle = CalculateAtan2MouseAtPos(hWnd, playerPos);
-	float degreeAngle = radianAngle * 180.0f / 3.1415;
+	float radianAngle = CalculateAtan2MouseAtPos(hWnd);
+	float degreeAngle = radianAngle * 180.0f / PI;
 
 	int scaleWidth = spriteOriginWidth * spriteScaleMag;
 	int scaleHeight = spriteOriginHeight * spriteScaleMag;
@@ -91,29 +80,28 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgMa
 	float centerX = static_cast<float>(scaleWidth) / 2.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
 
-	graphics.TranslateTransform(playerPos.x, playerPos.y);
+	graphics.TranslateTransform(playerPos.X, playerPos.Y);
 	graphics.RotateTransform(degreeAngle);
 	graphics.TranslateTransform(-centerX, -centerY);
 
 	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
 
-	graphics.DrawImage(gdiplusBitmapPtr, 
+	graphics.DrawImage(currentBitmap, 
 		Gdiplus::RectF(0, 0, scaleWidth, scaleHeight),
 		frameNum, 0, spriteOriginWidth, spriteOriginHeight,
 		Gdiplus::UnitPixel);
 
 	graphics.SetTransform(&originMatrix);
-	delete gdiplusBitmapPtr;
 }
 
-float Player::CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos)
+float Player::CalculateAtan2MouseAtPos(HWND hWnd)
 {
 	POINT mousePos;
 	GetCursorPos(&mousePos);
 	ScreenToClient(hWnd, &mousePos);
 
-	float radianAngle = atan2f(static_cast<float>(mousePos.y) - playerPos.y,
-								static_cast<float>(mousePos.x) - playerPos.x);
+	float radianAngle = atan2f(static_cast<float>(mousePos.y) - playerPos.Y,
+								static_cast<float>(mousePos.x) - playerPos.X);
 
 	return radianAngle;
 }

@@ -24,7 +24,7 @@ public:
 	~BackGround();
 
 	void Update();
-	void Render(HWND hWnd, HDC hDC);
+	void Render(HWND hWnd, Gdiplus::Graphics& memoryGraphics);
 	COLORREF HSVtoRGB();
 	float GetCurrentHue();
 };

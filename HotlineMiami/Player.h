@@ -1,5 +1,6 @@
 #pragma once
-#include <math.h>
+#include <cmath>
+#include <numbers>
 #include <string>
 #include <map>
 
@@ -8,13 +9,7 @@
 class Player {
 private:
 	std::wstring playerState;
-	std::wstring currentImageKey;
-
-	struct Position {
-		float	x;
-		float	y;
-	};
-	Position playerPos;
+	Gdiplus::PointF playerPos;
 
 	int			playerSpriteFrameNum;
 	int			spriteOriginWidth;
@@ -34,12 +29,10 @@ public:
 
 	bool Init();
 	void Update(float deltaTime);
-	void Render(HWND hWnd, HDC hDC);
+	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
 	void InputProcessing(float deltaTime);
 
 	void LoadPlayerImages(ImageManager& imgManager);
-	void SpriteDivideAndRotateRender(HWND hWnd, HDC hDC, ImageManager& imgManager);
-	float CalculateAtan2MouseAtPos(HWND hWnd, Position playerPos);
-
-	Gdiplus::PointF GetPlayerPos();
+	void SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
+	float CalculateAtan2MouseAtPos(HWND hWnd);
 };

@@ -17,17 +17,13 @@ void BackGround::Update()
 	HSV.H = GetCurrentHue();
 }
 
-void BackGround::Render(HWND hWnd, HDC hDC)
+void BackGround::Render(HWND hWnd, Gdiplus::Graphics& memoryGraphics)
 {
-	RECT rect;
-	GetClientRect(hWnd, &rect);
-
 	COLORREF color = HSVtoRGB();
-	HBRUSH brush = CreateSolidBrush(color);
+	Gdiplus::Color backGroundColor(255,
+		GetRValue(color), GetGValue(color), GetBValue(color));
 
-	FillRect(hDC, &rect, brush);
-
-	DeleteObject(brush);
+	memoryGraphics.Clear(backGroundColor);
 }
 
 COLORREF BackGround::HSVtoRGB()

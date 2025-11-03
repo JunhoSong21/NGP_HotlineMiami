@@ -12,7 +12,7 @@ public:
 	ImageManager();
 	~ImageManager();
 
-	bool LoadImage(const std::wstring& filePath, const std::wstring& imageKey);
+	bool LoadSpriteImage(const std::wstring& filePath, const std::wstring& imageKey);
 
 	Gdiplus::Bitmap* GetImage(const std::wstring& imageKey);
 

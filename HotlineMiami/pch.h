@@ -1,5 +1,3 @@
-#pragma once
-
 // 기본 헤더
 #include <Windows.h>
 
@@ -12,14 +10,19 @@ extern ULONG_PTR gdiplusToken;
 #include <wchar.h>
 #include <string>
 
+// 파이 정의
+#define PI 3.141592f
+
 // Debug 모드에서만 동작하는 디버그용 함수.
 // DEBUG_MSG(L"출력 텍스트"); 와 같이 사용한다.
 #ifdef _DEBUG
-#define DEBUG_MSG(format, ...) {								\
-	WCHAR buffer[512];											\
-	swprintf_s(buffer, _countof(buffer), format, __VA__ARGS__);	\
-	OutputDebugStringW(buffer);									\
-	OutputDebugString(L"\n");									\
-}
+#define DEBUG_MSG(format, ...)							\
+	do{													\
+	wchar_t buffer[1024];								\
+	swprintf_s(buffer, 1024, format, ##__VA_ARGS__);	\
+	OutputDebugString(buffer);							\
+    OutputDebugString(L"\n");							\
+	} while(0)
 #else
+#define DEBUG_MSG(format, ...) ((void)0)
 #endif

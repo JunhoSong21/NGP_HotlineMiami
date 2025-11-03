@@ -5,14 +5,18 @@
 #include "Timer.h"
 #include "Player.h"
 
+#include "ImageManager.h"
+
 class GameLoop {
 private:
-	HWND hWnd;
+	ImageManager imgManager;
 
 	BackGround* backGround;
 	Timer* timer;
 	Player* player;
 	float deltaTime;
+
+	HWND hWnd;
 	
 public:
 	GameLoop();
