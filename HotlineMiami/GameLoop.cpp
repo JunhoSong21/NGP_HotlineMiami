@@ -54,6 +54,9 @@ void GameLoop::Render()
 	HBITMAP hBitmap = CreateCompatibleBitmap(hDC, width, height);
 	HBITMAP oldBitmap = (HBITMAP)SelectObject(memoryDC, hBitmap);
 
+	Gdiplus::Graphics memoryGraphics(memoryDC);
+	memoryGraphics.Clear(Gdiplus::Color(0, 0, 0, 0));
+
 	if (backGround) backGround->Render(hWnd, memoryDC);
 	if (player) player->Render(hWnd, memoryDC);
 
