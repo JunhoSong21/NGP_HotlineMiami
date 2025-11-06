@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include "BackGround.h"
+#include "Map.h"
 #include "Timer.h"
 #include "Player.h"
 
@@ -12,6 +13,7 @@ private:
 	ImageManager imgManager;
 
 	BackGround* backGround;
+	Map* map;
 	Timer* timer;
 	Player* player;
 	float deltaTime;
