@@ -83,3 +83,5 @@ void GameLoop::Render()
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 }
+
+// test
