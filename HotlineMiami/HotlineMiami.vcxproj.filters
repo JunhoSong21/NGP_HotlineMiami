@@ -23,6 +23,12 @@
     <Filter Include="소스 파일\ImageManager">
       <UniqueIdentifier>{60e1bec9-1f85-4a41-b1ac-1e48be929353}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Wall">
+      <UniqueIdentifier>{cb3ada3a-69e5-4787-b1a3-021301f41850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Map">
+      <UniqueIdentifier>{33ceacac-ee34-43f3-821a-a2e92e4a80d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -46,6 +52,12 @@
     <ClCompile Include="ImageManager.cpp">
       <Filter>소스 파일\ImageManager</Filter>
     </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>소스 파일\Wall</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>소스 파일\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLoop.h">
@@ -65,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="ImageManager.h">
       <Filter>소스 파일\ImageManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>소스 파일\Wall</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>소스 파일\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
