@@ -36,8 +36,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	RegisterClassEx(&WndClass);
 
 	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW,
-						0, 0,
-						1280, 800,
+						0, 0, 1280, 800,
 						NULL, (HMENU)NULL, hInstance, NULL);
 	if (!hWnd)
 		return false;
@@ -62,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 				gameLoop->Render();
 			}
 
-			Sleep(16); // 60 FPS
+			Sleep(1); // 60 FPS
 		}
 	}
 
