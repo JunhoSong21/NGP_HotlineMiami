@@ -8,7 +8,9 @@
 #define IDC_EDIT3                       1003
 #define IDC_EDIT4                       1004
 #define IDC_BUTTON1                     1005
-#define IDC_IPADDRESS1                  1006
+
+#define IDC_BUTTON2                     1006
+constexpr int ID_SHUTDOWN =				1006;
 
 // Next default values for new objects
 // 
