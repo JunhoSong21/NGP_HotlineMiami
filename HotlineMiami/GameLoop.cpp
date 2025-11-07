@@ -4,6 +4,7 @@
 GameLoop::GameLoop() :
 	backGround(nullptr),
 	map(nullptr),
+	wall(nullptr),
 	timer(nullptr),
 	player(nullptr),
 	deltaTime(0.0f),
@@ -28,6 +29,12 @@ void GameLoop::Init(HWND hwnd)
 	map = new Map();
 	map->LoadMapImages(imgManager);
 	map->Init();
+
+	wall = new Wall();
+	wall->LoadImages(imgManager);
+	wall->Init();
+	wall->AddWall(Wall::BrickH, 2, 2, 1, 1, Wall::DrawMode::Tiled);
+	wall->AddWall(Wall::BrickV, 1, 2, 1, 1, Wall::DrawMode::Tiled);
 
 	timer = new Timer();
 
@@ -84,6 +91,8 @@ void GameLoop::Render()
 			if (map) map->Render(g);
 			g.Restore(s);
 		}
+
+		if (wall) wall->Render(g);     
 
 		// 3) 플레이어
 		{
