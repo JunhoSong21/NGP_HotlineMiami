@@ -12,6 +12,12 @@
     <Filter Include="소스 파일\Main">
       <UniqueIdentifier>{d1e46c01-df8c-4b48-8011-a3399edcc7b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\EventManager">
+      <UniqueIdentifier>{6282a060-9056-4222-be58-037aa546d3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\struct Header">
+      <UniqueIdentifier>{7e4f0702-8bc2-4521-904c-a7d5fe6c8f56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -20,13 +26,22 @@
     <ClInclude Include="resource.h">
       <Filter>리소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="EventManager.h">
+      <Filter>소스 파일\EventManager</Filter>
+    </ClInclude>
     <ClInclude Include="Packet.h">
-      <Filter>소스 파일\Main</Filter>
+      <Filter>소스 파일\struct Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEvent.h">
+      <Filter>소스 파일\struct Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManager.cpp">
+      <Filter>소스 파일\EventManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
