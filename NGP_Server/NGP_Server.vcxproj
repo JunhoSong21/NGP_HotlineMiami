@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
