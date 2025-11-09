@@ -1,4 +1,10 @@
 #pragma once
+constexpr int PACKET_TYPE_SIZE = 14;
+
+struct PacketHeader {
+	char packetType[PACKET_TYPE_SIZE];
+	unsigned short size;
+};
 
 struct SC_PLAYER_MOVE {
 	float posX;		// X ÁÂÇ¥

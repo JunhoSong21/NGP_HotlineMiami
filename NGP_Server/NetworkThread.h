@@ -1,6 +1,7 @@
 #pragma once
 #include <thread>
 #include "Common.h"
+#include "Packet.h"
 
 class NetworkThread {
 private:
