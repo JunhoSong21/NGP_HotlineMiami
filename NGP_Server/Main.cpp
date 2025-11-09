@@ -1,8 +1,7 @@
 #include "Common.h"
 #include "resource.h"
 
-constexpr int SERVERPORT	= 9000;
-constexpr int BUFSIZE		= 1024;
+constexpr int SERVERPORT = 9000;
 
 HWND hDlg = nullptr;
 HWND hEdit1, hEdit2, hEdit3, hEdit4;
@@ -64,10 +63,8 @@ int main(int argc, char* argv[])
 			err_display("accept()");
 			break;
 		}
-		else {
+		else
 			printf("client%d accept() complete\n", ++clientNum);
-			UpdateWindow(hDlg);
-		}
 
 		// 쓰레드 생성 및 데이터 넘겨주기
 	}
