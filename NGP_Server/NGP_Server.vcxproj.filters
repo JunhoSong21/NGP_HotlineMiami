@@ -18,6 +18,12 @@
     <Filter Include="소스 파일\struct Header">
       <UniqueIdentifier>{7e4f0702-8bc2-4521-904c-a7d5fe6c8f56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\DataManager">
+      <UniqueIdentifier>{1156d1c6-8322-47e9-a4cf-16beffcf55d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\NetworkThread">
+      <UniqueIdentifier>{2028d06b-4d04-49f3-bde4-f96879193bda}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -35,6 +41,12 @@
     <ClInclude Include="GameEvent.h">
       <Filter>소스 파일\struct Header</Filter>
     </ClInclude>
+    <ClInclude Include="DataManager.h">
+      <Filter>소스 파일\DataManager</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkThread.h">
+      <Filter>소스 파일\NetworkThread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -42,6 +54,12 @@
     </ClCompile>
     <ClCompile Include="EventManager.cpp">
       <Filter>소스 파일\EventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>소스 파일\DataManager</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkThread.cpp">
+      <Filter>소스 파일\NetworkThread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
