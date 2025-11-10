@@ -18,26 +18,14 @@ NetworkThread::~NetworkThread()
 
 void NetworkThread::ThreadFunc()
 {
-	int retValue;
-	PacketHeader header;
-
+	// recv
 	while (true) {
-		retValue = recv(clientSock, (char*)&header, sizeof(header), MSG_WAITALL);
-		if (retValue == SOCKET_ERROR) {
-			err_display("Client Thread recv() Error");
-			break;
-		}
 
-		printf("Client %d Thread Packet Input\n", threadId);
-		
-		size_t totalInput = 0;
-		size_t bytesToRecv = 0;
-		char buf[BUFSIZE];
-		while (totalInput < header.packetSize) {
-			bytesToRecv = recv(clientSock, buf, (size_t)bytesToRecv, MSG_WAITALL);
-			totalInput += retValue;
-		}
 	}
+
+	//if(send 큐에 데이터가 있을 경우) {
+	//send 작업
+	//}
 }
 
 void NetworkThread::PacketProcess()

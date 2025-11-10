@@ -50,7 +50,9 @@
     <ClInclude Include="NetworkThread.h">
       <Filter>소스 파일\NetworkThread</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadManager.h" />
+    <ClInclude Include="ThreadManager.h">
+      <Filter>소스 파일\ThreadManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -66,7 +68,7 @@
       <Filter>소스 파일\NetworkThread</Filter>
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\ThreadManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
