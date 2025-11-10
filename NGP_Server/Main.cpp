@@ -1,7 +1,7 @@
 #include "Common.h"
+#include "ThreadManager.h"
+#include "NetworkThread.h"
 #include "resource.h"
-
-constexpr int SERVERPORT = 9000;
 
 HWND hDlg = nullptr;
 HWND hEdit1, hEdit2, hEdit3, hEdit4;
@@ -55,8 +55,9 @@ int main(int argc, char* argv[])
 	struct sockaddr_in clientAddr;
 	int addrLen = sizeof(clientAddr);
 	int clientNum = 0;	// 클라이언트 쓰레드 개수
+	HANDLE hThread;	// 쓰레드 핸들
 
-	while (clientNum < 3) {
+	while (true) {
 		// accept
 		clientSock = accept(listenSock, (struct sockaddr*)&clientAddr, &addrLen);
 		if (clientSock == INVALID_SOCKET) {
@@ -66,10 +67,19 @@ int main(int argc, char* argv[])
 		else
 			printf("client%d accept() complete\n", ++clientNum);
 
-		// 쓰레드 생성 및 데이터 넘겨주기
+		// 쓰레드 생성
+		ThreadManager::GetInstance().AddThread(clientSock);
+		if (clientNum <= 3) {
+			closesocket(listenSock);
+			printf("3 Clients Connect. Wait for Ready\n");
+			break;
+		}
 	}
 
-	closesocket(listenSock);
+	while (true) {
+		// 게임 루프
+	}
+
 	WSACleanup();
 	return 0;
 }
