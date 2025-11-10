@@ -33,7 +33,7 @@ void NetworkThread::ThreadFunc()
 		size_t totalInput = 0;
 		size_t bytesToRecv = 0;
 		char buf[BUFSIZE];
-		while (totalInput < header.size) {
+		while (totalInput < header.packetSize) {
 			bytesToRecv = recv(clientSock, buf, (size_t)bytesToRecv, MSG_WAITALL);
 			totalInput += retValue;
 		}
