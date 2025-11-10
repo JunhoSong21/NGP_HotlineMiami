@@ -130,12 +130,14 @@
     <ClInclude Include="NetworkThread.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ThreadManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NetworkThread.cpp" />
+    <ClCompile Include="ThreadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NGP_Server.rc">

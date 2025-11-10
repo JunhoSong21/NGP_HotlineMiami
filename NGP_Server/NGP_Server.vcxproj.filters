@@ -24,6 +24,9 @@
     <Filter Include="소스 파일\NetworkThread">
       <UniqueIdentifier>{2028d06b-4d04-49f3-bde4-f96879193bda}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ThreadManager">
+      <UniqueIdentifier>{a2fa5c46-4d3b-4127-9766-728a35a216c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -47,6 +50,7 @@
     <ClInclude Include="NetworkThread.h">
       <Filter>소스 파일\NetworkThread</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -60,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="NetworkThread.cpp">
       <Filter>소스 파일\NetworkThread</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
