@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+
+
 struct CS_LOGIN_PACKET		// 접속을 시도하는 클라이언트 정보 패킷
 {
 	char playerID[20];

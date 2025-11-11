@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 				gameLoop->Render();
 			}
 
-			Sleep(16); // 60 FPS
+			Sleep(1); // 60 FPS
 		}
 	}
 

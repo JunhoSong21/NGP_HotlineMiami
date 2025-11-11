@@ -148,6 +148,7 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="GameLoop.h" />
     <ClInclude Include="ImageManager.h" />
+    <ClInclude Include="NetProtocol.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Timer.h" />
