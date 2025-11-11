@@ -1,6 +1,8 @@
 #include "Common.h"
+#include "EventManager.h"
 #include "ThreadManager.h"
 #include "NetworkThread.h"
+#include "UpdateProcess.h"
 #include "resource.h"
 
 HWND hDlg = nullptr;
@@ -65,19 +67,21 @@ int main(int argc, char* argv[])
 			break;
 		}
 		else
-			printf("client%d accept() complete\n", ++clientNum);
+			printf("Client %d accept() complete\n", ++clientNum);
 
 		// 쓰레드 생성
 		ThreadManager::GetInstance().AddThread(clientSock);
-		if (clientNum <= 3) {
+		if (clientNum >= 2) {
 			closesocket(listenSock);
 			printf("3 Clients Connect. Wait for Ready\n");
 			break;
 		}
 	}
 
+	UpdateProcess updateProcess;
 	while (true) {
 		// 게임 루프
+		updateProcess.EventProcess();
 	}
 
 	WSACleanup();
@@ -90,7 +94,6 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 		if (editControlBrush == nullptr)
 			editControlBrush = CreateSolidBrush(RGB(255, 255, 255));
-		SetTimer(hDlg, 1, 1000, NULL);
 		hEdit1 = GetDlgItem(hDlg, IDC_EDIT1);
 		hEdit2 = GetDlgItem(hDlg, IDC_EDIT2);
 		hEdit3 = GetDlgItem(hDlg, IDC_EDIT3);
@@ -105,13 +108,6 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		return FALSE;
 
-	case WM_CTLCOLOREDIT:
-		SetBkMode((HDC)wParam, OPAQUE);
-		SetTextColor((HDC)wParam, RGB(0, 0, 0));
-		return (INT_PTR)editControlBrush;
-
-	case WM_TIMER:
-		return TRUE;
 	case WM_DESTROY:
 		return TRUE;
 	}

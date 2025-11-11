@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct PacketHeader {
 	int packetType;
 	size_t packetSize;
