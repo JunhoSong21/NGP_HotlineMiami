@@ -27,6 +27,9 @@
     <Filter Include="소스 파일\ThreadManager">
       <UniqueIdentifier>{a2fa5c46-4d3b-4127-9766-728a35a216c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\UpdateProcess">
+      <UniqueIdentifier>{d3c1eb1d-46b3-4aa0-ab7c-e657e4344a89}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -53,6 +56,9 @@
     <ClInclude Include="ThreadManager.h">
       <Filter>소스 파일\ThreadManager</Filter>
     </ClInclude>
+    <ClInclude Include="UpdateProcess.h">
+      <Filter>소스 파일\UpdateProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -69,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
       <Filter>소스 파일\ThreadManager</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateProcess.cpp">
+      <Filter>소스 파일\UpdateProcess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
