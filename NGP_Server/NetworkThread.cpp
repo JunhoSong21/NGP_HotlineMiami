@@ -20,6 +20,7 @@ void NetworkThread::ThreadFunc()
 {	
 	int retValue = 0;
 	PacketHeader packetHeader{};
+
 	while (true) {
 		retValue = recv(clientSock, (char*)&packetHeader, sizeof(packetHeader), MSG_WAITALL);
 		if (retValue == SOCKET_ERROR) {
@@ -27,9 +28,18 @@ void NetworkThread::ThreadFunc()
 			break;
 		}
 
-		packetHeader.packetType;
-		
+		switch (packetHeader.packetType) {
+		case SC_PLAYER_MOVE_DF:
+			SC_PLAYER_MOVE playerMovePacket;
+			retValue = recv(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv()");
+			break;
 
+		default:
+			printf("정의되지 않은 패킷 타입\n");
+			break;
+		}
 	}
 
 	//if(send 큐에 데이터가 있을 경우) {
