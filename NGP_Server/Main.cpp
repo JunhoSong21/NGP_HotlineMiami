@@ -54,10 +54,10 @@ int main(int argc, char* argv[])
 	}
 	
 	SOCKET clientSock;
-	struct sockaddr_in clientAddr;
+	struct sockaddr_in clientAddr{};
 	int addrLen = sizeof(clientAddr);
 	int clientNum = 0;	// 클라이언트 쓰레드 개수
-	HANDLE hThread;	// 쓰레드 핸들
+	HANDLE hThread{};	// 쓰레드 핸들
 
 	while (true) {
 		// accept

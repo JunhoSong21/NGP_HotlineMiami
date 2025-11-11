@@ -17,9 +17,18 @@ NetworkThread::~NetworkThread()
 }
 
 void NetworkThread::ThreadFunc()
-{
-	// recv
+{	
+	int retValue = 0;
+	PacketHeader packetHeader{};
 	while (true) {
+		retValue = recv(clientSock, (char*)&packetHeader, sizeof(packetHeader), MSG_WAITALL);
+		if (retValue == SOCKET_ERROR) {
+			err_display("recv()");
+			break;
+		}
+
+		packetHeader.packetType;
+		
 
 	}
 
