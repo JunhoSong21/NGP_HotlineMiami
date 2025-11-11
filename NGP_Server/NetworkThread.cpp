@@ -29,7 +29,7 @@ void NetworkThread::ThreadFunc()
 		}
 
 		switch (packetHeader.packetType) {
-		case SC_PLAYER_MOVE_DF:
+		case PN::SC_PLAYER_MOVE:
 			SC_PLAYER_MOVE playerMovePacket;
 			retValue = recv(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
