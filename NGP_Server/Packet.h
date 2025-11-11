@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma pack(1)
 struct PacketHeader {
 	int packetType;
 	size_t packetSize;
@@ -35,3 +36,5 @@ constexpr int SC_GAME_END = 1003;
 struct SC_GAME_END {
 	bool isMatchEnded;	// 게임 종료 여부
 };
+
+#pragma pack()
