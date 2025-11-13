@@ -26,6 +26,9 @@
     <Filter Include="소스 파일\NetProtocol">
       <UniqueIdentifier>{2b8fa1a9-5f8e-4ea8-b804-cf75c360926b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ClientNetwork">
+      <UniqueIdentifier>{37819eb4-b049-411a-b46c-b7dcc550ad02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -49,6 +52,9 @@
     <ClCompile Include="ImageManager.cpp">
       <Filter>소스 파일\ImageManager</Filter>
     </ClCompile>
+    <ClCompile Include="ClientNetwork.cpp">
+      <Filter>소스 파일\ClientNetwork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLoop.h">
@@ -71,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="NetProtocol.h">
       <Filter>소스 파일\NetProtocol</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientNetwork.h">
+      <Filter>소스 파일\ClientNetwork</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

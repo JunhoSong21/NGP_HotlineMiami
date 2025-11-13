@@ -2,6 +2,13 @@
 #include <cstdint>
 
 
+enum KEY_INPUT_FLAGS : uint16_t		//  키 입력 플래그 정의
+{
+	KEY_MOVE_W = 1 << 0,
+	KEY_MOVE_A = 1 << 1,
+	KEY_MOVE_S = 1 << 2,
+	KEY_MOVE_D = 1 << 3,
+};
 
 struct CS_LOGIN_PACKET		// 접속을 시도하는 클라이언트 정보 패킷
 {

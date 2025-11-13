@@ -31,6 +31,9 @@ public:
 	void Update(float deltaTime);
 	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
 	void InputProcessing(float deltaTime);
+	
+	// 플레이어 위치 (Send_Input 에서 사용)
+	const Gdiplus::PointF& GetPosition() const { return playerPos; }
 
 	void LoadPlayerImages(ImageManager& imgManager);
 	void SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
