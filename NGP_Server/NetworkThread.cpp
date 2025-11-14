@@ -35,7 +35,18 @@ void NetworkThread::ThreadFunc()
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
 			break;
-
+		case PN::SC_BULLET_STATE:
+			SC_BULLET_STATE bulletStatePacket;
+			retValue = recv(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv()");
+			break;
+		case PN::SC_GRENADE_STATE:
+			SC_GRENADE_STATE grenadeStatePacket;
+			retValue = recv(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv()");
+			break;
 		default:
 			printf("정의되지 않은 패킷 타입\n");
 			break;
