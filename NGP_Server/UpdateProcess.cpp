@@ -37,15 +37,15 @@ void UpdateProcess::EventProcess()
 
 void UpdateProcess::ProcessPlayerInput()
 {
-
+	printf("ProcessPlayerInput\n");
 }
 
 void UpdateProcess::ProcessBulletInput()
 {
-
+	printf("ProcessBulletInput\n");
 }
 
 void UpdateProcess::ProcessGrenadeInput()
 {
-
+	printf("ProcessGrenadeInput\n");
 }
