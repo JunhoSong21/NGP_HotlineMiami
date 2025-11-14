@@ -29,21 +29,27 @@ void NetworkThread::ThreadFunc()
 		}
 
 		switch (packetHeader.packetType) {
-		case PN::SC_PLAYER_MOVE:
-			SC_PLAYER_MOVE playerMovePacket;
-			retValue = recv(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
+		case PN::CS_KEY_INPUT:
+			CS_KEY_INPUT keyInputPacket;
+			retValue = recv(clientSock, (char*)&keyInputPacket, sizeof(keyInputPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
 			break;
-		case PN::SC_BULLET_STATE:
-			SC_BULLET_STATE bulletStatePacket;
-			retValue = recv(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), MSG_WAITALL);
+		case PN::CS_BULLET_TRIGGER:
+			CS_BULLET_TRIGGER bulletTriggerPacket;
+			retValue = recv(clientSock, (char*)&bulletTriggerPacket, sizeof(bulletTriggerPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
 			break;
-		case PN::SC_GRENADE_STATE:
-			SC_GRENADE_STATE grenadeStatePacket;
-			retValue = recv(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), MSG_WAITALL);
+		case PN::CS_GRENADE_THROW:
+			CS_GRENADE_THROW grenadeThrowPacket;
+			retValue = recv(clientSock, (char*)&grenadeThrowPacket, sizeof(grenadeThrowPacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv()");
+			break;
+		case PN::CS_LOGIN_PACKET:
+			CS_LOGIN_PACKET loginPacket;
+			retValue = recv(clientSock, (char*)&loginPacket, sizeof(loginPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
 			break;
@@ -58,7 +64,17 @@ void NetworkThread::ThreadFunc()
 	//}
 }
 
-void NetworkThread::PacketProcess()
+void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT)
+{
+
+}
+
+void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER)
+{
+
+}
+
+void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW)
 {
 
 }
