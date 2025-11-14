@@ -3,9 +3,9 @@
 
 struct GameEvent {
 	enum Type {
-		PLAYER_INPUT,
-		BULLET_INPUT,
-		GRENADE_INPUT,
+		KEY_INPUT,
+		BULLET_TRIGGER,
+		GRENADE_THROW,
 		
 		LOGIN_TRY,
 		ROOM_MAKE,
@@ -13,6 +13,24 @@ struct GameEvent {
 	};
 
 	Type type;
+	int clientThreadId;
 
 	virtual ~GameEvent() = default;
+};
+
+struct PlayerMove : GameEvent {
+	float destX, destY;
+
+	PlayerMove(int threadId, float x, float y) :
+		destX(y), destY(y)
+	{
+		type = GameEvent::Type::KEY_INPUT;
+		clientThreadId = threadId;
+	}
+};
+
+struct BulletTrigger : GameEvent {
+	float posX, posY;
+
+	BulletTrigger();
 };

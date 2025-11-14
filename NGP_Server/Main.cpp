@@ -9,7 +9,7 @@ HWND hDlg = nullptr;
 HWND hEdit1, hEdit2, hEdit3, hEdit4;
 HINSTANCE hInst = GetModuleHandleW(NULL);
 HBRUSH editControlBrush = nullptr;
-INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+//INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int main(int argc, char* argv[])
 {
@@ -46,11 +46,11 @@ int main(int argc, char* argv[])
 		err_quit("listen()");
 	else {
 		printf("listen() complete\n");
-		hDlg = CreateDialogW(hInst, MAKEINTRESOURCE(IDD_DIALOG1), NULL, DialogProc);
+		/*hDlg = CreateDialogW(hInst, MAKEINTRESOURCE(IDD_DIALOG1), NULL, DialogProc);
 		if (hDlg) {
 			ShowWindow(hDlg, SW_SHOW);
 			
-		}
+		}*/
 	}
 	
 	SOCKET clientSock;

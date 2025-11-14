@@ -30,6 +30,18 @@
     <Filter Include="소스 파일\UpdateProcess">
       <UniqueIdentifier>{d3c1eb1d-46b3-4aa0-ab7c-e657e4344a89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Classes">
+      <UniqueIdentifier>{029ee3af-887e-4349-a0b2-77775b626304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Classes\Player">
+      <UniqueIdentifier>{73a07738-67b9-4c99-974b-cbccb0710c4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Classes\Bullet">
+      <UniqueIdentifier>{36f8bf6b-f929-40b1-907c-f5d972184911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Classes\Grenade">
+      <UniqueIdentifier>{07b78a81-59ba-4050-b4c4-086d100d5643}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -59,6 +71,9 @@
     <ClInclude Include="UpdateProcess.h">
       <Filter>소스 파일\UpdateProcess</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Classes\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -78,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="UpdateProcess.cpp">
       <Filter>소스 파일\UpdateProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Classes\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

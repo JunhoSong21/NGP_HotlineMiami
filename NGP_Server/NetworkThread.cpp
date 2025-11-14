@@ -34,12 +34,14 @@ void NetworkThread::ThreadFunc()
 			retValue = recv(clientSock, (char*)&keyInputPacket, sizeof(keyInputPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
+			KeyInputPacketProcess(keyInputPacket);
 			break;
 		case PN::CS_BULLET_TRIGGER:
 			CS_BULLET_TRIGGER bulletTriggerPacket;
 			retValue = recv(clientSock, (char*)&bulletTriggerPacket, sizeof(bulletTriggerPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
+			
 			break;
 		case PN::CS_GRENADE_THROW:
 			CS_GRENADE_THROW grenadeThrowPacket;

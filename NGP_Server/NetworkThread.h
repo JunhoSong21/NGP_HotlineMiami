@@ -1,13 +1,18 @@
 #pragma once
 #include <thread>
+#include <concurrent_queue.h>
 #include "Common.h"
 #include "Packet.h"
+
+using namespace Concurrency;
 
 class NetworkThread {
 private:
 	int			threadId;	// 클라이언트 고유 id값
 	SOCKET		clientSock;
 	std::thread clientThread;
+
+	concurrent_queue<int> ThreadQueue;
 
 	void ThreadFunc();
 
