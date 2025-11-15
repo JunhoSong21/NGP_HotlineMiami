@@ -33,9 +33,10 @@ void GameLoop::Init(HWND hwnd)
 	wall = new Wall();
 	wall->LoadImages(imgManager);
 	wall->Init();
-	wall->AddWall(Wall::BrickH, 2, 2, 1, 1, Wall::DrawMode::Tiled);
-	wall->AddWall(Wall::BrickV, 1, 2, 1, 1, Wall::DrawMode::Tiled);
 
+	for (int i = 0; i < 10; ++i)
+		wall->AddWall(Wall::BrickH, i, 1, 1, 1, Wall::DrawMode::Tiled);
+	
 	timer = new Timer();
 
 	player = new Player();
@@ -47,7 +48,26 @@ void GameLoop::Update()
 {
 	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
-	if (player) player->Update(deltaTime);
+	if (player)
+	{
+		// 1) 이동 이전 위치 저장
+		Gdiplus::PointF oldPos = player->GetPos();
+
+		// 2) 플레이어 이동 처리
+		player->Update(deltaTime);
+
+		// 3) 이동 후 delta 계산
+		Gdiplus::PointF newPos = player->GetPos();
+		Gdiplus::PointF delta(newPos.X - oldPos.X,
+			newPos.Y - oldPos.Y);
+
+		// 4) 플레이어 충돌 AABB
+		Gdiplus::SizeF playerAabb(50.0f, 32.0f);  
+
+		// 5) Wall과 충돌 해결
+		if (wall)
+			wall->ResolveMove(player->GetPos(), playerAabb, delta);
+	}
 }
 
 void GameLoop::Render()

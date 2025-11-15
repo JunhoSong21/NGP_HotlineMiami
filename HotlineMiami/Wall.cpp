@@ -199,3 +199,55 @@ void Wall::Render(Gdiplus::Graphics& g)
     if (cacheDirty) RebuildCache();
     if (cache) g.DrawImage(cache.get(), START_X, START_Y);
 }
+
+bool Wall::ResolveMove(Gdiplus::PointF& pos, Gdiplus::SizeF aabb, Gdiplus::PointF delta) const
+{
+    if (delta.X == 0.0f && delta.Y == 0.0f)
+        return false;
+
+    // 이동 후의 AABB
+    Gdiplus::RectF movedRect(
+        pos.X,
+        pos.Y,
+        aabb.Width,
+        aabb.Height
+    );
+
+    bool blocked = false;
+
+    // 모든 collider 검사
+    for (const auto& col : colliders)
+    {
+        if (!col.blocksMove)
+            continue;
+
+        if (!movedRect.IntersectsWith(col.rect))
+            continue;
+
+        blocked = true;
+
+        // 충돌한 방향으로 되돌리기
+        if (fabs(delta.X) > fabs(delta.Y))
+        {
+            // X축 보정
+            if (delta.X > 0)
+                pos.X = col.rect.X - aabb.Width;         // 오른쪽 이동  왼쪽으로 밀기
+            else
+                pos.X = col.rect.GetRight();             // 왼쪽 이동  오른쪽으로 밀기
+        }
+        else
+        {
+            // Y축 보정
+            if (delta.Y > 0)
+                pos.Y = col.rect.Y - aabb.Height;        // 아래 이동  위로 밀기
+            else
+                pos.Y = col.rect.GetBottom();            // 위 이동  아래로 밀기
+        }
+
+        // 보정 후 다시 movedRect 업데이트
+        movedRect.X = pos.X;
+        movedRect.Y = pos.Y;
+    }
+
+    return blocked;
+}

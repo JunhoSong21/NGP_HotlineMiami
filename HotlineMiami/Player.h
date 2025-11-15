@@ -26,7 +26,8 @@ private:
 public:
 	Player();
 	~Player();
-
+	
+	Gdiplus::PointF& GetPos();
 	bool Init();
 	void Update(float deltaTime);
 	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);

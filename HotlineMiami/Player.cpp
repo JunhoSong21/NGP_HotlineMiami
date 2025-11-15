@@ -107,3 +107,8 @@ float Player::CalculateAtan2MouseAtPos(HWND hWnd)
 
 	return radianAngle;
 }
+
+Gdiplus::PointF& Player::GetPos()
+{
+	return playerPos;
+}
