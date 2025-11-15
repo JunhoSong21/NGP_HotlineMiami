@@ -202,51 +202,91 @@ void Wall::Render(Gdiplus::Graphics& g)
 
 bool Wall::ResolveMove(Gdiplus::PointF& pos, Gdiplus::SizeF aabb, Gdiplus::PointF delta) const
 {
-    if (delta.X == 0.0f && delta.Y == 0.0f)
+    // 이동 없으면 처리할 것 없음
+    if ((delta.X == 0.0f && delta.Y == 0.0f) || colliders.empty())
         return false;
 
-    // 이동 후의 AABB
-    Gdiplus::RectF movedRect(
-        pos.X,
-        pos.Y,
-        aabb.Width,
-        aabb.Height
-    );
+    // pos 는 "플레이어 중심 좌표"
+    const float halfW = aabb.Width * 0.5f;
+    const float halfH = aabb.Height * 0.5f;
+
+    // 한 프레임 이동 길이
+    float maxLen = std::max(std::fabs(delta.X), std::fabs(delta.Y));
+    if (maxLen <= 0.0f)
+        return false;
+
+    // 한 스텝 최대 이동량 (타일의 1/8 정도)
+    const float maxStep = 4.0f; // TILE_W(32) 기준
+
+    int steps = static_cast<int>(std::ceil(maxLen / maxStep));
+    if (steps < 1) steps = 1;
+
+    Gdiplus::PointF step(delta.X / steps, delta.Y / steps);
+
+    auto intersectsAt = [&](const Gdiplus::PointF& centerPos) -> bool
+        {
+            Gdiplus::RectF rect(
+                centerPos.X - halfW,
+                centerPos.Y - halfH,
+                aabb.Width,
+                aabb.Height
+            );
+
+            for (const auto& col : colliders)
+            {
+                if (!col.blocksMove)
+                    continue;
+                if (rect.IntersectsWith(col.rect))
+                    return true;
+            }
+            return false;
+        };
 
     bool blocked = false;
 
-    // 모든 collider 검사
-    for (const auto& col : colliders)
+    // 여러 작은 스텝으로 나누어 이동
+    for (int i = 0; i < steps; ++i)
     {
-        if (!col.blocksMove)
-            continue;
-
-        if (!movedRect.IntersectsWith(col.rect))
-            continue;
-
-        blocked = true;
-
-        // 충돌한 방향으로 되돌리기
-        if (fabs(delta.X) > fabs(delta.Y))
+        // 1) 전체 (X+Y) 이동 시도
+        Gdiplus::PointF tryFull(pos.X + step.X, pos.Y + step.Y);
+        if (!intersectsAt(tryFull))
         {
-            // X축 보정
-            if (delta.X > 0)
-                pos.X = col.rect.X - aabb.Width;         // 오른쪽 이동  왼쪽으로 밀기
-            else
-                pos.X = col.rect.GetRight();             // 왼쪽 이동  오른쪽으로 밀기
-        }
-        else
-        {
-            // Y축 보정
-            if (delta.Y > 0)
-                pos.Y = col.rect.Y - aabb.Height;        // 아래 이동  위로 밀기
-            else
-                pos.Y = col.rect.GetBottom();            // 위 이동  아래로 밀기
+            pos = tryFull;
+            continue;
         }
 
-        // 보정 후 다시 movedRect 업데이트
-        movedRect.X = pos.X;
-        movedRect.Y = pos.Y;
+        // 2) 전체가 막히면 X만 이동 시도 (슬라이딩)
+        bool movedThisStep = false;
+        if (step.X != 0.0f)
+        {
+            Gdiplus::PointF tryX(pos.X + step.X, pos.Y);
+            if (!intersectsAt(tryX))
+            {
+                pos = tryX;
+                movedThisStep = true;
+                // Y축 이동은 이 스텝에서 막힌 것으로 보고 다음 스텝에서도 0 유지
+                step.Y = 0.0f;
+            }
+        }
+
+        // 3) X도 막혔다면 Y만 이동 시도
+        if (!movedThisStep && step.Y != 0.0f)
+        {
+            Gdiplus::PointF tryY(pos.X, pos.Y + step.Y);
+            if (!intersectsAt(tryY))
+            {
+                pos = tryY;
+                movedThisStep = true;
+                step.X = 0.0f;
+            }
+        }
+
+        // 4) 둘 다 막혀 있으면 이 방향 이동은 더 이상 불가
+        if (!movedThisStep)
+        {
+            blocked = true;
+            break;
+        }
     }
 
     return blocked;
