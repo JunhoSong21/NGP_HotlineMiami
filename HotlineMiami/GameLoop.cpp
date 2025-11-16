@@ -40,6 +40,11 @@ void GameLoop::Init(HWND hwnd)
 	for (int i = 0; i < 10; ++i)
 		wall->AddWall(Wall::BrickV, 0, i, 1, 1, Wall::DrawMode::Tiled);
 	
+	wall->AddWall(Wall::BarBooth, 3, 4, 1, 1, Wall::DrawMode::Tiled);
+	wall->AddWall(Wall::BossSofa, 7, 7, 1, 1, Wall::DrawMode::Tiled);
+	wall->AddWall(Wall::PoolTable, 10, 6, 1, 1, Wall::DrawMode::Tiled);
+	wall->AddWall(Wall::BigBed, 6, 10, 1, 1, Wall::DrawMode::Tiled);
+
 	timer = new Timer();
 
 	player = new Player();

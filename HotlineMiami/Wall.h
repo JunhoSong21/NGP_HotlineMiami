@@ -20,7 +20,17 @@ public:
     enum : uint8_t {
         None = 0,
         BrickH = 1,   // 32x8  Resource/Map/sprWallBrickH.png
-        BrickV = 2    // 8x32  Resource/Map/sprWallBrickV.png
+        BrickV = 2,   // 8x32  Resource/Map/sprWallBrickV.png
+        HeavyH = 3,   // 32x8  Resource/Map/sprHeavyWallBrickH.png
+        HeavyV = 4,   // 8x32  Resource/Map/sprHeavyWallBrickH.png
+        CellH = 5,    // 32x8  Resource/Map/sprCellWallBrickV.png
+        CellV = 6,    // 8x32  Resource/Map/sprCellWallBrickH.png
+        SewerH = 7,   // 32x8  Resource/Map/sprSewerWallBrickV.png
+        SewerV = 8,   // 8x32  Resource/Map/sprSewerWallBrickV.png
+        BarBooth = 9, // 72x64 Resource/Map/sprBarBooth.png
+        PoolTable = 10, // 32x68 Resource/Map/sprPoolTable.png
+        BigBed = 11,    // 60x80 Resource/Map/sprBigBed.png
+        BossSofa = 12   // 128x64 Resource/Map/sprBossSofa.png
     };
 
     enum class DrawMode : uint8_t { Tiled, Stretch };

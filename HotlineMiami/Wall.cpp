@@ -9,9 +9,21 @@
 void Wall::LoadImages(ImageManager& imgMgr)
 {
     imgManager = &imgMgr;
-
+    // 벽 종류
     imgMgr.LoadSpriteImage(L"Resource/Map/sprWallBrickH.png", L"sprWallBrickH");
     imgMgr.LoadSpriteImage(L"Resource/Map/sprWallBrickV.png", L"sprWallBrickV");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprWallHeavyH.png", L"sprWallHeavyH");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprWallHeavyV.png", L"sprWallHeavyV");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprSewerWallH.png", L"sprSewerWallH");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprSewerWallV.png", L"sprSewerWallV");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprCellWallH.png", L"sprCellWallH");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprCellWallV.png", L"sprCellWallV");
+    // 가구 종류
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprBarBooth.png", L"sprBarBooth");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprPoolTable.png", L"sprPoolTable");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprBigBed.png", L"sprbigBed");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprBossSofa.png", L"sprBossSofa");
+    
 
     // 사전 등록: 실제 크기와 충돌 형태 지정
     dict[BrickH] = {
@@ -27,6 +39,76 @@ void Wall::LoadImages(ImageManager& imgMgr)
         true, true,
         CollisionKind::StripV, 8, Align::Center
     };
+
+    dict[HeavyH] = {
+    L"sprHeavyWallH",
+    Gdiplus::Rect(0, 0, 32, 8),
+    true, true,
+    CollisionKind::StripH, 8, Align::Center
+    };
+
+    dict[HeavyV] = {
+        L"sprHeavyWallV",
+        Gdiplus::Rect(0, 0, 8, 32),
+        true, true,
+        CollisionKind::StripV, 8, Align::Center
+    };
+
+    dict[CellH] = {
+    L"sprCellWallH",
+    Gdiplus::Rect(0, 0, 32, 8),
+    true, true,
+    CollisionKind::StripH, 8, Align::Center
+    };
+
+    dict[CellV] = {
+        L"sprCellWallV",
+        Gdiplus::Rect(0, 0, 8, 32),
+        true, true,
+        CollisionKind::StripV, 8, Align::Center
+    };
+
+    dict[SewerH] = {
+    L"sprSewerWallH",
+    Gdiplus::Rect(0, 0, 32, 8),
+    true, true,
+    CollisionKind::StripH, 8, Align::Center
+    };
+
+    dict[SewerV] = {
+        L"sprSewerWallV",
+        Gdiplus::Rect(0, 0, 8, 32),
+        true, true,
+        CollisionKind::StripV, 8, Align::Center
+    };
+
+    dict[BarBooth] = {
+     L"sprBarBooth",
+     Gdiplus::Rect(0, 0, 72, 64),
+     true, true,
+     CollisionKind::StripH, 8, Align::Center
+    };
+
+     dict[PoolTable] = {
+     L"sprPoolTable",
+     Gdiplus::Rect(0, 0, 32, 68),
+     true, true,
+     CollisionKind::StripV, 32, Align::End
+    };
+
+     dict[BigBed] = {
+     L"sprBigBed",
+     Gdiplus::Rect(0, 0, 60, 80),
+     true, true,
+     CollisionKind::StripH, 8, Align::Center
+    };
+
+     dict[BossSofa] = {
+     L"sprBossSofa",
+     Gdiplus::Rect(0, 0, 128, 64),
+     true, true,
+     CollisionKind::StripH, 8, Align::Center
+     };
 }
 
 void Wall::Init()
