@@ -86,28 +86,28 @@ void Wall::LoadImages(ImageManager& imgMgr)
      L"sprBarBooth",
      Gdiplus::Rect(0, 0, 72, 64),
      true, true,
-     CollisionKind::StripH, 72, Align::Center
+     CollisionKind::StripH, 0, Align::Start
     };
 
      dict[PoolTable] = {
      L"sprPoolTable",
      Gdiplus::Rect(0, 0, 32, 68),
      true, true,
-     CollisionKind::StripV, 32, Align::Center
+     CollisionKind::StripV, 0, Align::Start
     };
 
      dict[BigBed] = {
      L"sprBigBed",
      Gdiplus::Rect(0, 0, 60, 80),
      true, true,
-     CollisionKind::StripV, 60, Align::Center
+     CollisionKind::StripV, 0, Align::Start
     };
 
      dict[BossSofa] = {
      L"sprBossSofa",
      Gdiplus::Rect(0, 0, 128, 64),
      true, true,
-     CollisionKind::StripH, 128, Align::Center
+     CollisionKind::StripH, 0, Align::Start
      };
 }
 
@@ -167,12 +167,58 @@ void Wall::RebuildOccupancyOnly()
     for (const auto& inst : instances) {
         const auto it = dict.find(inst.id);
         if (it == dict.end()) continue;
-        const auto& d = it->second;
+        const Desc& d = it->second;
 
         int x0 = std::max(0, inst.gx);
         int y0 = std::max(0, inst.gy);
         int x1 = std::min(COLS - 1, inst.gx + inst.wTiles - 1);
         int y1 = std::min(ROWS - 1, inst.gy + inst.hTiles - 1);
+        if (inst.drawMode == DrawMode::Sprite)
+        {
+            // 월드 좌표계 기준
+            const float baseX = static_cast<float>(START_X + inst.gx * TILE_W);
+            const float baseY = static_cast<float>(START_Y + inst.gy * TILE_H);
+            const float regionW = static_cast<float>(inst.wTiles * TILE_W);
+            const float regionH = static_cast<float>(inst.hTiles * TILE_H);
+
+            const float rcX = baseX + (regionW - d.src.Width) * 0.5f;
+            const float rcY = baseY + regionH - d.src.Height;
+
+            Gdiplus::RectF rc(
+                rcX,
+                rcY,
+                static_cast<float>(d.src.Width),
+                static_cast<float>(d.src.Height)
+            );
+
+            // 콜라이더 등록
+            const int idx = static_cast<int>(colliders.size());
+            colliders.push_back({ rc, d.blocksMove, d.blocksProjectile });
+
+            // 이 콜라이더가 겹치는 타일들에 LUT 등록 + grid 표시
+            const float left = rc.X - START_X;
+            const float top = rc.Y - START_Y;
+            const float right = rc.GetRight() - START_X;
+            const float bottom = rc.GetBottom() - START_Y;
+
+            int gx0 = static_cast<int>(std::floor(left / TILE_W));
+            int gy0 = static_cast<int>(std::floor(top / TILE_H));
+            int gx1 = static_cast<int>(std::floor((right - 0.001f) / TILE_W));
+            int gy1 = static_cast<int>(std::floor((bottom - 0.001f) / TILE_H));
+
+            gx0 = std::max(0, gx0);
+            gy0 = std::max(0, gy0);
+            gx1 = std::min(COLS - 1, gx1);
+            gy1 = std::min(ROWS - 1, gy1);
+
+            for (int gy = gy0; gy <= gy1; ++gy) {
+                for (int gx = gx0; gx <= gx1; ++gx) {
+                    grid[gy][gx] = inst.id;
+                    colliderLUT[gy][gx].push_back(idx);
+                }
+            }
+            continue;
+        }
 
         for (int gy = y0; gy <= y1; ++gy) {
             for (int gx = x0; gx <= x1; ++gx) {
@@ -234,19 +280,22 @@ void Wall::RebuildCache()
         // 1) Sprite 모드: 스프라이트 전체를 한 번에 그림
         if (inst.drawMode == DrawMode::Sprite)
         {
-            // 기준 타일의 왼쪽 위 (캐시 좌표계: 타일 * 32)
+            // 캐시 좌표계 기준 (0,0)부터 시작, START_X/START_Y 없음
             const float baseX = static_cast<float>(inst.gx * TILE_W);
             const float baseY = static_cast<float>(inst.gy * TILE_H);
+            const float regionW = static_cast<float>(inst.wTiles * TILE_W);
+            const float regionH = static_cast<float>(inst.hTiles * TILE_H);
 
-            // 가구를 "타일 아래쪽에 발이 닿게" 놓고 싶으면:
-            // - 타일 한 칸 높이(TILE_H) 기준으로 아래에 닿게 하고
-            // - 중앙 정렬
-            const float dstX = baseX + (TILE_W - d.src.Width) * 0.5f;
-            const float dstY = baseY + TILE_H - d.src.Height;
+            // 타일 w×h 영역 안에서 중앙 정렬 + 바닥 맞춤
+            const float dstX = baseX + (regionW - d.src.Width) * 0.5f;
+            const float dstY = baseY + regionH - d.src.Height;
 
-            Gdiplus::RectF dst(dstX, dstY,
+            Gdiplus::RectF dst(
+                dstX,
+                dstY,
                 static_cast<float>(d.src.Width),
-                static_cast<float>(d.src.Height));
+                static_cast<float>(d.src.Height)
+            );
 
             gg.DrawImage(img, dst,
                 d.src.X, d.src.Y, d.src.Width, d.src.Height,
