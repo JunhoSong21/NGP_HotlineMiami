@@ -33,7 +33,7 @@ public:
         BossSofa = 12   // 128x64 Resource/Map/sprBossSofa.png
     };
 
-    enum class DrawMode : uint8_t { Tiled, Stretch };
+    enum class DrawMode : uint8_t { Tiled, Stretch, Sprite };
 
     enum class CollisionKind : uint8_t { FullTile, StripH, StripV };
     enum class Align : uint8_t { Start, Center, End };

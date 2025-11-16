@@ -21,7 +21,7 @@ void Wall::LoadImages(ImageManager& imgMgr)
     // 가구 종류
     imgMgr.LoadSpriteImage(L"Resource/Map/sprBarBooth.png", L"sprBarBooth");
     imgMgr.LoadSpriteImage(L"Resource/Map/sprPoolTable.png", L"sprPoolTable");
-    imgMgr.LoadSpriteImage(L"Resource/Map/sprBigBed.png", L"sprbigBed");
+    imgMgr.LoadSpriteImage(L"Resource/Map/sprBigBed.png", L"sprBigBed");
     imgMgr.LoadSpriteImage(L"Resource/Map/sprBossSofa.png", L"sprBossSofa");
     
 
@@ -86,28 +86,28 @@ void Wall::LoadImages(ImageManager& imgMgr)
      L"sprBarBooth",
      Gdiplus::Rect(0, 0, 72, 64),
      true, true,
-     CollisionKind::StripH, 8, Align::Center
+     CollisionKind::StripH, 72, Align::Center
     };
 
      dict[PoolTable] = {
      L"sprPoolTable",
      Gdiplus::Rect(0, 0, 32, 68),
      true, true,
-     CollisionKind::StripV, 32, Align::End
+     CollisionKind::StripV, 32, Align::Center
     };
 
      dict[BigBed] = {
      L"sprBigBed",
      Gdiplus::Rect(0, 0, 60, 80),
      true, true,
-     CollisionKind::StripH, 8, Align::Center
+     CollisionKind::StripV, 60, Align::Center
     };
 
      dict[BossSofa] = {
      L"sprBossSofa",
      Gdiplus::Rect(0, 0, 128, 64),
      true, true,
-     CollisionKind::StripH, 8, Align::Center
+     CollisionKind::StripH, 128, Align::Center
      };
 }
 
@@ -231,47 +231,73 @@ void Wall::RebuildCache()
         Gdiplus::Image* img = imgManager->GetImage(d.imageKey);
         if (!img) continue;
 
-        // 인스턴스 영역의 타일 범위를 직접 돈다 (타일당 1회만 그림)
+        // 1) Sprite 모드: 스프라이트 전체를 한 번에 그림
+        if (inst.drawMode == DrawMode::Sprite)
+        {
+            // 기준 타일의 왼쪽 위 (캐시 좌표계: 타일 * 32)
+            const float baseX = static_cast<float>(inst.gx * TILE_W);
+            const float baseY = static_cast<float>(inst.gy * TILE_H);
+
+            // 가구를 "타일 아래쪽에 발이 닿게" 놓고 싶으면:
+            // - 타일 한 칸 높이(TILE_H) 기준으로 아래에 닿게 하고
+            // - 중앙 정렬
+            const float dstX = baseX + (TILE_W - d.src.Width) * 0.5f;
+            const float dstY = baseY + TILE_H - d.src.Height;
+
+            Gdiplus::RectF dst(dstX, dstY,
+                static_cast<float>(d.src.Width),
+                static_cast<float>(d.src.Height));
+
+            gg.DrawImage(img, dst,
+                d.src.X, d.src.Y, d.src.Width, d.src.Height,
+                Gdiplus::UnitPixel);
+
+            // Sprite 모드는 여기서 끝 (타일 루프 X)
+            continue;
+        }
+
+        // 2) 나머지(Tiled / Stretch)는 기존 타일 기반 루프 사용
         for (int ty = 0; ty < inst.hTiles; ++ty) {
             for (int tx = 0; tx < inst.wTiles; ++tx) {
                 const int gx = inst.gx + tx;
                 const int gy = inst.gy + ty;
 
-                // 캐시 좌표계 기준 타일 사각형
                 Gdiplus::Rect tileDst(gx * TILE_W, gy * TILE_H, TILE_W, TILE_H);
 
                 if (d.ck == CollisionKind::FullTile) {
-                    // 한 타일을 딱 1번 그림 
-                    gg.DrawImage(img, tileDst, d.src.X, d.src.Y, d.src.Width, d.src.Height, Gdiplus::UnitPixel);
+                    gg.DrawImage(img, tileDst,
+                        d.src.X, d.src.Y, d.src.Width, d.src.Height,
+                        Gdiplus::UnitPixel);
                 }
                 else if (d.ck == CollisionKind::StripH) {
-                    // 수평 띠: 높이 = thicknessPx, 위치 = Align (위/중앙/아래)
                     int h = std::min(d.thicknessPx, TILE_H);
                     int y = tileDst.Y;
                     switch (d.align) {
-                    case Align::Start:  y = tileDst.Y; break; // 위 붙임
+                    case Align::Start:  y = tileDst.Y; break;
                     case Align::Center: y = tileDst.Y + (TILE_H - h) / 2; break;
-                    case Align::End:    y = tileDst.Y + TILE_H - h; break; // 아래 붙임
+                    case Align::End:    y = tileDst.Y + TILE_H - h; break;
                     }
                     Gdiplus::Rect stripDst(tileDst.X, y, TILE_W, h);
-                    gg.DrawImage(img, stripDst, d.src.X, d.src.Y, d.src.Width, d.src.Height, Gdiplus::UnitPixel);
+                    gg.DrawImage(img, stripDst,
+                        d.src.X, d.src.Y, d.src.Width, d.src.Height,
+                        Gdiplus::UnitPixel);
                 }
                 else if (d.ck == CollisionKind::StripV) {
-                    // 수직 띠: 너비 = thicknessPx, 위치 = Align (좌/중앙/우)
                     int w = std::min(d.thicknessPx, TILE_W);
                     int x = tileDst.X;
                     switch (d.align) {
-                    case Align::Start:  x = tileDst.X; break; // 왼쪽 붙임
+                    case Align::Start:  x = tileDst.X; break;
                     case Align::Center: x = tileDst.X + (TILE_W - w) / 2; break;
-                    case Align::End:    x = tileDst.X + TILE_W - w; break; // 오른쪽 붙임
+                    case Align::End:    x = tileDst.X + TILE_W - w; break;
                     }
                     Gdiplus::Rect stripDst(x, tileDst.Y, w, TILE_H);
-                    gg.DrawImage(img, stripDst, d.src.X, d.src.Y, d.src.Width, d.src.Height, Gdiplus::UnitPixel);
+                    gg.DrawImage(img, stripDst,
+                        d.src.X, d.src.Y, d.src.Width, d.src.Height,
+                        Gdiplus::UnitPixel);
                 }
             }
         }
     }
-
     cacheDirty = false;
 }
 
