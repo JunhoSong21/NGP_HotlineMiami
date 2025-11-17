@@ -29,6 +29,9 @@
     <Filter Include="소스 파일\ClientNetwork">
       <UniqueIdentifier>{37819eb4-b049-411a-b46c-b7dcc550ad02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Bullet">
+      <UniqueIdentifier>{1ba50458-ea45-4df7-ba9c-4f82a998c36a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -80,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="ClientNetwork.h">
       <Filter>소스 파일\ClientNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>소스 파일\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
