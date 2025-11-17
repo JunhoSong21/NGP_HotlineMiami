@@ -15,4 +15,6 @@ private:
 public:
 	NetworkThread(int id, SOCKET clientSock);
 	~NetworkThread();
+
+	void KeyInputPacketProcess(struct CS_KEY_INPUT packet);
 };

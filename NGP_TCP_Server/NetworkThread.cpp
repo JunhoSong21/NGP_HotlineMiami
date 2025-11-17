@@ -29,6 +29,12 @@ void NetworkThread::ThreadFunc()
 
 		switch (packetHeader.packetType) {
 		case PN::CS_KEY_INPUT:
+			CS_KEY_INPUT keyinputPacket;
+			retValue = recv(clientSock, (char*)&keyinputPacket, sizeof(keyinputPacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv()");
+			else
+				KeyInputPacketProcess(keyinputPacket);
 			break;
 		case PN::CS_BULLET_TRIGGER:
 			break;
@@ -40,4 +46,9 @@ void NetworkThread::ThreadFunc()
 			break;
 		}
 	}
+}
+
+void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
+{
+	
 }
