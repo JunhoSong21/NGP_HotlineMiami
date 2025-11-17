@@ -58,6 +58,9 @@
     <ClCompile Include="ClientNetwork.cpp">
       <Filter>소스 파일\ClientNetwork</Filter>
     </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>소스 파일\Bullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLoop.h">

@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="ClientNetwork.cpp" />
     <ClCompile Include="GameLoop.cpp" />
     <ClCompile Include="ImageManager.cpp" />
