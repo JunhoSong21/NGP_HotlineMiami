@@ -41,7 +41,6 @@ void NetworkThread::ThreadFunc()
 			retValue = recv(clientSock, (char*)&bulletTriggerPacket, sizeof(bulletTriggerPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
 				err_display("recv()");
-			
 			break;
 		case PN::CS_GRENADE_THROW:
 			CS_GRENADE_THROW grenadeThrowPacket;

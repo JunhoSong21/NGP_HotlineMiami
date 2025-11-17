@@ -22,7 +22,7 @@ struct PlayerMove : GameEvent {
 	float destX, destY;
 
 	PlayerMove(int threadId, float x, float y) :
-		destX(y), destY(y)
+		destX(x), destY(y)
 	{
 		type = GameEvent::Type::KEY_INPUT;
 		clientThreadId = threadId;
@@ -32,5 +32,21 @@ struct PlayerMove : GameEvent {
 struct BulletTrigger : GameEvent {
 	float posX, posY;
 
-	BulletTrigger();
+	BulletTrigger(int threadId, float x, float y) :
+		posX(x), posY(y)
+	{
+		type = GameEvent::Type::BULLET_TRIGGER;
+		clientThreadId = threadId;
+	}
+};
+
+struct GrenadeThrow : GameEvent {
+	float posX, posY;
+
+	GrenadeThrow(int threadId, float x, float y) :
+		posX(x), posY(y)
+	{
+		type = GameEvent::Type::GRENADE_THROW;
+		clientThreadId = threadId;
+	}
 };

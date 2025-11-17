@@ -16,5 +16,7 @@ private:
 	void ProcessPlayerInput();
 	void ProcessBulletInput();
 	void ProcessGrenadeInput();
+
+	void TimerEvent();
 };
 

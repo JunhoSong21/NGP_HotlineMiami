@@ -49,3 +49,8 @@ void UpdateProcess::ProcessGrenadeInput()
 {
 	printf("ProcessGrenadeInput\n");
 }
+
+void TimerEvent()
+{
+	printf("TimerEvent\n");
+}
