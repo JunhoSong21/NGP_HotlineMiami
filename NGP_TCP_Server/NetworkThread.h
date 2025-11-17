@@ -16,4 +16,3 @@ public:
 	NetworkThread(int id, SOCKET clientSock);
 	~NetworkThread();
 };
-

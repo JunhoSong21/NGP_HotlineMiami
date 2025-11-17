@@ -51,7 +51,6 @@ int main()
 			printf("Client accept() complete\n");
 	}
 
-
 	WSACleanup();
 	return 0;
 }
