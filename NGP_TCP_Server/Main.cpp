@@ -73,6 +73,7 @@ int main()
 		}
 	}
 
+	closesocket(listenSock);
 	WSACleanup();
 	return 0;
 }

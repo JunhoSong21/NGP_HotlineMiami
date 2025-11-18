@@ -36,6 +36,9 @@
     <Filter Include="소스 파일\ThreadManager">
       <UniqueIdentifier>{54ec9786-8208-44ad-850c-73899da5350c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\DataManager">
+      <UniqueIdentifier>{c5b69291-a338-49cb-bfb5-4bca67420f71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -58,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
       <Filter>소스 파일\ThreadManager</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,5 +94,6 @@
     <ClInclude Include="ThreadManager.h">
       <Filter>소스 파일\ThreadManager</Filter>
     </ClInclude>
+    <ClInclude Include="DataManager.h" />
   </ItemGroup>
 </Project>
