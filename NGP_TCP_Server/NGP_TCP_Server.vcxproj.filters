@@ -30,6 +30,9 @@
     <Filter Include="소스 파일\Object Class\Bullet">
       <UniqueIdentifier>{53a97a5b-004e-44e1-ac42-6094d96217b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Object Class\Grenade">
+      <UniqueIdentifier>{6edbb99f-fc22-4a20-bb68-a7f267020509}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -46,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="Bullet.cpp">
       <Filter>소스 파일\Object Class\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Grenade.cpp">
+      <Filter>소스 파일\Object Class\Grenade</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="Bullet.h">
       <Filter>소스 파일\Object Class\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Grenade.h">
+      <Filter>소스 파일\Object Class\Grenade</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

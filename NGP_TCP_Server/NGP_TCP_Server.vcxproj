@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="EventQueue.cpp" />
+    <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NetworkThread.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="GameEvent.h" />
+    <ClInclude Include="Grenade.h" />
     <ClInclude Include="NetworkThread.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Player.h" />
