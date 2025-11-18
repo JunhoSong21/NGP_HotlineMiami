@@ -50,5 +50,6 @@ void NetworkThread::ThreadFunc()
 
 void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 {
-	EventQueue::GetInstance().PushEvent()
+	auto playerMoveEvent = std::make_unique<PlayerMove>(threadId, 0.0, 0.0);
+	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
 }
