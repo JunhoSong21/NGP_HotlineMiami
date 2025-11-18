@@ -2,6 +2,8 @@
 #include <Windows.h>
 
 #include "BackGround.h"
+#include "Map.h"
+#include "Wall.h"
 #include "Timer.h"
 #include "Player.h"
 
@@ -12,8 +14,10 @@ private:
 	ImageManager imgManager;
 
 	BackGround* backGround;
+	Map* map;
 	Timer* timer;
 	Player* player;
+	Wall* wall;
 	float deltaTime;
 
 	HWND hWnd;
