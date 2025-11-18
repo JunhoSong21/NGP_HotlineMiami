@@ -17,14 +17,23 @@ int main()
 	else
 		printf("socket() complete\n");
 
-	// SO_REUSEADDR
+	// SO_KEEPALIVE
 	DWORD optValue = 1;
+	retValue = setsockopt(listenSock, SOL_SOCKET, SO_KEEPALIVE,
+		(const char*)&optValue, sizeof(optValue));
+	if (retValue == SOCKET_ERROR)
+		err_quit("setsockopt() SO_KEEPALIVE");
+	else
+		printf("setsockopt() SO_KEEPALIVE complete\n");
+
+	// SO_REUSEADDR
+	optValue = 1;
 	retValue = setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR,
 		(const char*)&optValue, sizeof(optValue));
 	if (retValue == SOCKET_ERROR)
 		err_quit("setsockopt()");
 	else
-		printf("setsockopt() complete\n");
+		printf("setsockopt() SO_REUSEADDR complete\n");
 
 	// bind
 	struct sockaddr_in serverAddr;
