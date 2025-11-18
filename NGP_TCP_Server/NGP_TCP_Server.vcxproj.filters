@@ -21,6 +21,15 @@
     <Filter Include="소스 파일\EventQueue">
       <UniqueIdentifier>{ea0a5c8d-bc20-4d7b-9d4f-1763c4494813}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Object Class">
+      <UniqueIdentifier>{1120ee52-b3ab-4e07-8040-d3e51d44468b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Object Class\Player">
+      <UniqueIdentifier>{cf6368d9-b2c8-454c-8745-ebd611861d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Object Class\Bullet">
+      <UniqueIdentifier>{53a97a5b-004e-44e1-ac42-6094d96217b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -31,6 +40,12 @@
     </ClCompile>
     <ClCompile Include="EventQueue.cpp">
       <Filter>소스 파일\EventQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Object Class\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>소스 파일\Object Class\Bullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +63,12 @@
     </ClInclude>
     <ClInclude Include="EventQueue.h">
       <Filter>소스 파일\EventQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Object Class\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>소스 파일\Object Class\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
