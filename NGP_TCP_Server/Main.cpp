@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "ThreadManager.h"
 
 int main()
 {
@@ -65,8 +66,11 @@ int main()
 			err_display("accept()");
 			break;
 		}
-		else
+		else {
 			printf("Client accept() complete\n");
+			ThreadManager::GetInstance().AddThread(clientSock);
+			printf("Add NetworkThread\n");
+		}
 	}
 
 	WSACleanup();
