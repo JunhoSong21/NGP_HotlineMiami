@@ -33,6 +33,9 @@
     <Filter Include="소스 파일\Object Class\Grenade">
       <UniqueIdentifier>{6edbb99f-fc22-4a20-bb68-a7f267020509}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ThreadManager">
+      <UniqueIdentifier>{54ec9786-8208-44ad-850c-73899da5350c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -52,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="Grenade.cpp">
       <Filter>소스 파일\Object Class\Grenade</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>소스 파일\ThreadManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="Grenade.h">
       <Filter>소스 파일\Object Class\Grenade</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadManager.h">
+      <Filter>소스 파일\ThreadManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
