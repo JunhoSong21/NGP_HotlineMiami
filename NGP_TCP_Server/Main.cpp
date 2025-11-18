@@ -17,6 +17,15 @@ int main()
 	else
 		printf("socket() complete\n");
 
+	// SO_REUSEADDR
+	DWORD optValue = 1;
+	retValue = setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR,
+		(const char*)&optValue, sizeof(optValue));
+	if (retValue == SOCKET_ERROR)
+		err_quit("setsockopt()");
+	else
+		printf("setsockopt() complete\n");
+
 	// bind
 	struct sockaddr_in serverAddr;
 	memset(&serverAddr, 0, sizeof(serverAddr));
