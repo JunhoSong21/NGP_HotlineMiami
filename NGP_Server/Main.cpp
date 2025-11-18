@@ -5,10 +5,10 @@
 #include "UpdateProcess.h"
 #include "resource.h"
 
-HWND hDlg = nullptr;
-HWND hEdit1, hEdit2, hEdit3, hEdit4;
-HINSTANCE hInst = GetModuleHandleW(NULL);
-HBRUSH editControlBrush = nullptr;
+//HWND hDlg = nullptr;
+//HWND hEdit1, hEdit2, hEdit3, hEdit4;
+//HINSTANCE hInst = GetModuleHandleW(NULL);
+//HBRUSH editControlBrush = nullptr;
 //INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int main(int argc, char* argv[])
@@ -88,29 +88,29 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg) {
-	case WM_INITDIALOG:
-		if (editControlBrush == nullptr)
-			editControlBrush = CreateSolidBrush(RGB(255, 255, 255));
-		hEdit1 = GetDlgItem(hDlg, IDC_EDIT1);
-		hEdit2 = GetDlgItem(hDlg, IDC_EDIT2);
-		hEdit3 = GetDlgItem(hDlg, IDC_EDIT3);
-		hEdit4 = GetDlgItem(hDlg, IDC_EDIT4);
-		return TRUE;
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-		case ID_SHUTDOWN:
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-		}
-		return FALSE;
-
-	case WM_DESTROY:
-		return TRUE;
-	}
-
-	return FALSE;
-}
+//INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+//{
+//	switch (msg) {
+//	case WM_INITDIALOG:
+//		if (editControlBrush == nullptr)
+//			editControlBrush = CreateSolidBrush(RGB(255, 255, 255));
+//		hEdit1 = GetDlgItem(hDlg, IDC_EDIT1);
+//		hEdit2 = GetDlgItem(hDlg, IDC_EDIT2);
+//		hEdit3 = GetDlgItem(hDlg, IDC_EDIT3);
+//		hEdit4 = GetDlgItem(hDlg, IDC_EDIT4);
+//		return TRUE;
+//
+//	case WM_COMMAND:
+//		switch (LOWORD(wParam)) {
+//		case ID_SHUTDOWN:
+//			EndDialog(hDlg, LOWORD(wParam));
+//			return TRUE;
+//		}
+//		return FALSE;
+//
+//	case WM_DESTROY:
+//		return TRUE;
+//	}
+//
+//	return FALSE;
+//}

@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "Packet.h"
+#include "EventQueue.h"
 
 class NetworkThread {
 private:

@@ -50,5 +50,5 @@ void NetworkThread::ThreadFunc()
 
 void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 {
-	
+	EventQueue::GetInstance().PushEvent()
 }
