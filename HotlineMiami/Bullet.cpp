@@ -36,12 +36,6 @@ void Bullet::Update(float deltaTime)
 {
     if (!isVisible) return;
 
-    lifeTime += deltaTime;
-    if (lifeTime > maxLifeTime) {
-        isVisible = false;
-        return;
-    }
-
     // 방향 벡터 * 속도 * deltaTime 만큼 이동
     x += dirX * speed * deltaTime;
     y += dirY * speed * deltaTime;
