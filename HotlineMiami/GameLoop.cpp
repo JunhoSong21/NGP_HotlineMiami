@@ -105,7 +105,7 @@ void GameLoop::Render()
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
 
-		// 1) ¹è°æ 
+		// 1) 배경 렌더링
 		{
 			auto s = g.Save();
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
@@ -114,7 +114,7 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 2) ¸Ê(Å¸ÀÏ) 
+		// 2) 맵(타일) 렌더링
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeNone);
@@ -125,9 +125,10 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
+		// 3) 벽(Wall) 렌더링
 		if (wall) wall->Render(g);     
 
-		// 3) ÇÃ·¹ÀÌ¾î
+		// 4) 플레이어 렌더링
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
