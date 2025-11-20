@@ -6,6 +6,7 @@
 #include "Wall.h"
 #include "Timer.h"
 #include "Player.h"
+#include "Bullet.h"
 
 #include "ImageManager.h"
 
@@ -18,9 +19,11 @@ private:
 	Timer* timer;
 	Player* player;
 	Wall* wall;
+	Bullet* bullet;
 	float deltaTime;
 
 	HWND hWnd;
+
 	
 public:
 	GameLoop();

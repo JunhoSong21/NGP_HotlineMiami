@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GameLoop.h"
+#include "ClientNetwork.h"
 
 ULONG_PTR gdiplusToken = 0;
 
@@ -10,6 +11,8 @@ LPCTSTR IpszWindowName = L"Hotline Miami.exe";
 GameLoop* gameLoop = nullptr;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdParam, int nCmdShow)
 {

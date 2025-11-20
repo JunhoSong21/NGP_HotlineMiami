@@ -7,6 +7,7 @@ GameLoop::GameLoop() :
 	wall(nullptr),
 	timer(nullptr),
 	player(nullptr),
+	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
 {
@@ -50,6 +51,14 @@ void GameLoop::Init(HWND hwnd)
 	player = new Player();
 	player->Init();
 	player->LoadPlayerImages(imgManager);    
+
+	bullet = new Bullet();
+	bullet->LoadBulletImages(imgManager);
+	bullet->Init(
+		640.0f, 360.0f,   // 시작 위치
+		1.0f, 0.0f,       // 진행 방향 (오른쪽)
+		0                 // ownerID
+	);
 }
 
 void GameLoop::Update()
@@ -81,6 +90,7 @@ void GameLoop::Update()
 		// 5) Ãæµ¹ Ã³¸® °á°ú¸¦ ÇÃ·¹ÀÌ¾î¿¡ ¹Ý¿µ
 		player->GetPos() = resolvedPos;
 	}
+	if (bullet)     bullet->Update(deltaTime);
 }
 
 void GameLoop::Render()
@@ -136,6 +146,17 @@ void GameLoop::Render()
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 			if (player) player->Render(hWnd, g, imgManager);
+			g.Restore(s);
+		}
+
+		// 5) 총알 렌더링
+		{
+			auto s = g.Save();
+			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
+			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+			if (bullet) bullet->Render(hWnd, g, imgManager);
 			g.Restore(s);
 		}
 	}
