@@ -58,6 +58,7 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 {
 	auto playerMoveEvent = std::make_unique<PlayerMove>(threadId, 0.0, 0.0);
 	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
+	printf("Key Input Packet recv\n");
 }
 
 void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
