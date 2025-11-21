@@ -67,9 +67,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\NGP_Server\Common.h">
-      <Filter>소스 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkThread.h">
       <Filter>소스 파일\NetworkThread</Filter>
     </ClInclude>
@@ -96,6 +93,9 @@
     </ClInclude>
     <ClInclude Include="DataManager.h">
       <Filter>소스 파일\DataManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>소스 파일\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
