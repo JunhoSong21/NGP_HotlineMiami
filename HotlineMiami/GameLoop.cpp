@@ -7,6 +7,7 @@ GameLoop::GameLoop() :
 	wall(nullptr),
 	timer(nullptr),
 	player(nullptr),
+	grenade(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
 {
@@ -23,7 +24,7 @@ GameLoop::~GameLoop()
 void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
-	// °´Ã¼ Å¬·¡½º Init, ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	
 	backGround = new BackGround();
         
 	map = new Map();
@@ -49,7 +50,11 @@ void GameLoop::Init(HWND hwnd)
 
 	player = new Player();
 	player->Init();
-	player->LoadPlayerImages(imgManager);    
+	player->LoadPlayerImages(imgManager);
+
+	grenade = new Grenade();
+	grenade->Init();
+	grenade->LoadGrenadeImage(imgManager);
 }
 
 void GameLoop::Update()
@@ -105,7 +110,7 @@ void GameLoop::Render()
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
 
-		// 1) ¹è°æ 
+		// 1) backGround
 		{
 			auto s = g.Save();
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
@@ -114,7 +119,7 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 2) ¸Ê(Å¸ÀÏ) 
+		// 2) map
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeNone);
@@ -126,8 +131,9 @@ void GameLoop::Render()
 		}
 
 		if (wall) wall->Render(g);     
+		if (grenade) grenade->Render(g, imgManager);
 
-		// 3) ÇÃ·¹ÀÌ¾î
+		// 3) player
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);

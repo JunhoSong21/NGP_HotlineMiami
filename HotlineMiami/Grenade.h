@@ -17,8 +17,10 @@ public:
     Grenade();
     ~Grenade() = default;
 
+    // 수류탄 개수 초기화
+    void Init();
     // 리소스 로드용
-    void Init(ImageManager& imgMgr);
+    void LoadGrenadeImage(ImageManager& imgMgr);
     void Update(float deltaTime);
     void Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr);
     // 발사 (플레이어 위치, 목표 위치)

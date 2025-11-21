@@ -7,17 +7,22 @@ Grenade::Grenade() :
     pos{ 0.0f, 0.0f },
     dir{ 0.0f, 0.0f },
     speed(400.0f),         // 필요하면 나중에 조절
-    isActive(false),
+    isActive(true),
     maxDistance(0.0f),
     traveled(0.0f)
 {
 }
 
-void Grenade::Init(ImageManager& imgMgr)
+void Grenade::Init()
 {
-    // 실제 파일 이름에 맞게 경로/이름만 수정하면 됨
-    // 예) Resource/Grenade/sprGrenade.png
-    imgMgr.LoadSpriteImage(L"Resource/Grenade/sprGrenade.png", spriteKey);
+    isActive = true;      // 테스트용
+    traveled = 0.0f;
+    maxDistance = 0.0f;
+}
+
+void Grenade::LoadGrenadeImage(ImageManager& imgMgr)
+{
+    imgMgr.LoadSpriteImage(L"Resource/Grenade/sampleGrenade.png", spriteKey);
 }
 
 void Grenade::Update(float deltaTime)
@@ -50,26 +55,29 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
         return;
 
     Gdiplus::Bitmap* bmp = imgMgr.GetImage(spriteKey);
-    if (!bmp)
+    if (!bmp) {
+        DEBUG_MSG(L"[Grenade] GetImage 실패 -> 키가 잘못 되었거나 이미지가 로드되지 않음");
         return;
+    }
 
-    const float w = static_cast<float>(bmp->GetWidth());
-    const float h = static_cast<float>(bmp->GetHeight());
+    // 화면에 찍을 위치 (테스트용 100,100, 32x32)
+    const float drawX = 100.0f;
+    const float drawY = 100.0f;
+    const float renderW = 18.0f;
+    const float renderH = 15.0f;
 
-    // 수류탄이 중심에 오도록 렌더
-    Gdiplus::RectF dst(
-        pos.X - w * 0.5f,
-        pos.Y - h * 0.5f,
-        w,
-        h
-    );
+    Gdiplus::RectF dst(drawX, drawY, renderW, renderH);
+
+    const float srcX = 0.0f;   
+    const float srcY = 0.0f;   
+    const float srcW = 18.0f;
+    const float srcH = 15.0f;
 
     graphics.DrawImage(
         bmp,
         dst,
-        0, 0,
-        static_cast<INT>(w),
-        static_cast<INT>(h),
+        srcX, srcY,
+        srcW, srcH,
         Gdiplus::UnitPixel
     );
 }

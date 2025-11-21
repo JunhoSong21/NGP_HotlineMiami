@@ -19,6 +19,7 @@ private:
 	Timer* timer;
 	Player* player;
 	Wall* wall;
+	Grenade* grenade;
 	float deltaTime;
 	
 	HWND hWnd;
