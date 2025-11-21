@@ -21,15 +21,15 @@ void DataManager::AddGrenade(std::unique_ptr<Grenade> grenade)
 
 Player* DataManager::GetPlayer(int id)
 {
-
+	return 0;
 }
 
 Bullet* DataManager::GetBullet(int id)
 {
-
+	return 0;
 }
 
 Grenade* DataManager::GetGrenade(int id)
 {
-
+	return 0;
 }

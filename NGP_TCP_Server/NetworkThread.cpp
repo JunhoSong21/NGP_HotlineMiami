@@ -63,12 +63,12 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 
 void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
 {
-	auto bulletTriggerEvent = std::make_unique<BulletTrigger>(threadId, 0.0, 0.0);
-	EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
+	//auto bulletTriggerEvent = std::make_unique<BulletTrigger>(threadId, 0.0, 0.0);
+	//EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
 }
 
 void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 {
-	auto grenadeThrowEvent = std::make_unique<GrenadeThrow>(threadId, 0, 0, 0.0);
-	EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
+	//auto grenadeThrowEvent = std::make_unique<GrenadeThrow>(threadId, 0, 0, 0.0);
+	//EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
 }

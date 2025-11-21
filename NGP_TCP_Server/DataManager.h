@@ -4,6 +4,8 @@
 #include <mutex>
 
 #include "Player.h"
+#include "Bullet.h"
+#include "Grenade.h"
 
 class Player;
 class Bullet;

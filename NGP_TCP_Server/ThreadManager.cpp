@@ -7,8 +7,8 @@ void ThreadManager::AddThread(SOCKET clientSock)
 	int clientThreadId = threadId;
 	networkThreads[clientThreadId] = std::make_unique<NetworkThread>(clientThreadId, clientSock);
 
-	auto newPlayer = std::make_unique<Player>(threadId, threadId);
-	DataManager::GetInstance().AddPlayer(std::move(newPlayer));
+	//auto newPlayer = std::make_unique<Player>(threadId, threadId);
+	//DataManager::GetInstance().AddPlayer(std::move(newPlayer));
 
 	// 클라이언트가 가진 플레이어, 총알, 수류탄 정보를 쉽게 관리하기 위해
 	// 쓰레드 id를 공용키로 사용할 수 있도록 한다.

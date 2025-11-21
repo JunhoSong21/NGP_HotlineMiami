@@ -65,6 +65,9 @@
     <ClCompile Include="DataManager.cpp">
       <Filter>소스 파일\DataManager</Filter>
     </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkThread.h">
@@ -96,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>소스 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="concurrentqueue.h">
+      <Filter>소스 파일\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

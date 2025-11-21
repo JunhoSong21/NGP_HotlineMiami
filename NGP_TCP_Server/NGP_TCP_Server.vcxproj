@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Common.cpp" />
     <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="EventQueue.cpp" />
     <ClCompile Include="Grenade.cpp" />
@@ -135,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="concurrentqueue.h" />
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="GameEvent.h" />

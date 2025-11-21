@@ -18,7 +18,10 @@ struct GameEvent {
 	Type	type;
 	int		networkThreadId;
 
+	GameEvent() : type(PLAYER_MOVE), networkThreadId(-1) {}
 	virtual ~GameEvent() = default;
+	GameEvent(const GameEvent&) = delete;
+	GameEvent& operator=(const GameEvent&) = delete;
 };
 
 struct PlayerMove : GameEvent {
@@ -65,26 +68,26 @@ struct BulletCollision : GameEvent {
 	}
 };
 
-struct GrenadeThrow : GameEvent {
-
-};
-
-struct GrenadeUpdate : GameEvent {
-
-};
-
-struct GrenadeExplosion : GameEvent {
-
-};
-
-struct LoginTry : GameEvent {
-
-};
-
-struct RoomMake : GameEvent {
-
-};
-
-struct RoomReady : GameEvent {
-
-};
+//struct GrenadeThrow : GameEvent {
+//
+//};
+//
+//struct GrenadeUpdate : GameEvent {
+//
+//};
+//
+//struct GrenadeExplosion : GameEvent {
+//
+//};
+//
+//struct LoginTry : GameEvent {
+//
+//};
+//
+//struct RoomMake : GameEvent {
+//
+//};
+//
+//struct RoomReady : GameEvent {
+//
+//};
