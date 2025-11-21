@@ -6,6 +6,7 @@
 #include "Wall.h"
 #include "Timer.h"
 #include "Player.h"
+#include "Grenade.h"
 
 #include "ImageManager.h"
 
@@ -19,7 +20,7 @@ private:
 	Player* player;
 	Wall* wall;
 	float deltaTime;
-
+	
 	HWND hWnd;
 	
 public:
