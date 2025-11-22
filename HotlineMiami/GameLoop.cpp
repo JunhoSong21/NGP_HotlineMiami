@@ -7,6 +7,7 @@ GameLoop::GameLoop() :
 	wall(nullptr),
 	timer(nullptr),
 	player(nullptr),
+	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
 {
@@ -50,6 +51,15 @@ void GameLoop::Init(HWND hwnd)
 	player = new Player();
 	player->Init();
 	player->LoadPlayerImages(imgManager);    
+
+	bullet = new Bullet();
+	bullet->LoadBulletImages(imgManager);
+	bullet->Init(
+		640.0f, 360.0f,   // 시작 위치
+		1.0f, 0.0f,       // 진행 방향 (오른쪽)
+		0                 // ownerID
+	);
+	OutputDebugStringA("Init!\n");
 }
 
 void GameLoop::Update()
@@ -81,6 +91,7 @@ void GameLoop::Update()
 		// 5) Ãæµ¹ Ã³¸® °á°ú¸¦ ÇÃ·¹ÀÌ¾î¿¡ ¹Ý¿µ
 		player->GetPos() = resolvedPos;
 	}
+	if (bullet)     bullet->Update(deltaTime);
 }
 
 void GameLoop::Render()
@@ -105,7 +116,7 @@ void GameLoop::Render()
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
 
-		// 1) ¹è°æ 
+		// 1) 배경 렌더링
 		{
 			auto s = g.Save();
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
@@ -114,7 +125,7 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 2) ¸Ê(Å¸ÀÏ) 
+		// 2) 맵(타일) 렌더링
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeNone);
@@ -125,9 +136,10 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
+		// 3) 벽(Wall) 렌더링
 		if (wall) wall->Render(g);     
 
-		// 3) ÇÃ·¹ÀÌ¾î
+		// 4) 플레이어 렌더링
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
@@ -135,6 +147,17 @@ void GameLoop::Render()
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 			if (player) player->Render(hWnd, g, imgManager);
+			g.Restore(s);
+		}
+
+		// 5) 총알 렌더링
+		{
+			auto s = g.Save();
+			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
+			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+			if (bullet) bullet->Render(hWnd, g, imgManager);
 			g.Restore(s);
 		}
 	}
@@ -145,6 +168,7 @@ void GameLoop::Render()
 
 	delete backBufferBitmap;
 	ReleaseDC(hWnd, hDC);
+
 }
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)

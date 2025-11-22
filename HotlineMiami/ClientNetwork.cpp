@@ -3,8 +3,12 @@
 #include "NetProtocol.h"
 #include "Player.h"
 
+SOCKET g_ClientSock = INVALID_SOCKET;
+bool   g_NetworkRunning = false;
+
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 {
+    OutputDebugStringA("sendready\n");
     CS_KEY_INPUT pkt{};
     pkt.flags = 0;
 
@@ -28,13 +32,88 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     pkt.mouseX = static_cast<float>(mouse.x);
     pkt.mouseY = static_cast<float>(mouse.y);
 
-    // 패킷을 버퍼로 복사
-    char buffer[sizeof(pkt)];
-    std::memcpy(buffer, &pkt, sizeof(pkt));
+    // 패킷헤더 채우기
+    PacketHeader header{};
+    header.packetType = PN::CS_KEY_INPUT;
+    header.packetSize = sizeof(PacketHeader) + sizeof(pkt);
+    
+    // 헤더 먼저 보내기
+    int sent = send(sock, reinterpret_cast<const char*>(&header),
+        sizeof(header), 0);
+    if (sent == SOCKET_ERROR)
+        return SOCKET_ERROR;
+    // 바디 보내기
+    sent = send(
+        sock,
+		reinterpret_cast<const char*>(&pkt),    // reinterpret_cast는 포인터 타입 변환에 사용된다
+        static_cast<int>(sizeof(pkt)),
+        0
+    );
+    if (sent == SOCKET_ERROR)
+        return SOCKET_ERROR;
 
-    // 서버로 전송
-    int retval = send(sock, buffer, sizeof(buffer), 0);
+    OutputDebugStringA("send!\n");
 
-    return retval;
+    return static_cast<int>(sizeof(header) + sizeof(pkt));
 
+}
+
+// 네트워크 초기화
+bool InitNetwork(const char* serverIp, unsigned short port)
+{
+	// 윈속 초기화
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+        return false;
+	// 소켓 생성
+    g_ClientSock = socket(AF_INET, SOCK_STREAM, 0);
+    if (g_ClientSock == INVALID_SOCKET)
+        return false;
+	// connect
+    sockaddr_in server{};
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    inet_pton(AF_INET, serverIp, &server.sin_addr);
+
+    if (connect(g_ClientSock, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
+        return false;
+
+    g_NetworkRunning = true;
+    return true;
+}
+
+// 네트워크 종료
+void ShutdownNetwork()
+{
+    g_NetworkRunning = false;
+
+    if (g_ClientSock != INVALID_SOCKET)
+    {
+        closesocket(g_ClientSock);
+        g_ClientSock = INVALID_SOCKET;
+    }
+    WSACleanup();
+}
+
+DWORD WINAPI Client_Network_Thread(LPVOID param)
+{
+    NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
+    HWND    hWnd = p->hWnd;
+    Player* player = p->player;
+
+    while (g_NetworkRunning)
+    {
+        // 입력을 서버에 보냄
+        if (Send_Input(g_ClientSock, hWnd, *player) == SOCKET_ERROR)
+        {
+            g_NetworkRunning = false;
+            break;
+        }
+
+        //(나중에) RecvProcess();
+        Sleep(16);
+    }
+
+    delete p; // 동적 할당했던 param delete
+    return 0;
 }
