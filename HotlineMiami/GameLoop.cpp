@@ -54,11 +54,8 @@ void GameLoop::Init(HWND hwnd)
 
 	bullet = new Bullet();
 	bullet->LoadBulletImages(imgManager);
-	bullet->Init(
-		640.0f, 360.0f,   // 시작 위치
-		1.0f, 0.0f,       // 진행 방향 (오른쪽)
-		0                 // ownerID
-	);
+	bullet->SetVisible(false);
+
 	OutputDebugStringA("Init!\n");
 }
 
@@ -173,4 +170,32 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	switch (Msg)
+	{
+	case WM_LBUTTONDOWN:
+	{
+		if(!player || !bullet)
+			break;
+		int mouseX = GET_X_LPARAM(lParam);
+		int mouseY = GET_Y_LPARAM(lParam);
+		// 플레이어 위치
+		Gdiplus::PointF playerPos = player->GetPosition();
+		// 방향벡터
+		float dx = static_cast<float>(mouseX) - playerPos.X;
+		float dy = static_cast<float>(mouseY) - playerPos.Y;
+
+		float len = std::sqrt(dx * dx + dy * dy);
+		if (len > 0.0f)
+		{
+			dx /= len;
+			dy /= len;
+		}
+
+		// 총알 초기화
+		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+		break;
+	}
+	default:
+		break;
+	}
 }
