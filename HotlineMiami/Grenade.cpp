@@ -111,6 +111,35 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
         srcW, srcH,
         Gdiplus::UnitPixel
     );
+
+    // 남은 시간 표시
+    if (isInFuse)
+    {
+        // 남은 시간(초)을 0.0 단위로 표시
+        wchar_t buf[32]{};
+        swprintf_s(buf, L"%.1f", fuseRemain);
+
+        Gdiplus::FontFamily fontFamily(L"Arial");
+        Gdiplus::Font font(&fontFamily, 12.0f, Gdiplus::FontStyleBold, Gdiplus::UnitPoint);
+        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 0, 0)); // 불투명 빨강
+        Gdiplus::StringFormat format;
+        format.SetAlignment(Gdiplus::StringAlignmentCenter);
+
+        // 수류탄 바로 위에 텍스트 찍기
+        Gdiplus::PointF textPos(
+            pos.X,
+            pos.Y - renderH * 0.5f - 15.0f
+        );
+
+        graphics.DrawString(
+            buf,
+            -1,
+            &font,
+            textPos,
+            &format,
+            &brush
+        );
+    }
 }
 
 // 마우스 우클릭 지점까지 던지기 
