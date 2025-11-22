@@ -11,7 +11,10 @@ Grenade::Grenade() :
     maxDistance(0.0f),
     traveled(0.0f),
     maxCount(2),           // 최대 2발
-    remainCount(2)         // 시작 시 2개 소지
+    remainCount(2),         // 시작 시 2개 소지
+    isInFuse(false),
+    fuseDuration(4.0f),
+    fuseRemain(0.0f)
 {
 }
 
@@ -21,6 +24,9 @@ void Grenade::Init()
     traveled = 0.0f;
     maxDistance = 0.0f;
     remainCount = maxCount;  // 수류탄 2개로 리셋
+    isInFuse = false;
+    fuseDuration = 4.0f;
+    fuseRemain = 0.0f;
 }
 
 void Grenade::LoadGrenadeImage(ImageManager& imgMgr)
@@ -36,28 +42,38 @@ void Grenade::Update(float deltaTime)
     if (deltaTime <= 0.0f)
         return;
 
-    float step = speed * deltaTime;
-    // 남은 거리
-    float remain = maxDistance - traveled;
-    if (remain <= 0.0f) {
-        // 도착 지점에 이미 도달 → 여기서 "폭발" 예정
-        isActive = false;    // 현재는 그냥 사라지게 처리
-        return;
-    }
-    
-    // 보정
-    if (step > remain)
-        step = remain;
+    // 아직 비행 중인 상태라면 이동 처리
+    if (!isInFuse)
+    {
+        float step = speed * deltaTime;
+        // 남은 거리
+        float remain = maxDistance - traveled;
+        if (remain <= 0.0f) {
+            // 도착 지점에 이미 도달 → 여기서 "폭발" 예정
+            speed = 0.0f;
+            isInFuse = true;
+            fuseRemain = fuseDuration;   // 4초 카운트다운 시작
+            return;
+        }
 
-    pos.X += dir.X * step;
-    pos.Y += dir.Y * step;
-    traveled += step;
+        // 보정
+        if (step > remain)
+            step = remain;
 
-    // 목표 지점까지 다 왔으면 비활성화 (폭발은 나중에 구현)
-    if (traveled >= maxDistance) {
-        isActive = false;
-        // 나중에 여기서 폭발 함수 호출
+        pos.X += dir.X * step;
+        pos.Y += dir.Y * step;
+        traveled += step;
+
+        // 목표 지점까지 다 왔으면 여기서 멈추고 대기
+        if (traveled >= maxDistance) {
+            speed = 0.0f;
+            isInFuse = true;
+            fuseRemain = fuseDuration;
+            return;
+        }
     }
+    // 폭발 시작
+    Active(deltaTime);
 }
 
 void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
@@ -133,8 +149,32 @@ void Grenade::Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targ
     traveled = 0.0f;
     isActive = true;
 
+    // 퓨즈 상태 초기화
+    isInFuse = false;
+    fuseRemain = 0.0f;
+    speed = 400.0f; // 다시 정상 속도로 세팅
+
     --remainCount;           // 한 발 소모
     DEBUG_MSG(L"[Grenade] 수류탄 투척! 남은 수류탄: %d", remainCount);
+}
+
+void Grenade::Active(float deltaTime)
+{
+    if (!isActive || !isInFuse)
+        return;
+
+    if (deltaTime <= 0.0f)
+        return;
+
+    fuseRemain -= deltaTime;
+    if (fuseRemain <= 0.0f)
+    {
+        fuseRemain = 0.0f;
+        // 지금은 단순히 사라지는 것까지만
+        isActive = false;
+        isInFuse = false;
+        DEBUG_MSG(L"[Grenade] 폭발 시간 종료, 수류탄 비활성화");
+    }
 }
 
 void Grenade::Reset()

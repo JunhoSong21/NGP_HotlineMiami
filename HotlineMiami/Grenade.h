@@ -15,6 +15,11 @@ private:
     int            maxCount;     // 최대 소지 개수 (2)
     int            remainCount;  // 남은 수류탄 개수
 
+    // 폭발 관련
+    bool  isInFuse;      // true면 멈춰서 카운트다운 중
+    float fuseDuration;  // 전체 대기 시간(초) - 여기서는 4.0f
+    float fuseRemain;    // 남은 시간(초)
+
 public:
     Grenade();
     ~Grenade() = default;
@@ -28,6 +33,7 @@ public:
     // 발사 (플레이어 위치, 목표 위치)
     void Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targetPos);
 
+    void Active(float deltaTime);
     bool IsActive() const { return isActive; }
     int  GetRemain()    const { return remainCount; }
 
