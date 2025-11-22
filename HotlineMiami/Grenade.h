@@ -17,7 +17,7 @@ private:
 
     // 폭발 관련
     bool  isInFuse;      // true면 멈춰서 카운트다운 중
-    float fuseDuration;  // 전체 대기 시간(초) - 여기서는 4.0f
+    float fuseDuration;  // 전체 대기 시간(초) 
     float fuseRemain;    // 남은 시간(초)
 
 public:

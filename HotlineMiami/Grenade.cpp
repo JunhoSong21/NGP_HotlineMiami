@@ -13,7 +13,7 @@ Grenade::Grenade() :
     maxCount(2),           // 최대 2발
     remainCount(2),         // 시작 시 2개 소지
     isInFuse(false),
-    fuseDuration(4.0f),
+    fuseDuration(3.0f),
     fuseRemain(0.0f)
 {
 }
@@ -25,7 +25,7 @@ void Grenade::Init()
     maxDistance = 0.0f;
     remainCount = maxCount;  // 수류탄 2개로 리셋
     isInFuse = false;
-    fuseDuration = 4.0f;
+    fuseDuration = 3.0f;
     fuseRemain = 0.0f;
 }
 
