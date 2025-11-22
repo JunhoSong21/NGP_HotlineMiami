@@ -59,6 +59,7 @@ void GameLoop::Init(HWND hwnd)
 		1.0f, 0.0f,       // 진행 방향 (오른쪽)
 		0                 // ownerID
 	);
+	OutputDebugStringA("Init!\n");
 }
 
 void GameLoop::Update()
@@ -167,6 +168,7 @@ void GameLoop::Render()
 
 	delete backBufferBitmap;
 	ReleaseDC(hWnd, hDC);
+
 }
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)

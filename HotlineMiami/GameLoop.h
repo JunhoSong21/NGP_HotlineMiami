@@ -33,4 +33,5 @@ public:
 	void Update();
 	void Render();
 	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
+	Player* GetPlayer() { return player; } // Gammeloop에서 player 꺼낼 수 있도록
 };
