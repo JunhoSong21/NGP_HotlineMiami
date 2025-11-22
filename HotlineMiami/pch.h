@@ -8,7 +8,7 @@
 
 // 기본 헤더
 #include <Windows.h>
-
+#include <cmath>
 // Gdiplus
 #include <gdiplus.h>
 #pragma comment(lib, "gdiplus.lib")
