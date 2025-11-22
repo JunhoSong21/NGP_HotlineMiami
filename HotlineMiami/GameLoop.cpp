@@ -63,29 +63,25 @@ void GameLoop::Update()
 	if (timer) deltaTime = timer->getDeltaTime();
 	if (player)
 	{
-		// 1) ÀÌµ¿ Àü À§Ä¡
 		Gdiplus::PointF oldPos = player->GetPos();
 
-		// 2) ÇÃ·¹ÀÌ¾î ÀÚÃ¼ ·ÎÁ÷À¸·Î ¸ÕÀú ÀÌµ¿ ½Ãµµ
 		player->Update(deltaTime);
 
-		// 3) ÀÌµ¿ ÈÄ À§Ä¡¿Í delta °è»ê
 		Gdiplus::PointF newPos = player->GetPos();
 		Gdiplus::PointF delta(newPos.X - oldPos.X,
 			newPos.Y - oldPos.Y);
 
-		// ·»´õ ±âÁØ ½ÇÁ¦ Ãæµ¹ ¹Ú½º Å©±â
 		Gdiplus::SizeF playerAabb(90.0f, 50.0f);
 
-		// 4) Ãæµ¹ Ã³¸®¿ë À§Ä¡´Â oldPos¿¡¼­ ½ÃÀÛ
 		Gdiplus::PointF resolvedPos = oldPos;
 
 		if (wall)
 			wall->ResolveMove(resolvedPos, playerAabb, delta);
 
-		// 5) Ãæµ¹ Ã³¸® °á°ú¸¦ ÇÃ·¹ÀÌ¾î¿¡ ¹Ý¿µ
 		player->GetPos() = resolvedPos;
 	}
+	if (grenade)
+		grenade->Update(deltaTime);
 }
 
 void GameLoop::Render()
@@ -155,4 +151,29 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	switch (Msg)
+	{
+	case WM_RBUTTONDOWN:
+	{
+		// 플레이어/수류탄이 준비되어 있을 때만 처리
+		if (!player || !grenade)
+			return;
+
+		// 마우스 클릭 지점 (클라이언트 좌표계)
+		int mouseX = static_cast<short>(LOWORD(lParam));
+		int mouseY = static_cast<short>(HIWORD(lParam));
+
+		Gdiplus::PointF startPos = player->GetPos();                 // 플레이어 중심
+		Gdiplus::PointF targetPos(
+			static_cast<float>(mouseX),
+			static_cast<float>(mouseY)
+		);
+
+		// 수류탄 투척 시도 (내부에서 2발 제한 체크)
+		grenade->Throw(startPos, targetPos);
+		break;
+	}
+	default:
+		break;
+	}
 }

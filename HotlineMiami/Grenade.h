@@ -12,6 +12,8 @@ private:
 
     float maxDistance;        // 목표 지점까지 거리
     float traveled;           // 지금까지 이동한 거리
+    int            maxCount;     // 최대 소지 개수 (2)
+    int            remainCount;  // 남은 수류탄 개수
 
 public:
     Grenade();
@@ -27,5 +29,7 @@ public:
     void Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targetPos);
 
     bool IsActive() const { return isActive; }
+    int  GetRemain()    const { return remainCount; }
+
     void Reset();
 };
