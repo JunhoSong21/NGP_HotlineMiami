@@ -15,7 +15,7 @@ private:
 	mutable std::mutex threadMutex;
 	std::atomic<int> threadId;
 
-	ThreadManager() = default;
+	ThreadManager();
 	ThreadManager(const ThreadManager&) = delete;
 	ThreadManager& operator=(const ThreadManager&) = delete;
 

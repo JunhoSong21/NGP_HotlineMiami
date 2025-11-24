@@ -24,6 +24,8 @@ void PopEvent::HandleEvent(std::unique_ptr<GameEvent> event)
 
 void PopEvent::HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event)
 {
+	std::lock_guard<std::mutex> lock(playerUpdateMutex);
+
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player) {
 		player->posX = event->destX;
