@@ -51,6 +51,8 @@ void NetworkThread::ThreadFunc()
 		case PN::CS_ROOM_PACKET:
 			break;
 		}
+
+		// send큐에 데이터가 있다면 전송
 	}
 }
 

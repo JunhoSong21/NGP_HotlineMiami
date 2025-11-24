@@ -12,4 +12,6 @@ public:
 
 private:
 	void HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event);
+
+	float CalculateAtan2Float(float x1, float y1, float x2, float y2);
 };
