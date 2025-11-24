@@ -49,6 +49,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	gameLoop = new GameLoop();
 	gameLoop->Init(hWnd);
 
+	if (!InitNetwork("127.0.0.1", 9000)) {
+		MessageBox(hWnd, L"서버 연결 실패", L"Error", MB_OK);
+		return -1;
+	}
+
 
 	// 서버통신 스레드 생성
 	NetworkThreadParam* netParam = new NetworkThreadParam;

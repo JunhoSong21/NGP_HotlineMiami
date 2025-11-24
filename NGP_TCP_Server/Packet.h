@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct PacketHeader {
 	int		packetType;
 	size_t	packetSize;
@@ -63,13 +63,13 @@ struct CS_KEY_INPUT {
 };
 
 struct CS_BULLET_TRIGGER {
-	float	dirAngle;
+	float	dirRadAngle;
 };
 
 struct CS_GRENADE_THROW {
-	float	dirAngle;
+	float	dirRadAngle;
 };
-#pragma pack()
+#pragma pack(pop)
 
 namespace PN { // Packet Name
 	constexpr int SC_PLAYER_MOVE	= 1000;
@@ -83,3 +83,11 @@ namespace PN { // Packet Name
 	constexpr int CS_BULLET_TRIGGER = 1008;
 	constexpr int CS_GRENADE_THROW	= 1009;
 }
+
+enum KEY_INPUT_FLAGS : uint16_t		//  키 입력 플래그 정의
+{
+	KEY_MOVE_W = 1 << 0,
+	KEY_MOVE_A = 1 << 1,
+	KEY_MOVE_S = 1 << 2,
+	KEY_MOVE_D = 1 << 3,
+};
