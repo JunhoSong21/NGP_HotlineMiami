@@ -2,6 +2,7 @@
 #include "ClientNetwork.h"
 #include "NetProtocol.h"
 #include "Player.h"
+#include "Bullet.h"
 
 SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
@@ -100,6 +101,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
     NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
     HWND    hWnd = p->hWnd;
     Player* player = p->player;
+	Bullet* bullet = p->bullet;
 
     while (g_NetworkRunning)
     {
@@ -109,11 +111,62 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
             g_NetworkRunning = false;
             break;
         }
+        
+        // RecvProcess();
+        if (RecvProcess(g_ClientSock, bullet) == -1)
+        {
+            g_NetworkRunning = false;
+            break;
+        }
 
-        //(나중에) RecvProcess();
+
         Sleep(16);
     }
 
     delete p; // 동적 할당했던 param delete
     return 0;
 }
+
+// Recv 관련 함수 구현
+int Recv_BulletData(SOCKET sock, Bullet* bullet)
+{
+    if (!bullet)
+        return 0;
+
+    SC_BULLET_STATE pkt{};
+    int ret = recv(sock, reinterpret_cast<char*>(&pkt),
+        sizeof(pkt), MSG_WAITALL);
+    if (ret <= 0)
+    {
+        return -1;
+    }
+
+    bullet->SetVisible(pkt.isActive != 0);
+    bullet->SetPosition(pkt.posX, pkt.posY);
+    bullet->SetDirection(pkt.dirX, pkt.dirY);
+
+    return ret;
+}
+
+int RecvProcess(SOCKET sock, Bullet* bullet)
+{
+    // 공통 헤더 먼저 받기
+    PacketHeader header{};
+    int ret = recv(sock, reinterpret_cast<char*>(&header),
+        sizeof(header), MSG_WAITALL);
+    if (ret <= 0)
+    {
+        return -1;  // 소켓 종료/에러
+    }
+
+    // 2) 패킷 종류에 따라 분기
+    switch (header.packetType)
+    {
+    case PN::SC_BULLET_STATE:
+        return Recv_BulletData(sock, bullet);
+
+    default:
+        return 0;
+    }
+}
+

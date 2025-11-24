@@ -59,6 +59,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	NetworkThreadParam* netParam = new NetworkThreadParam;
 	netParam->hWnd = hWnd;
 	netParam->player = gameLoop->GetPlayer();
+	netParam->bullet = gameLoop->GetBullet();
 
 	HANDLE hNetThread = CreateThread(
 		nullptr,
