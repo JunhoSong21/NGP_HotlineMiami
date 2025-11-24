@@ -1,6 +1,7 @@
 // Grenade.cpp
 #include "pch.h"
 #include "Grenade.h"
+#include "Wall.h"
 
 Grenade::Grenade() :
     spriteKey(L"GRENADE"),
@@ -14,7 +15,8 @@ Grenade::Grenade() :
     remainCount(2),         // 시작 시 2개 소지
     isInFuse(false),
     fuseDuration(3.0f),
-    fuseRemain(0.0f)
+    fuseRemain(0.0f),
+    wall(nullptr)
 {
 }
 
@@ -59,6 +61,14 @@ void Grenade::Update(float deltaTime)
         // 보정
         if (step > remain)
             step = remain;
+
+        Gdiplus::PointF prevPos = pos;
+
+        if (wall && Bounce(prevPos, step))
+        {
+            Active(deltaTime);
+            return;
+        }
 
         pos.X += dir.X * step;
         pos.Y += dir.Y * step;
@@ -205,6 +215,88 @@ void Grenade::Active(float deltaTime)
         DEBUG_MSG(L"[Grenade] 폭발 시간 종료, 수류탄 비활성화");
     }
 }
+
+bool Grenade::Bounce(const Gdiplus::PointF& prevPos, float step)
+{
+    if (!wall)
+        return false;
+
+    Gdiplus::PointF hitPoint;
+    POINT           hitCell{ -1, -1 };
+
+    // Raycast: prevPos → dir 방향으로 step 거리까지 검사
+    if (!wall->Raycast(prevPos, dir, step, &hitPoint, &hitCell))
+        return false;
+
+    // 충돌한 타일의 월드 좌표 Rect
+    Gdiplus::RectF tileRect = Wall::GridToWorldRect(hitCell.x, hitCell.y);
+
+    float left = tileRect.X;
+    float right = tileRect.GetRight();
+    float top = tileRect.Y;
+    float bottom = tileRect.GetBottom();
+
+    float dl = std::fabs(hitPoint.X - left);
+    float dr = std::fabs(hitPoint.X - right);
+    float dt = std::fabs(hitPoint.Y - top);
+    float db = std::fabs(hitPoint.Y - bottom);
+
+    // 어느 면에서 가장 가까운지 판단
+    float minDist = dl;
+    int   side = 0; // 0: left, 1: right, 2: top, 3: bottom
+
+    if (dr < minDist) { minDist = dr; side = 1; }
+    if (dt < minDist) { minDist = dt; side = 2; }
+    if (db < minDist) { minDist = db; side = 3; }
+
+    // 면에 따른 법선 벡터
+    Gdiplus::PointF n(0.0f, 0.0f);
+    switch (side)
+    {
+    case 0: n = Gdiplus::PointF(-1.0f, 0.0f); break; // 왼쪽 면 → 법선 (-1,0)
+    case 1: n = Gdiplus::PointF(1.0f, 0.0f); break; // 오른쪽 면 → (1,0)
+    case 2: n = Gdiplus::PointF(0.0f, -1.0f); break; // 위쪽 면 → (0,-1)
+    case 3: n = Gdiplus::PointF(0.0f, 1.0f); break; // 아래쪽 면 → (0,1)
+    }
+
+    // 반사 벡터 
+    float dot = dir.X * n.X + dir.Y * n.Y;
+    Gdiplus::PointF reflect(
+        dir.X - 2.0f * dot * n.X,
+        dir.Y - 2.0f * dot * n.Y
+    );
+
+    // 정규화
+    float len = std::sqrt(reflect.X * reflect.X + reflect.Y * reflect.Y);
+    if (len > 0.0f)
+    {
+        reflect.X /= len;
+        reflect.Y /= len;
+    }
+
+    // 수류탄을 충돌 지점에서 벽 밖으로 살짝 밀어내기
+    const float separate = 60.0f;
+    pos = hitPoint;
+    pos.X += reflect.X * separate;
+    pos.Y += reflect.Y * separate;
+
+    // 새 방향으로 교체
+    dir = reflect;
+
+    // 속도 감소 (벽에 맞으면 크게 감속)
+    speed *= 0.4f;
+    if (speed < 50.0f)
+        speed = 0.0f;
+
+    // 여기서 "active" 상태로 전환 (터질 준비)
+    isInFuse = true;
+    fuseRemain = fuseDuration;
+
+    DEBUG_MSG(L"[Grenade] 벽에 충돌 -> 반사 및 속도 감소, 퓨즈 시작");
+
+    return true;
+}
+
 
 void Grenade::Reset()
 {

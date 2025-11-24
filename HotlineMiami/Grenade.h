@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "ImageManager.h"
 
+class Wall;
+
 class Grenade {
 private:
     std::wstring spriteKey;   // 이미지 키
@@ -19,6 +21,8 @@ private:
     bool  isInFuse;      // true면 멈춰서 카운트다운 중
     float fuseDuration;  // 전체 대기 시간(초) 
     float fuseRemain;    // 남은 시간(초)
+
+    const Wall* wall;     
 
 public:
     Grenade();
@@ -38,4 +42,7 @@ public:
     int  GetRemain()    const { return remainCount; }
 
     void Reset();
+
+    void SetWall(const Wall* w) { wall = w; }
+    bool Bounce(const Gdiplus::PointF& prevPos, float step);
 };
