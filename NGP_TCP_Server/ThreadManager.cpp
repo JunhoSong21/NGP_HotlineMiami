@@ -1,5 +1,10 @@
 #include "ThreadManager.h"
 
+ThreadManager::ThreadManager() :
+	threadId(0)
+{
+}
+
 void ThreadManager::AddThread(SOCKET clientSock)
 {
 	std::lock_guard<std::mutex> lock(threadMutex);

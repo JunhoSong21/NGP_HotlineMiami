@@ -75,11 +75,12 @@ int main()
 
 		if (ThreadManager::GetInstance().ThreadCount() == 3) {
 			printf("3 Client Accept Complete\n");
+			closesocket(listenSock);
 			break;
 		}
 	}
 
-	closesocket(listenSock);
+	
 	WSACleanup();
 	return 0;
 }
