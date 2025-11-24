@@ -16,7 +16,8 @@ Grenade::Grenade() :
     isInFuse(false),
     fuseDuration(3.0f),
     fuseRemain(0.0f),
-    wall(nullptr)
+    wall(nullptr),
+    fragmentSpriteKey(L"GRENADE_FRAG")
 {
 }
 
@@ -29,143 +30,212 @@ void Grenade::Init()
     isInFuse = false;
     fuseDuration = 3.0f;
     fuseRemain = 0.0f;
+    fragments.clear();  // 파편 초기화
 }
 
 void Grenade::LoadGrenadeImage(ImageManager& imgMgr)
 {
+    // 수류탄 이미지 로드
     imgMgr.LoadSpriteImage(L"Resource/Grenade/sampleGrenade.png", spriteKey);
+
+    // 파편 이미지 로드
+    imgMgr.LoadSpriteImage(L"Resource/Grenade/sprGrenadeFragment.png", fragmentSpriteKey);
 }
 
 void Grenade::Update(float deltaTime)
 {
-    if (!isActive)
-        return;
-
     if (deltaTime <= 0.0f)
         return;
 
-    // 아직 퓨즈가 안 켜졌으면 계속 날아감
-    if (!isInFuse)
+    if (isActive)
     {
-        // 이번 프레임에 이동할 거리
-        float step = speed * deltaTime;
-
-        // 속도가 0인데 아직 퓨즈 안 켜졌으면 바로 퓨즈 시작
-        if (step <= 0.0f)
+        // 아직 퓨즈가 안 켜졌으면 계속 날아감
+        if (!isInFuse)
         {
-            isInFuse = true;
-            fuseRemain = fuseDuration;
-            Active(deltaTime);
-            return;
+            float step = speed * deltaTime;
+
+            // 속도가 0인데 아직 퓨즈 안 켜졌으면 퓨즈 시작
+            if (step <= 0.0f)
+            {
+                isInFuse = true;
+                fuseRemain = fuseDuration;
+                Active(deltaTime);
+            }
+            else
+            {
+                float remainDist = maxDistance - traveled;
+                if (remainDist <= 0.0f)
+                {
+                    // 목표 지점 도달 → 멈추고 퓨즈 시작
+                    speed = 0.0f;
+                    isInFuse = true;
+                    fuseRemain = fuseDuration;
+                    Active(deltaTime);
+                }
+                else
+                {
+                    if (step > remainDist)
+                        step = remainDist;
+
+                    Gdiplus::PointF prevPos = pos;
+
+                    if (wall && Bounce(prevPos, step))
+                    {
+                        // 충돌 시 step 만큼 이동했다고 간주
+                        traveled += step;
+                    }
+                    else
+                    {
+                        pos.X += dir.X * step;
+                        pos.Y += dir.Y * step;
+                        traveled += step;
+                    }
+
+                    const float fuseSpeedThreshold = 80.0f;
+                    if (traveled >= maxDistance || speed <= fuseSpeedThreshold)
+                    {
+                        speed = 0.0f;
+                        isInFuse = true;
+                        fuseRemain = fuseDuration;
+                    }
+                }
+            }
         }
+        // 퓨즈 카운트다운 및 폭발 처리
+        Active(deltaTime);
+    }
+    // 파편 업데이트
+    if (!fragments.empty())
+    {
+        const float dt = deltaTime;
 
-        // 목표 지점까지 남은 거리
-        float remainDist = maxDistance - traveled;
-        if (remainDist <= 0.0f)
+        for (auto& f : fragments)
         {
-            // 목표 지점까지 다 온 상태 멈추고 퓨즈 시작
-            speed = 0.0f;
-            isInFuse = true;
-            fuseRemain = fuseDuration;
-            Active(deltaTime);
-            return;
-        }
+            if (!f.active)
+                continue;
 
-        // 남은 거리보다 step이 크면 보정
-        if (step > remainDist)
-            step = remainDist;
+            f.life -= dt;
+            if (f.life <= 0.0f)
+            {
+                f.active = false;
+                continue;
+            }
 
-        Gdiplus::PointF prevPos = pos;
-
-        if (wall && Bounce(prevPos, step))
-        {
-            // step 만큼은 이동했다고 간주
-            traveled += step;
-        }
-        else
-        {
-            // 충돌 없으면 직선 이동
-            pos.X += dir.X * step;
-            pos.Y += dir.Y * step;
-            traveled += step;
-        }
-
-        const float fuseSpeedThreshold = 80.0f;
-
-        if (traveled >= maxDistance || speed <= fuseSpeedThreshold)
-        {
-            speed = 0.0f;
-            isInFuse = true;
-            fuseRemain = fuseDuration;
+            f.pos.X += f.dir.X * f.speed * dt;
+            f.pos.Y += f.dir.Y * f.speed * dt;
         }
     }
-    // 폭발 시작
-    Active(deltaTime);
 }
 
 void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
 {
-    if (!isActive)
-        return;
+    if (isActive) {
 
-    Gdiplus::Bitmap* bmp = imgMgr.GetImage(spriteKey);
-    if (!bmp) {
-        DEBUG_MSG(L"[Grenade] GetImage 실패 -> 키가 잘못 되었거나 이미지가 로드되지 않음");
-        return;
+        Gdiplus::Bitmap* bmp = imgMgr.GetImage(spriteKey);
+        if (!bmp) {
+            DEBUG_MSG(L"[Grenade] GetImage 실패 -> 키가 잘못 되었거나 이미지가 로드되지 않음");
+        }
+        else {
+            // 수류탄 실제 크기(스프라이트 기준)
+            const float renderW = 18.0f;
+            const float renderH = 15.0f;
+
+            // pos를 중심으로 그리기
+            Gdiplus::RectF dst(
+                pos.X - renderW * 0.5f,
+                pos.Y - renderH * 0.5f,
+                renderW,
+                renderH
+            );
+
+            const float srcX = 0.0f;
+            const float srcY = 0.0f;
+            const float srcW = 18.0f;
+            const float srcH = 15.0f;
+
+            graphics.DrawImage(
+                bmp,
+                dst,
+                srcX, srcY,
+                srcW, srcH,
+                Gdiplus::UnitPixel
+            );
+        }
+
+        // 남은 시간 표시
+        if (isInFuse)
+        {
+            // 남은 시간(초)을 0.0 단위로 표시
+            wchar_t buf[32]{};
+            swprintf_s(buf, L"%.1f", fuseRemain);
+
+            Gdiplus::FontFamily fontFamily(L"Arial");
+            Gdiplus::Font font(&fontFamily, 12.0f, Gdiplus::FontStyleBold, Gdiplus::UnitPoint);
+            Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 0, 0)); // 불투명 빨강
+            Gdiplus::StringFormat format;
+            format.SetAlignment(Gdiplus::StringAlignmentCenter);
+
+            const float renderH = 15.0f;
+
+            // 수류탄 바로 위에 텍스트 찍기
+            Gdiplus::PointF textPos(
+                pos.X,
+                pos.Y - renderH * 0.5f - 15.0f
+            );
+
+            graphics.DrawString(
+                buf,
+                -1,
+                &font,
+                textPos,
+                &format,
+                &brush
+            );
+        }
     }
 
-    // 수류탄 실제 크기(스프라이트 기준)
-    const float renderW = 18.0f;
-    const float renderH = 15.0f;
-    
-    // pos를 중심으로 그리기
-    Gdiplus::RectF dst(
-        pos.X - renderW * 0.5f,
-        pos.Y - renderH * 0.5f,
-        renderW,
-        renderH
-    );
-
-    const float srcX = 0.0f;   
-    const float srcY = 0.0f;   
-    const float srcW = 18.0f;
-    const float srcH = 15.0f;
-
-    graphics.DrawImage(
-        bmp,
-        dst,
-        srcX, srcY,
-        srcW, srcH,
-        Gdiplus::UnitPixel
-    );
-
-    // 남은 시간 표시
-    if (isInFuse)
+    // 파편 렌더링
+    if (!fragments.empty())
     {
-        // 남은 시간(초)을 0.0 단위로 표시
-        wchar_t buf[32]{};
-        swprintf_s(buf, L"%.1f", fuseRemain);
+        Gdiplus::Bitmap* fragBmp = imgMgr.GetImage(fragmentSpriteKey);
+        if (!fragBmp)
+        {
+            DEBUG_MSG(L"[Grenade] 파편 이미지 로드 실패");
+            return;
+        }
 
-        Gdiplus::FontFamily fontFamily(L"Arial");
-        Gdiplus::Font font(&fontFamily, 12.0f, Gdiplus::FontStyleBold, Gdiplus::UnitPoint);
-        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 0, 0)); // 불투명 빨강
-        Gdiplus::StringFormat format;
-        format.SetAlignment(Gdiplus::StringAlignmentCenter);
+        const float fragW = 10.0f; // 원본: 10
+        const float fragH = 3.0f;  // 원본: 3
 
-        // 수류탄 바로 위에 텍스트 찍기
-        Gdiplus::PointF textPos(
-            pos.X,
-            pos.Y - renderH * 0.5f - 15.0f
-        );
+        Gdiplus::Matrix originMat;
+        graphics.GetTransform(&originMat);
 
-        graphics.DrawString(
-            buf,
-            -1,
-            &font,
-            textPos,
-            &format,
-            &brush
-        );
+        for (const auto& f : fragments)
+        {
+            if (!f.active)
+                continue;
+
+            // 방향에 맞춰 회전
+            float angleRad = std::atan2f(f.dir.Y, f.dir.X);
+            float angleDeg = angleRad * 180.0f / PI;
+
+            graphics.SetTransform(&originMat);
+            graphics.TranslateTransform(f.pos.X, f.pos.Y);
+            graphics.RotateTransform(angleDeg);
+            graphics.TranslateTransform(-fragW * 0.5f, -fragH * 0.5f);
+
+            Gdiplus::RectF dst(0.0f, 0.0f, fragW, fragH);
+
+            graphics.DrawImage(
+                fragBmp,
+                dst,
+                0.0f, 0.0f,
+                10.0f, 3.0f,
+                Gdiplus::UnitPixel
+            );
+        }
+
+        graphics.SetTransform(&originMat);
     }
 }
 
@@ -223,13 +293,41 @@ void Grenade::Active(float deltaTime)
         return;
 
     fuseRemain -= deltaTime;
-    if (fuseRemain <= 0.0f)
-    {
+    if (fuseRemain <= 0.0f) {
         fuseRemain = 0.0f;
-        // 지금은 단순히 사라지는 것까지만
-        isActive = false;
-        isInFuse = false;
-        DEBUG_MSG(L"[Grenade] 폭발 시간 종료, 수류탄 비활성화");
+        Explode();
+    }
+}
+
+void Grenade::Explode()
+{
+    // 수류탄 본체는 더 이상 렌더하지 않음
+    isActive = false;
+    isInFuse = false;
+    speed = 0.0f;
+
+    fragments.clear();
+
+    const int   FRAG_COUNT = 24;         // 360 / 15 -> 24갈래
+    const float DEG2RAD = PI / 180.0f;
+    const float FRAG_SPEED = 600.0f;    // 파편 속도
+    const float FRAG_LIFETIME = 0.7f;      // 파편 존재 시간(초) - 필요에 따라 조절
+
+    fragments.reserve(FRAG_COUNT);
+
+    for (int i = 0; i < FRAG_COUNT; ++i)
+    {
+        float angleDeg = i * 15.0f;
+        float rad = angleDeg * DEG2RAD;
+
+        Fragment f{};
+        f.pos = pos; // 수류탄 위치에서 시작
+        f.dir = Gdiplus::PointF(std::cos(rad), std::sin(rad));
+        f.speed = FRAG_SPEED;
+        f.life = FRAG_LIFETIME;
+        f.active = true;
+
+        fragments.push_back(f);
     }
 }
 
@@ -333,7 +431,6 @@ bool Grenade::Bounce(const Gdiplus::PointF& prevPos, float step)
 
     return true;
 }
-
 
 void Grenade::Reset()
 {
