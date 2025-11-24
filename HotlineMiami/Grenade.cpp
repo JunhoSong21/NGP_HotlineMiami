@@ -44,42 +44,59 @@ void Grenade::Update(float deltaTime)
     if (deltaTime <= 0.0f)
         return;
 
-    // 아직 비행 중인 상태라면 이동 처리
+    // 아직 퓨즈가 안 켜졌으면 계속 날아감
     if (!isInFuse)
     {
+        // 이번 프레임에 이동할 거리
         float step = speed * deltaTime;
-        // 남은 거리
-        float remain = maxDistance - traveled;
-        if (remain <= 0.0f) {
-            // 도착 지점에 이미 도달 → 여기서 "폭발" 예정
-            speed = 0.0f;
+
+        // 속도가 0인데 아직 퓨즈 안 켜졌으면 바로 퓨즈 시작
+        if (step <= 0.0f)
+        {
             isInFuse = true;
-            fuseRemain = fuseDuration;   // 4초 카운트다운 시작
+            fuseRemain = fuseDuration;
+            Active(deltaTime);
             return;
         }
 
-        // 보정
-        if (step > remain)
-            step = remain;
+        // 목표 지점까지 남은 거리
+        float remainDist = maxDistance - traveled;
+        if (remainDist <= 0.0f)
+        {
+            // 목표 지점까지 다 온 상태 멈추고 퓨즈 시작
+            speed = 0.0f;
+            isInFuse = true;
+            fuseRemain = fuseDuration;
+            Active(deltaTime);
+            return;
+        }
+
+        // 남은 거리보다 step이 크면 보정
+        if (step > remainDist)
+            step = remainDist;
 
         Gdiplus::PointF prevPos = pos;
 
         if (wall && Bounce(prevPos, step))
         {
-            Active(deltaTime);
-            return;
+            // step 만큼은 이동했다고 간주
+            traveled += step;
+        }
+        else
+        {
+            // 충돌 없으면 직선 이동
+            pos.X += dir.X * step;
+            pos.Y += dir.Y * step;
+            traveled += step;
         }
 
-        pos.X += dir.X * step;
-        pos.Y += dir.Y * step;
-        traveled += step;
+        const float fuseSpeedThreshold = 80.0f;
 
-        // 목표 지점까지 다 왔으면 여기서 멈추고 대기
-        if (traveled >= maxDistance) {
+        if (traveled >= maxDistance || speed <= fuseSpeedThreshold)
+        {
             speed = 0.0f;
             isInFuse = true;
             fuseRemain = fuseDuration;
-            return;
         }
     }
     // 폭발 시작
@@ -222,9 +239,9 @@ bool Grenade::Bounce(const Gdiplus::PointF& prevPos, float step)
         return false;
 
     Gdiplus::PointF hitPoint;
-    POINT           hitCell{ -1, -1 };
+    POINT hitCell{ -1, -1 };
 
-    // Raycast: prevPos → dir 방향으로 step 거리까지 검사
+    // Raycast: prevPos -> dir 방향으로 step 거리까지 검사
     if (!wall->Raycast(prevPos, dir, step, &hitPoint, &hitCell))
         return false;
 
@@ -253,11 +270,24 @@ bool Grenade::Bounce(const Gdiplus::PointF& prevPos, float step)
     Gdiplus::PointF n(0.0f, 0.0f);
     switch (side)
     {
-    case 0: n = Gdiplus::PointF(-1.0f, 0.0f); break; // 왼쪽 면 → 법선 (-1,0)
-    case 1: n = Gdiplus::PointF(1.0f, 0.0f); break; // 오른쪽 면 → (1,0)
-    case 2: n = Gdiplus::PointF(0.0f, -1.0f); break; // 위쪽 면 → (0,-1)
-    case 3: n = Gdiplus::PointF(0.0f, 1.0f); break; // 아래쪽 면 → (0,1)
+    case 0: n = Gdiplus::PointF(-1.0f, 0.0f); break; // 왼쪽 면 
+    case 1: n = Gdiplus::PointF(1.0f, 0.0f); break; // 오른쪽 면 
+    case 2: n = Gdiplus::PointF(0.0f, -1.0f); break; // 위쪽 면 
+    case 3: n = Gdiplus::PointF(0.0f, 1.0f); break; // 아래쪽 면 
     }
+
+    // 충돌 지점까지 실제로 이동한 거리
+    float vx = hitPoint.X - prevPos.X;
+    float vy = hitPoint.Y - prevPos.Y;
+    float hitDist = std::sqrt(vx * vx + vy * vy);
+
+    if (hitDist < 0.0f)
+        hitDist = 0.0f;
+
+    // 이번 프레임에서 남아 있는 거리 (반사 후에 쓸 것)
+    float remain = step - hitDist;
+    if (remain < 0.0f)
+        remain = 0.0f;
 
     // 반사 벡터 
     float dot = dir.X * n.X + dir.Y * n.Y;
@@ -266,33 +296,40 @@ bool Grenade::Bounce(const Gdiplus::PointF& prevPos, float step)
         dir.Y - 2.0f * dot * n.Y
     );
 
-    // 정규화
+    // 반사 방향 정규화
     float len = std::sqrt(reflect.X * reflect.X + reflect.Y * reflect.Y);
-    if (len > 0.0f)
+    if (len > 0.0001f)
     {
         reflect.X /= len;
         reflect.Y /= len;
     }
 
-    // 수류탄을 충돌 지점에서 벽 밖으로 살짝 밀어내기
-    const float separate = 60.0f;
+    // 충돌 지점에 위치시키고, 벽 밖으로 아주 살짝만 밀어냄 (겹침 방지)
+    const float epsilon = 0.5f;
     pos = hitPoint;
-    pos.X += reflect.X * separate;
-    pos.Y += reflect.Y * separate;
+    pos.X += n.X * epsilon;
+    pos.Y += n.Y * epsilon;
 
-    // 새 방향으로 교체
-    dir = reflect;
-
-    // 속도 감소 (벽에 맞으면 크게 감속)
-    speed *= 0.4f;
-    if (speed < 50.0f)
+    // 속도 감쇠 
+    const float bounceDamp = 0.6f;   
+    speed *= bounceDamp;
+    if (speed < 0.0f)
         speed = 0.0f;
 
-    // 여기서 "active" 상태로 전환 (터질 준비)
-    isInFuse = true;
-    fuseRemain = fuseDuration;
+    // 새 방향 저장
+    dir = reflect;
 
-    DEBUG_MSG(L"[Grenade] 벽에 충돌 -> 반사 및 속도 감소, 퓨즈 시작");
+    // 속도가 0이 아니고, 남은 거리가 있으면
+    // 이번 프레임 남은 거리만큼 새 방향으로 추가 이동
+    if (speed > 0.0f && remain > 0.0f)
+    {
+        // dir는 이미 정규화되어 있음
+        pos.X += dir.X * remain;
+        pos.Y += dir.Y * remain;
+    }
+
+    DEBUG_MSG(L"[Grenade] 벽 반사: hitDist=%.1f, remain=%.1f, speed=%.1f",
+        hitDist, remain, speed);
 
     return true;
 }
