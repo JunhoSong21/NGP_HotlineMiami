@@ -25,10 +25,10 @@ struct GameEvent {
 };
 
 struct PlayerMove : GameEvent {
-	float destX, destY;
+	float destX, destY, angleX, angleY;
 
-	PlayerMove(int threadId, float x, float y) :
-		destX(x), destY(y)
+	PlayerMove(int threadId, float x, float y, float aX, float aY) :
+		destX(x), destY(y), angleX(aX), angleY(aY)
 	{
 		type = GameEvent::Type::PLAYER_MOVE;
 		networkThreadId = threadId;

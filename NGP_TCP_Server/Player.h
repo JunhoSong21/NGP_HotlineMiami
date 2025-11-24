@@ -1,7 +1,7 @@
 #pragma once
 
 class Player {
-private:
+public:
 	float posX;
 	float posY;
 	float angle;

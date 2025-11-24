@@ -39,6 +39,9 @@
     <Filter Include="소스 파일\DataManager">
       <UniqueIdentifier>{c5b69291-a338-49cb-bfb5-4bca67420f71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\PopEvent">
+      <UniqueIdentifier>{b62e2f9a-0b08-4487-bfa9-00fdd6cd31cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="Common.cpp">
       <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PopEvent.cpp">
+      <Filter>소스 파일\PopEvent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +108,9 @@
     </ClInclude>
     <ClInclude Include="concurrentqueue.h">
       <Filter>소스 파일\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PopEvent.h">
+      <Filter>소스 파일\PopEvent</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
