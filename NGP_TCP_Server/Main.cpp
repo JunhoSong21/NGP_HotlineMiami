@@ -72,6 +72,11 @@ int main()
 			ThreadManager::GetInstance().AddThread(clientSock);
 			printf("Add NetworkThread\n");
 		}
+
+		if (ThreadManager::GetInstance().ThreadCount() == 3) {
+			printf("3 Client Accept Complete\n");
+			break;
+		}
 	}
 
 	closesocket(listenSock);
