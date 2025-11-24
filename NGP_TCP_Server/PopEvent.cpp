@@ -1,4 +1,7 @@
 #include "PopEvent.h"
+
+#include <stdio.h>
+
 #include "DataManager.h"
 #include "Player.h"
 
@@ -24,4 +27,5 @@ void PopEvent::HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event)
 	if (player) {
 		player->posX = event->destX;
 	}
+	printf("playerMoveEvent 처리 완료\n");
 }

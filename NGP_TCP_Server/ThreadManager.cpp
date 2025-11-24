@@ -23,3 +23,9 @@ void ThreadManager::RemoveThread(int id)
 	if (it != networkThreads.end())
 		networkThreads.erase(it);
 }
+
+int ThreadManager::ThreadCount()
+{
+	std::lock_guard<std::mutex> lock(threadMutex);
+	return networkThreads.size();
+}

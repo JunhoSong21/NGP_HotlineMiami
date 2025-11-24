@@ -28,4 +28,5 @@ public:
 
 	void AddThread(SOCKET clientSock);
 	void RemoveThread(int id);
+	int ThreadCount();
 };
