@@ -42,6 +42,9 @@
     <Filter Include="소스 파일\PopEvent">
       <UniqueIdentifier>{b62e2f9a-0b08-4487-bfa9-00fdd6cd31cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Timer">
+      <UniqueIdentifier>{eaadbbbc-79eb-4f62-bac6-bcb9e71e1a9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="PopEvent.cpp">
       <Filter>소스 파일\PopEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일\Timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +117,9 @@
     </ClInclude>
     <ClInclude Include="PopEvent.h">
       <Filter>소스 파일\PopEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>소스 파일\Timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

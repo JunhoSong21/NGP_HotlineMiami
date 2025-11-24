@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 #include "ThreadManager.h"
+#include "PopEvent.h"
 
 int main()
 {
@@ -74,12 +75,18 @@ int main()
 		}
 
 		if (ThreadManager::GetInstance().ThreadCount() == 3) {
-			printf("3 Client Accept Complete\n");
+			printf("3 Client Accept			Complete\n");
 			closesocket(listenSock);
 			break;
 		}
 	}
 
+	PopEvent gameLoop;
+	while (true) {
+		std::unique_ptr<GameEvent> event;
+		if (EventQueue::GetInstance().PopEvent(event))
+			gameLoop.HandleEvent(std::move(event));
+	}
 	
 	WSACleanup();
 	return 0;
