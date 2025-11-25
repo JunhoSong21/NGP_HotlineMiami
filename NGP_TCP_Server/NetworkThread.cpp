@@ -58,7 +58,9 @@ void NetworkThread::ThreadFunc()
 
 void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 {
+#ifdef _DEBUG
 	printf("Key Input Packet recv %f, %f\n", packet.posX, packet.posY);
+#endif
 	auto playerMoveEvent = std::make_unique<PlayerMove>(
 		threadId, packet.posX, packet.posY, packet.mouseX, packet.mouseY);
 	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
@@ -74,4 +76,15 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 {
 	//auto grenadeThrowEvent = std::make_unique<GrenadeThrow>(threadId, 0, 0, 0.0);
 	//EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
+}
+
+void NetworkThread::SendQueueInput(std::unique_ptr<GameEvent> event)
+{
+	switch (event->type) {
+	case GameEvent::Type::PLAYER_UPDATE:
+		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
+		break;
+	default:
+		break;
+	}
 }
