@@ -3,6 +3,7 @@
 struct GameEvent {
 	enum Type {
 		PLAYER_MOVE,
+		PLAYER_UPDATE,
 		BULLET_TRIGGER,
 		BULLET_UPDATE,
 		BULLET_COLLISION,
@@ -32,6 +33,14 @@ struct PlayerMove : GameEvent {
 	{
 		type = GameEvent::Type::PLAYER_MOVE;
 		networkThreadId = threadId;
+	}
+};
+
+struct PlayerUpdate : GameEvent {
+	PlayerUpdate()
+	{
+		type = GameEvent::Type::PLAYER_UPDATE;
+		networkThreadId = 0;
 	}
 };
 
