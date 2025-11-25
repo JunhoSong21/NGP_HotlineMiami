@@ -34,3 +34,10 @@ int ThreadManager::ThreadCount()
 	std::lock_guard<std::mutex> lock(threadMutex);
 	return networkThreads.size();
 }
+
+void ThreadManager::BroadcastEvent(std::unique_ptr<GameEvent> event)
+{
+	for (const auto& pair : networkThreads) {
+		pair.second->SendQueueInput(std::move(event));
+	}
+}

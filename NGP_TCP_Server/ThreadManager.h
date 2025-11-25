@@ -29,4 +29,6 @@ public:
 	void AddThread(SOCKET clientSock);
 	void RemoveThread(int id);
 	int ThreadCount();
+
+	void BroadcastEvent(std::unique_ptr<GameEvent> event);
 };
