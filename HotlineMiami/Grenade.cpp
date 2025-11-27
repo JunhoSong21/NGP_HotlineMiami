@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Grenade.h"
 #include "Wall.h"
+#include "Player.h" 
 
 Grenade::Grenade() :
     spriteKey(L"GRENADE"),
@@ -118,11 +119,7 @@ void Grenade::Update(float deltaTime)
             if (f.life <= 0.0f)
             {
                 f.active = false;
-                continue;
             }
-
-            f.pos.X += f.dir.X * f.speed * dt;
-            f.pos.Y += f.dir.Y * f.speed * dt;
         }
     }
 }
@@ -328,6 +325,84 @@ void Grenade::Explode()
         f.active = true;
 
         fragments.push_back(f);
+    }
+}
+
+void Grenade::Collision(float deltaTime, Player* player)
+{
+    if (deltaTime <= 0.0f)
+        return;
+
+    if (fragments.empty())
+        return;
+
+    // 플레이어 충돌용 AABB (GameLoop에서 쓰는 90x50 기준)
+    Gdiplus::RectF playerRect;
+    bool hasPlayer = false;
+
+    if (player)
+    {
+        Gdiplus::PointF pPos = player->GetPos();
+        float halfW = 90.0f * 0.5f;
+        float halfH = 50.0f * 0.5f;
+
+        playerRect = Gdiplus::RectF(
+            pPos.X - halfW,
+            pPos.Y - halfH,
+            90.0f,
+            50.0f
+        );
+        hasPlayer = true;
+    }
+
+    for (auto& f : fragments)
+    {
+        if (!f.active)
+            continue;
+        if (f.life <= 0.0f)
+            continue;
+
+        float step = f.speed * deltaTime;
+        if (step <= 0.0f)
+            continue;
+
+        Gdiplus::PointF prevPos = f.pos;
+
+        // 1) 벽 충돌 검사
+        bool hitWall = false;
+        if (wall)
+        {
+            Gdiplus::PointF hitPoint;
+            POINT hitCell{ -1, -1 };
+
+            if (wall->Raycast(prevPos, f.dir, step, &hitPoint, &hitCell))
+            {
+                // 벽에 닿은 해당 파편만 제거
+                f.active = false;
+                hitWall = true;
+            }
+        }
+
+        if (hitWall)
+            continue; // 이미 사라진 파편은 더 처리 X
+
+        // 2) 벽에 안 닿았으면 이동
+        f.pos.X += f.dir.X * step;
+        f.pos.Y += f.dir.Y * step;
+
+        // 3) 플레이어 충돌 검사
+        if (hasPlayer)
+        {
+            // 간단히 "점-사각형" 충돌로 처리
+            if (playerRect.Contains(f.pos))
+            {
+                // 실제로는 여기에서 HP -= damage 1회 처리
+                DEBUG_MSG(L"[Grenade] 파편이 플레이어에 명중했습니다! (1회 데미지 처리)");
+
+                // 이 파편은 1회만 데미지 주고 사라짐
+                f.active = false;
+            }
+        }
     }
 }
 

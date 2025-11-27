@@ -88,8 +88,11 @@ void GameLoop::Update()
 
 		player->GetPos() = resolvedPos;
 	}
-	if (grenade)
+	if (grenade) {
 		grenade->Update(deltaTime);
+		// 파편 충돌 처리 (벽 + 플레이어)
+		grenade->Collision(deltaTime, player);
+	}
 }
 
 void GameLoop::Render()

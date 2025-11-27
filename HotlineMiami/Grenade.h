@@ -3,6 +3,7 @@
 #include "ImageManager.h"
 #include <vector>
 
+class Player;
 class Wall;
 
 class Grenade {
@@ -51,6 +52,8 @@ public:
 
     void Active(float deltaTime);
     void Explode();
+    void Collision(float deltaTime, Player* player);
+
     bool IsActive() const { return isActive; }
     int  GetRemain()    const { return remainCount; }
 
