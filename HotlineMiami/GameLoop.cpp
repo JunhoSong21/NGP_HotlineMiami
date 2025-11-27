@@ -8,6 +8,7 @@ GameLoop::GameLoop() :
 	timer(nullptr),
 	player(nullptr),
 	grenade(nullptr),
+	hud(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
 {
@@ -59,6 +60,9 @@ void GameLoop::Init(HWND hwnd)
 	// 수류탄에 벽 정보 넘겨주기
 	if (wall && grenade)
 		grenade->SetWall(wall);
+
+	hud = new HUD();
+	hud->Init(imgManager);
 }
 
 void GameLoop::Update()
@@ -132,6 +136,7 @@ void GameLoop::Render()
 
 		if (wall) wall->Render(g);     
 		if (grenade) grenade->Render(g, imgManager);
+		if (hud) hud->Render(hWnd, g, imgManager);
 
 		// 3) player
 		{

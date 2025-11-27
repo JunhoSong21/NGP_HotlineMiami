@@ -80,6 +80,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		break;
+	case WM_SETCURSOR:
+		SetCursor(nullptr);    // 기본 커서 제거
+		return TRUE;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;

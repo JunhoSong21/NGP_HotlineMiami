@@ -4,8 +4,8 @@
 
 HUD::HUD()
     : aimSpriteKey(L"Aim"),
-    aimWidth(11.0f),
-    aimHeight(11.0f)
+    aimWidth(20.0f),
+    aimHeight(20.0f)
 {
 }
 
@@ -20,8 +20,8 @@ void HUD::Render(HWND hWnd, Gdiplus::Graphics& g, ImageManager& imgMgr)
     // --- HUD 구성 요소 렌더 ---
     RenderAimCursor(hWnd, g, imgMgr);
 
-    // ※ 앞으로 HP바, 탄창, 스킬 쿨타임, 미니맵 등 추가할 때
-    //    여기 함수에 호출을 추가하면 된다.
+    // 앞으로 HP바, 탄창, 스킬 쿨타임, 미니맵 등 추가할 때
+    // 여기 함수에 호출을 추가하면 된다.
 }
 
 void HUD::RenderAimCursor(HWND hWnd, Gdiplus::Graphics& g, ImageManager& imgMgr)

@@ -7,12 +7,14 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Grenade.h"
+#include "HUD.h"
 
 #include "ImageManager.h"
 
 class GameLoop {
 private:
 	ImageManager imgManager;
+	HUD* hud;
 
 	BackGround* backGround;
 	Map* map;
@@ -21,7 +23,7 @@ private:
 	Wall* wall;
 	Grenade* grenade;
 	float deltaTime;
-	
+
 	HWND hWnd;
 	
 public:
