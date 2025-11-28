@@ -3,8 +3,12 @@
 #include "ThreadManager.h"
 #include "PopEvent.h"
 
+using std::unique_ptr;
+
 int main()
 {
+	//std::ios_base::sync_with_stdio(false);
+
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -83,7 +87,7 @@ int main()
 
 	PopEvent gameLoop;
 	while (true) {
-		std::unique_ptr<GameEvent> event;
+		unique_ptr<GameEvent> event;
 		if (EventQueue::GetInstance().PopEvent(event))
 			gameLoop.HandleEvent(std::move(event));
 	}

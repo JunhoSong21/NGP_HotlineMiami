@@ -1,8 +1,12 @@
 #include "DataManager.h"
 
-void DataManager::AddPlayer(std::unique_ptr<Player> player)
+using std::unique_ptr;
+using std::lock_guard;
+using std::mutex;
+
+void DataManager::AddPlayer(unique_ptr<Player> player)
 {
-	std::lock_guard<std::mutex> lock(playerMapMutex);
+	lock_guard<mutex> lock(playerMapMutex);
 	if (player) {
 		playerData[player->playerId] = std::move(player);
 		printf("player 추가 완료\n");
@@ -11,19 +15,26 @@ void DataManager::AddPlayer(std::unique_ptr<Player> player)
 		printf("플레이어 데이터 nullptr\n");
 }
 
-void DataManager::AddBullet(std::unique_ptr<Bullet> bullet)
+void DataManager::AddBullet(unique_ptr<Bullet> bullet)
 {
 
 }
 
-void DataManager::AddGrenade(std::unique_ptr<Grenade> grenade)
+void DataManager::AddGrenade(unique_ptr<Grenade> grenade)
 {
 
 }
 
 Player* DataManager::GetPlayer(int id)
 {
-	return 0;
+	lock_guard<mutex> lock(playerMapMutex);
+	auto it = playerData.find(id);
+	if (it != playerData.end())
+		return it->second.get();
+	else {
+		printf("GetPlayer() nullptr\n");
+		return nullptr;
+	}
 }
 
 Bullet* DataManager::GetBullet(int id)

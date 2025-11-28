@@ -6,14 +6,18 @@ constexpr float PI = 3.1415;
 #include "DataManager.h"
 #include "Player.h"
 
-void PopEvent::HandleEvent(std::unique_ptr<GameEvent> event)
+using std::unique_ptr;
+using std::lock_guard;
+using std::mutex;
+
+void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 {
 	if (!event)
 		printf("nullptr Event\n");
 
 	switch (event->type) {
 	case GameEvent::Type::PLAYER_MOVE: {
-		std::unique_ptr<PlayerMove> moveEvent(static_cast<PlayerMove*>(event.release()));
+		unique_ptr<PlayerMove> moveEvent(static_cast<PlayerMove*>(event.release()));
 		HandlePlayerMoveEvent(std::move(moveEvent));
 		break;
 	}
@@ -22,9 +26,9 @@ void PopEvent::HandleEvent(std::unique_ptr<GameEvent> event)
 	}
 }
 
-void PopEvent::HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event)
+void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 {
-	std::lock_guard<std::mutex> lock(playerUpdateMutex);
+	lock_guard<mutex> lock(playerUpdateMutex);
 
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player) {

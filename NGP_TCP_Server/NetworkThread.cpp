@@ -1,5 +1,8 @@
 #include "NetworkThread.h"
 
+using std::unique_ptr;
+using std::make_unique;
+
 NetworkThread::NetworkThread(int id, SOCKET clientSock) :
 	threadId(id), clientSock(clientSock)
 {
@@ -53,7 +56,7 @@ void NetworkThread::ThreadFunc()
 		}
 
 		// send큐에 데이터가 있다면 전송
-		std::unique_ptr<int> eventNum;
+		unique_ptr<int> eventNum;
 		if (sendQueue.try_dequeue(eventNum)) {
 			PacketHeader sendPacketHeader{};
 			sendPacketHeader.packetType = *eventNum;
@@ -81,7 +84,7 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 #ifdef _DEBUG
 	printf("Key Input Packet recv %f, %f\n", packet.posX, packet.posY);
 #endif
-	auto playerMoveEvent = std::make_unique<PlayerMove>(
+	auto playerMoveEvent = make_unique<PlayerMove>(
 		threadId, packet.posX, packet.posY, packet.mouseX, packet.mouseY);
 	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
 }
@@ -113,6 +116,14 @@ void NetworkThread::SendPlayerMove()
 {
 	int retValue = 0;
 	SC_PLAYER_MOVE playerMovePacket{};
-	//DataManager::GetPlayer(5);
-	retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
+
+	for (int i = 0; i < 3; ++i) {
+		playerMovePacket.targetNum = i;
+		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
+		playerMovePacket.posX = sendPlayer->posX;
+		playerMovePacket.posY = sendPlayer->posY;
+		playerMovePacket.angle = sendPlayer->angle;
+
+		retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
+	}
 }
