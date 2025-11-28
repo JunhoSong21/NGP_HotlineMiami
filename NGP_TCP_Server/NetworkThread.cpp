@@ -60,6 +60,7 @@ void NetworkThread::ThreadFunc()
 		if (sendQueue.try_dequeue(eventNum)) {
 			PacketHeader sendPacketHeader{};
 			sendPacketHeader.packetType = *eventNum;
+
 			switch (sendPacketHeader.packetType) {
 			case PN::SC_PLAYER_MOVE:
 				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
