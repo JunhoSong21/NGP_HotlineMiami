@@ -78,7 +78,7 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 	//EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
 }
 
-void NetworkThread::SendQueueInput(std::unique_ptr<GameEvent> event)
+void NetworkThread::SendQueueInput(std::shared_ptr<GameEvent> event)
 {
 	switch (event->type) {
 	case GameEvent::Type::PLAYER_UPDATE:

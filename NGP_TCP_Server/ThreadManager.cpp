@@ -37,7 +37,8 @@ int ThreadManager::ThreadCount()
 
 void ThreadManager::BroadcastEvent(std::unique_ptr<GameEvent> event)
 {
+	std::shared_ptr<GameEvent> sharedEvent = std::move(event);
 	for (const auto& pair : networkThreads) {
-		pair.second->SendQueueInput(std::move(event));
+		pair.second->SendQueueInput(sharedEvent);
 	}
 }
