@@ -111,5 +111,8 @@ void NetworkThread::SendQueueInput(std::shared_ptr<GameEvent> event)
 
 void NetworkThread::SendPlayerMove()
 {
-
+	int retValue = 0;
+	SC_PLAYER_MOVE playerMovePacket{};
+	//DataManager::GetPlayer(5);
+	retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 }

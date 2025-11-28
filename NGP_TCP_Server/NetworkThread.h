@@ -5,6 +5,7 @@
 #include "Packet.h"
 #include "EventQueue.h"
 #include "concurrentqueue.h"
+#include "DataManager.h"
 
 class NetworkThread {
 private:
