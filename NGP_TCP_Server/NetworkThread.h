@@ -25,4 +25,6 @@ public:
 	void GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet);
 
 	void SendQueueInput(std::shared_ptr<GameEvent> event);
+
+	void SendPlayerMove();
 };

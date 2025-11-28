@@ -60,6 +60,11 @@ void NetworkThread::ThreadFunc()
 			switch (sendPacketHeader.packetType) {
 			case PN::SC_PLAYER_MOVE:
 				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
+				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+				if (retValue == SOCKET_ERROR)
+					printf("send() SC_PLAYER_MOVE() Error\n");
+				else
+					SendPlayerMove();
 				break;
 			default:
 				break;
@@ -102,4 +107,9 @@ void NetworkThread::SendQueueInput(std::shared_ptr<GameEvent> event)
 	default:
 		break;
 	}
+}
+
+void NetworkThread::SendPlayerMove()
+{
+
 }
