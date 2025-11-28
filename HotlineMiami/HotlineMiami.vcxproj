@@ -112,12 +112,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-<<<<<<< Updated upstream
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-=======
-      <LanguageStandard>stdcpp20</LanguageStandard>
->>>>>>> Stashed changes
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
