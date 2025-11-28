@@ -18,16 +18,16 @@ NetworkThread::~NetworkThread()
 void NetworkThread::ThreadFunc()
 {
 	int retValue = 0;
-	PacketHeader packetHeader{};
+	PacketHeader recvPacketHeader{};
 
 	while (true) {
-		retValue = recv(clientSock, (char*)&packetHeader, sizeof(packetHeader), MSG_WAITALL);
+		retValue = recv(clientSock, (char*)&recvPacketHeader, sizeof(recvPacketHeader), MSG_WAITALL);
 		if (retValue == SOCKET_ERROR) {
 			err_display("recv()");
 			break;
 		}
 
-		switch (packetHeader.packetType) {
+		switch (recvPacketHeader.packetType) {
 		case PN::CS_KEY_INPUT:
 			CS_KEY_INPUT keyinputPacket;
 			retValue = recv(clientSock, (char*)&keyinputPacket, sizeof(keyinputPacket), MSG_WAITALL);
@@ -53,6 +53,21 @@ void NetworkThread::ThreadFunc()
 		}
 
 		// send큐에 데이터가 있다면 전송
+		std::unique_ptr<int> eventNum;
+		if (sendQueue.try_dequeue(eventNum)) {
+			PacketHeader sendPacketHeader{};
+			sendPacketHeader.packetType = *eventNum;
+			switch (sendPacketHeader.packetType) {
+			case PN::SC_PLAYER_MOVE:
+				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
+				break;
+			default:
+				break;
+			}
+
+			retValue;
+
+		}
 	}
 }
 
