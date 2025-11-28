@@ -79,7 +79,7 @@ void GameLoop::Update()
 		Gdiplus::PointF delta(newPos.X - oldPos.X,
 			newPos.Y - oldPos.Y);
 
-		Gdiplus::SizeF playerAabb(90.0f, 50.0f);
+		Gdiplus::SizeF playerAabb(50.0f, 50.0f);
 
 		Gdiplus::PointF resolvedPos = oldPos;
 
