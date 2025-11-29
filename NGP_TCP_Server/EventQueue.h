@@ -1,14 +1,12 @@
 #pragma once
-#include <concurrent_queue.h>
+#include "concurrentqueue.h"
 #include <memory>
 
 #include "GameEvent.h"
 
-using namespace Concurrency;
-
 class EventQueue {
 private:
-	concurrent_queue<std::unique_ptr<GameEvent>> eventQueue;
+	moodycamel::ConcurrentQueue<std::unique_ptr<GameEvent>> eventQueue;
 
 	EventQueue() = default;
 	EventQueue(const EventQueue&) = delete;
@@ -23,5 +21,4 @@ public:
 
 	void PushEvent(std::unique_ptr<GameEvent> event);
 	bool PopEvent(std::unique_ptr<GameEvent>& event);
-	bool IsEventExist();
 };

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GameLoop.h"
+#include "ClientNetwork.h"
 
 ULONG_PTR gdiplusToken = 0;
 
@@ -11,8 +12,11 @@ GameLoop* gameLoop = nullptr;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdParam, int nCmdShow)
 {
+
 	Gdiplus::GdiplusStartupInput gdiplusStartUpInput;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartUpInput, NULL);
 
@@ -45,6 +49,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	gameLoop = new GameLoop();
 	gameLoop->Init(hWnd);
 
+	if (!InitNetwork("127.0.0.1", 9000)) {
+		MessageBox(hWnd, L"서버 연결 실패", L"Error", MB_OK);
+		return -1;
+	}
+
+
+	// 서버통신 스레드 생성
+	NetworkThreadParam* netParam = new NetworkThreadParam;
+	netParam->hWnd = hWnd;
+	netParam->player = gameLoop->GetPlayer();
+
+	HANDLE hNetThread = CreateThread(
+		nullptr,
+		0,
+		Client_Network_Thread,
+		netParam,
+		0,
+		nullptr
+	);
+
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -66,6 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 		}
 	}
 
+
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 	return msg.wParam;
 }
@@ -84,6 +109,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		SetCursor(nullptr);    // 기본 커서 제거
 		return TRUE;
 	case WM_DESTROY:
+		g_NetworkRunning = false;
+		ShutdownNetwork();
 		PostQuitMessage(0);
 		return 0;
 	}

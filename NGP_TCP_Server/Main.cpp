@@ -1,4 +1,6 @@
+#pragma once
 #include "Common.h"
+#include "ThreadManager.h"
 
 int main()
 {
@@ -15,16 +17,25 @@ int main()
 	if (listenSock == INVALID_SOCKET)
 		err_quit("socket()");
 	else
-		printf("socket() complete\n");
+		printf("socket()			complete\n");
+
+	// SO_KEEPALIVE
+	DWORD optValue = 1;
+	retValue = setsockopt(listenSock, SOL_SOCKET, SO_KEEPALIVE,
+		(const char*)&optValue, sizeof(optValue));
+	if (retValue == SOCKET_ERROR)
+		err_quit("setsockopt() SO_KEEPALIVE");
+	else
+		printf("setsockopt() SO_KEEPALIVE	complete\n");
 
 	// SO_REUSEADDR
-	DWORD optValue = 1;
+	optValue = 1;
 	retValue = setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR,
 		(const char*)&optValue, sizeof(optValue));
 	if (retValue == SOCKET_ERROR)
 		err_quit("setsockopt()");
 	else
-		printf("setsockopt() complete\n");
+		printf("setsockopt() SO_REUSEADDR	complete\n");
 
 	// bind
 	struct sockaddr_in serverAddr;
@@ -36,14 +47,14 @@ int main()
 	if (retValue == SOCKET_ERROR)
 		err_quit("bind()");
 	else
-		printf("bind() complete\n");
+		printf("bind()				complete\n");
 
 	// listen
 	retValue = listen(listenSock, SOMAXCONN);
 	if (retValue == SOCKET_ERROR)
 		err_quit("listen()");
 	else
-		printf("listen() complete\n");
+		printf("listen()			complete\n");
 
 	SOCKET clientSock{};
 	struct sockaddr_in clientAddr{};
@@ -56,10 +67,14 @@ int main()
 			err_display("accept()");
 			break;
 		}
-		else
-			printf("Client accept() complete\n");
+		else {
+			printf("Client accept()			complete\n");
+			ThreadManager::GetInstance().AddThread(clientSock);
+			printf("Add NetworkThread\n");
+		}
 	}
 
+	closesocket(listenSock);
 	WSACleanup();
 	return 0;
 }

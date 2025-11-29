@@ -54,7 +54,7 @@ void Player::InputProcessing(float deltaTime)
 	if (GetAsyncKeyState('S') & 0x8000) vectorY += 1.0f;
 	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
 	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
-
+	OutputDebugStringA("move!\n");
 	playerPos.X += vectorX * deltaTime * playerSpeed;
 	playerPos.Y += vectorY * deltaTime * playerSpeed;
 }

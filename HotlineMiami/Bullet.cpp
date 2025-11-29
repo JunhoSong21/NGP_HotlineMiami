@@ -11,7 +11,7 @@ Bullet::Bullet() :
     ownerID(0),
     spriteWidth(16),
     spriteHeight(16),
-    spriteScale(2)
+    spriteScale(1)
 {
 }
 
