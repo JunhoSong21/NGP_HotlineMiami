@@ -31,7 +31,7 @@ void NetworkThread::ThreadFunc()
 		}
 
 		switch (recvPacketHeader.packetType) {
-		case PN::CS_KEY_INPUT:
+		case PN::CS_KEY_INPUT: {
 			CS_KEY_INPUT keyinputPacket;
 			retValue = recv(clientSock, (char*)&keyinputPacket, sizeof(keyinputPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
@@ -39,7 +39,8 @@ void NetworkThread::ThreadFunc()
 			else
 				KeyInputPacketProcess(keyinputPacket);
 			break;
-		case PN::CS_BULLET_TRIGGER:
+		}
+		case PN::CS_BULLET_TRIGGER: {
 			CS_BULLET_TRIGGER bulletTriggerPacket;
 			retValue = recv(clientSock, (char*)&bulletTriggerPacket, sizeof(bulletTriggerPacket), MSG_WAITALL);
 			if (retValue == SOCKET_ERROR)
@@ -47,6 +48,7 @@ void NetworkThread::ThreadFunc()
 			else
 				BulletTriggerPacketProcess(bulletTriggerPacket);
 			break;
+		}
 		case PN::CS_GRENADE_THROW:
 			break;
 		case PN::CS_LOGIN_PACKET:
@@ -85,7 +87,7 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 #ifdef _DEBUG
 	printf("Key Input Packet recv %f, %f\n", packet.posX, packet.posY);
 #endif
-	auto playerMoveEvent = make_unique<PlayerMove>(
+	unique_ptr<GameEvent> playerMoveEvent = make_unique<PlayerMove>(
 		threadId, packet.posX, packet.posY, packet.mouseX, packet.mouseY);
 	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
 }

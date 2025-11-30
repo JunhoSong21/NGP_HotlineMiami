@@ -9,5 +9,5 @@ void EventQueue::PushEvent(unique_ptr<GameEvent> event)
 
 bool EventQueue::PopEvent(unique_ptr<GameEvent>& event)
 {
-	return eventQueue.try_enqueue(std::move(event));
+	return eventQueue.try_dequeue(event);
 }
