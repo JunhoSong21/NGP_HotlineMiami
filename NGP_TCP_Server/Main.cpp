@@ -1,9 +1,15 @@
 #pragma once
 #include "Common.h"
 #include "ThreadManager.h"
+#include "PopEvent.h"
+
+constexpr int MAX_CLIENT_NUM = 1;
+using std::unique_ptr;
 
 int main()
 {
+	//std::ios_base::sync_with_stdio(false);
+
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -72,9 +78,21 @@ int main()
 			ThreadManager::GetInstance().AddThread(clientSock);
 			printf("Add NetworkThread\n");
 		}
+
+		if (ThreadManager::GetInstance().ThreadCount() == MAX_CLIENT_NUM) {
+			printf("3 Client Accept			Complete\n");
+			closesocket(listenSock);
+			break;
+		}
 	}
 
-	closesocket(listenSock);
+	PopEvent gameLoop;
+	while (true) {
+		unique_ptr<GameEvent> event;
+		if (EventQueue::GetInstance().PopEvent(event))
+			gameLoop.HandleEvent(std::move(event));
+	}
+	
 	WSACleanup();
 	return 0;
 }
