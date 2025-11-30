@@ -18,7 +18,6 @@ void ThreadManager::AddThread(SOCKET clientSock)
 	int clientThreadId = threadId;
 	networkThreads[clientThreadId] = make_unique<NetworkThread>(clientThreadId, clientSock);
 
-	//auto newPlayer = std::make_unique<Player>(threadId, threadId);
 	auto newPlayer = make_unique<Player>(clientThreadId);
 	DataManager::GetInstance().AddPlayer(std::move(newPlayer));
 
