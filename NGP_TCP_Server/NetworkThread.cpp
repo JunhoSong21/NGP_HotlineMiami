@@ -45,6 +45,12 @@ void NetworkThread::ThreadFunc()
 				BulletTriggerPacketProcess(bulletTriggerPacket);
 			break;
 		case PN::CS_GRENADE_THROW:
+			CS_GRENADE_THROW grenadePacket;
+			retValue = recv(clientSock, (char*)&grenadePacket, sizeof(grenadePacket), MSG_WAITALL);
+			if (retValue == SOCKET_ERROR)
+				err_display("recv() Grenade Throw");
+			else
+				GrenadeThrowPacketProcess(grenadePacket);
 			break;
 		case PN::CS_LOGIN_PACKET:
 			break;
@@ -71,4 +77,7 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 {
 	//auto grenadeThrowEvent = std::make_unique<GrenadeThrow>(threadId, 0, 0, 0.0);
 	//EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
+
+	// È®ÀÎ¿ë
+	printf("Client %d Grenade Throw angle=%.2f\n", threadId, packet.dirRadAngle);
 }

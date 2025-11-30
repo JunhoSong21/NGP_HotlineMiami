@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GameLoop.h"
+#include "ClientNetwork.h"
 
 GameLoop::GameLoop() :
 	backGround(nullptr),
@@ -207,8 +208,22 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			static_cast<float>(mouseY)
 		);
 
+		// 기존 활성 상태 저장
+		bool wasActive = grenade->IsActive();
+
 		// 수류탄 투척 시도 (내부에서 2발 제한 체크)
 		grenade->Throw(startPos, targetPos);
+
+		// 이번 클릭에서 새로 활성화된 경우에만 서버에 알림
+		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
+		{
+			// 플레이어 기준 마우스 방향 (라디안)
+			float dirRad = player->CalculateAtan2MouseAtPos(hWnd);
+
+			g_GrenadeReq.requested = true;
+			g_GrenadeReq.dirRadAngle = dirRad;
+		}
+
 		break;
 	}
 	default:
