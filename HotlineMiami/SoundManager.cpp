@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SoundManager.h"
 
 void SoundManager::LoadSound(const std::string& key, const std::string& filePath)

@@ -155,6 +155,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Wall.cpp" />
   </ItemGroup>
@@ -170,6 +171,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>

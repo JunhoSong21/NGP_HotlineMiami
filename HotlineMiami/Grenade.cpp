@@ -326,6 +326,8 @@ void Grenade::Explode()
 
         fragments.push_back(f);
     }
+
+    SoundManager::Get().Play("grenade_explosion");
 }
 
 void Grenade::Collision(float deltaTime, Player* player)

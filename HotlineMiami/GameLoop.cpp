@@ -58,6 +58,7 @@ void GameLoop::Init(HWND hwnd)
 	grenade = new Grenade();
 	grenade->Init();
 	grenade->LoadGrenadeImage(imgManager);
+	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
 
 	// 수류탄에 벽 정보 넘겨주기
 	if (wall && grenade)
