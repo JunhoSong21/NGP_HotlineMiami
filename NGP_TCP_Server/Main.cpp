@@ -3,6 +3,7 @@
 #include "ThreadManager.h"
 #include "PopEvent.h"
 
+constexpr int MAX_CLIENT_NUM = 1;
 using std::unique_ptr;
 
 int main()
@@ -78,7 +79,7 @@ int main()
 			printf("Add NetworkThread\n");
 		}
 
-		if (ThreadManager::GetInstance().ThreadCount() == 3) {
+		if (ThreadManager::GetInstance().ThreadCount() == MAX_CLIENT_NUM) {
 			printf("3 Client Accept			Complete\n");
 			closesocket(listenSock);
 			break;

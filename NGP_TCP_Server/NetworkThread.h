@@ -25,7 +25,7 @@ public:
 	void BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet);
 	void GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet);
 
-	void SendQueueInput(std::shared_ptr<GameEvent> event);
+	void SendQueueInput(int eventNum);
 
 	void SendPlayerMove();
 };

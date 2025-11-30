@@ -56,10 +56,10 @@ void NetworkThread::ThreadFunc()
 		}
 
 		// send큐에 데이터가 있다면 전송
-		unique_ptr<int> eventNum;
+		int eventNum;
 		if (sendQueue.try_dequeue(eventNum)) {
 			PacketHeader sendPacketHeader{};
-			sendPacketHeader.packetType = *eventNum;
+			sendPacketHeader.packetType = eventNum;
 
 			switch (sendPacketHeader.packetType) {
 			case PN::SC_PLAYER_MOVE:
@@ -102,9 +102,9 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 	//EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
 }
 
-void NetworkThread::SendQueueInput(std::shared_ptr<GameEvent> event)
+void NetworkThread::SendQueueInput(int eventNum)
 {
-	switch (event->type) {
+	switch (eventNum) {
 	case GameEvent::Type::PLAYER_UPDATE:
 		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
 		break;
