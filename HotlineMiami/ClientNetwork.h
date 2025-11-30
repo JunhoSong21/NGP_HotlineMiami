@@ -3,6 +3,7 @@
 
 class Player;
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
+void RecvProcess(SOCKET sock, Player& player);
 
 // 전역 네트워크 상태
 extern SOCKET g_ClientSock;
