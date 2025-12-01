@@ -128,5 +128,7 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.angle = sendPlayer->angle;
 
 		retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
+		if (retValue == SOCKET_ERROR)
+			printf("playerMovePacket Send() Error\n");
 	}
 }
