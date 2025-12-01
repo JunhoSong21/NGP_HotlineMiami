@@ -59,6 +59,28 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 
 }
 
+void RecvProcess(SOCKET sock)
+{
+    PacketHeader header{};
+    int retValue = recv(sock, (char*)&header, sizeof(header), 0);
+    if (retValue == SOCKET_ERROR) {}; // 오류시 처리코드 추가 필요
+
+    switch (header.packetType) {
+    case PN::SC_PLAYER_MOVE: {
+        SC_PLAYER_MOVE playerMovePacket{};
+        retValue = recv(sock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR) {}; // 오류시 처리코드 추가 필요
+
+        // playerMovePacket에 담긴 데이터로 플레이어 객체 업데이트
+        // 기본적으로 클라이언트가 3개라는 가정을 하고 전체적인 구조를 수정 할 필요가 있음
+        // Player 클래스 내부에 포지션을 변경할 수 있는 내부 함수 구현 필요
+        break;
+    }
+    }
+
+
+}
+
 // 네트워크 초기화
 bool InitNetwork(const char* serverIp, unsigned short port)
 {

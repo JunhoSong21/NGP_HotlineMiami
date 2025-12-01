@@ -7,6 +7,8 @@ GameLoop::GameLoop() :
 	wall(nullptr),
 	timer(nullptr),
 	player(nullptr),
+	grenade(nullptr),
+	hud(nullptr),
 	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
@@ -24,7 +26,7 @@ GameLoop::~GameLoop()
 void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
-	// °´Ã¼ Å¬·¡½º Init, ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	
 	backGround = new BackGround();
         
 	map = new Map();
@@ -50,6 +52,18 @@ void GameLoop::Init(HWND hwnd)
 
 	player = new Player();
 	player->Init();
+	player->LoadPlayerImages(imgManager);
+
+	grenade = new Grenade();
+	grenade->Init();
+	grenade->LoadGrenadeImage(imgManager);
+
+	// 수류탄에 벽 정보 넘겨주기
+	if (wall && grenade)
+		grenade->SetWall(wall);
+
+	hud = new HUD();
+	hud->Init(imgManager);
 	player->LoadPlayerImages(imgManager);    
 
 	bullet = new Bullet();
@@ -65,28 +79,27 @@ void GameLoop::Update()
 	if (timer) deltaTime = timer->getDeltaTime();
 	if (player)
 	{
-		// 1) ÀÌµ¿ Àü À§Ä¡
 		Gdiplus::PointF oldPos = player->GetPos();
 
-		// 2) ÇÃ·¹ÀÌ¾î ÀÚÃ¼ ·ÎÁ÷À¸·Î ¸ÕÀú ÀÌµ¿ ½Ãµµ
 		player->Update(deltaTime);
 
-		// 3) ÀÌµ¿ ÈÄ À§Ä¡¿Í delta °è»ê
 		Gdiplus::PointF newPos = player->GetPos();
 		Gdiplus::PointF delta(newPos.X - oldPos.X,
 			newPos.Y - oldPos.Y);
 
-		// ·»´õ ±âÁØ ½ÇÁ¦ Ãæµ¹ ¹Ú½º Å©±â
-		Gdiplus::SizeF playerAabb(90.0f, 50.0f);
+		Gdiplus::SizeF playerAabb(50.0f, 50.0f);
 
-		// 4) Ãæµ¹ Ã³¸®¿ë À§Ä¡´Â oldPos¿¡¼­ ½ÃÀÛ
 		Gdiplus::PointF resolvedPos = oldPos;
 
 		if (wall)
 			wall->ResolveMove(resolvedPos, playerAabb, delta);
 
-		// 5) Ãæµ¹ Ã³¸® °á°ú¸¦ ÇÃ·¹ÀÌ¾î¿¡ ¹Ý¿µ
 		player->GetPos() = resolvedPos;
+	}
+	if (grenade) {
+		grenade->Update(deltaTime);
+		// 파편 충돌 처리 (벽 + 플레이어)
+		grenade->Collision(deltaTime, player);
 	}
 	if (bullet)     bullet->Update(deltaTime);
 }
@@ -113,7 +126,7 @@ void GameLoop::Render()
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
 
-		// 1) 배경 렌더링
+		// 1) backGround
 		{
 			auto s = g.Save();
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
@@ -122,7 +135,7 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 2) 맵(타일) 렌더링
+		// 2) map
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeNone);
@@ -133,10 +146,13 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 3) 벽(Wall) 렌더링
+		// 3) Wall 
 		if (wall) wall->Render(g);     
+		if (grenade) grenade->Render(g, imgManager);
+		if (hud) hud->Render(hWnd, g, imgManager);
 
-		// 4) 플레이어 렌더링
+
+		// 3) player
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
@@ -193,6 +209,24 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		// 총알 초기화
 		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+	case WM_RBUTTONDOWN:
+	{
+		// 플레이어/수류탄이 준비되어 있을 때만 처리
+		if (!player || !grenade)
+			return;
+
+		// 마우스 클릭 지점 (클라이언트 좌표계)
+		int mouseX = static_cast<short>(LOWORD(lParam));
+		int mouseY = static_cast<short>(HIWORD(lParam));
+
+		Gdiplus::PointF startPos = player->GetPos();                 // 플레이어 중심
+		Gdiplus::PointF targetPos(
+			static_cast<float>(mouseX),
+			static_cast<float>(mouseY)
+		);
+
+		// 수류탄 투척 시도 (내부에서 2발 제한 체크)
+		grenade->Throw(startPos, targetPos);
 		break;
 	}
 	default:

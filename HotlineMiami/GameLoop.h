@@ -6,20 +6,30 @@
 #include "Wall.h"
 #include "Timer.h"
 #include "Player.h"
+
+#include "Grenade.h"
+#include "HUD.h"
+
 #include "Bullet.h"
+
 
 #include "ImageManager.h"
 
 class GameLoop {
 private:
 	ImageManager imgManager;
+	HUD* hud;
 
 	BackGround* backGround;
 	Map* map;
 	Timer* timer;
 	Player* player;
 	Wall* wall;
+
+	Grenade* grenade;
+
 	Bullet* bullet;
+
 	float deltaTime;
 
 	HWND hWnd;

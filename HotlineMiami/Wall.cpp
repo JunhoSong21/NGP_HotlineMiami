@@ -448,3 +448,56 @@ bool Wall::ResolveMove(Gdiplus::PointF& pos, Gdiplus::SizeF aabb, Gdiplus::Point
 
     return blocked;
 }
+
+bool Wall::Raycast(const Gdiplus::PointF& start,
+    const Gdiplus::PointF& dir,
+    float distance,
+    Gdiplus::PointF* hitPos,
+    POINT* hitCell) const
+{
+    // 이동 거리가 0 이하면 충돌 없음
+    if (distance <= 0.0f)
+        return false;
+
+    // 방향 벡터 길이 검사 및 정규화
+    float len = std::sqrt(dir.X * dir.X + dir.Y * dir.Y);
+    if (len <= 0.0001f)
+        return false;
+
+    Gdiplus::PointF nDir(dir.X / len, dir.Y / len);
+
+    // ResolveMove 에 맞춰서 step = 4.0f 사용
+    const float maxStep = 4.0f;
+    float travelled = 0.0f;
+
+    while (travelled <= distance)
+    {
+        // 현재 샘플링 위치
+        Gdiplus::PointF p(
+            start.X + nDir.X * travelled,
+            start.Y + nDir.Y * travelled
+        );
+        // 월드 → 그리드 좌표
+        POINT cell = WorldToGrid(p);
+
+        // 그리드 범위 밖이면 그냥 다음 위치로 진행
+        if (cell.x >= 0 && cell.x < COLS &&
+            cell.y >= 0 && cell.y < ROWS)
+        {
+            // grid[y][x] == None 이면 빈칸, 아니면 벽
+            if (grid[cell.y][cell.x] != None)
+            {
+                if (hitPos)
+                    *hitPos = p;
+
+                if (hitCell) {
+                    hitCell->x = cell.x;
+                    hitCell->y = cell.y;
+                }
+               return true;
+            }
+        }
+        travelled += maxStep;
+    }
+    return false;
+}

@@ -13,6 +13,8 @@ constexpr int BUFSIZE		= 1024;	// BUFSIZE 공용사용
 #include <stdlib.h> // exit(), ...
 #include <string.h> // strncpy(), ...
 
+#include <ios>
+
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
 void err_quit(const char* msg);
