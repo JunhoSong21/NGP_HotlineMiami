@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "ThreadManager.h"
 #include "PopEvent.h"
+#include "Timer.h"
 
 constexpr int MAX_CLIENT_NUM = 1;
 using std::unique_ptr;
@@ -87,6 +88,7 @@ int main()
 	}
 
 	PopEvent gameLoop;
+	Timer timer;
 	while (true) {
 		unique_ptr<GameEvent> event;
 		if (EventQueue::GetInstance().PopEvent(event))
