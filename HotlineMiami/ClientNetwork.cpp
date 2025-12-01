@@ -171,9 +171,15 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
 
     while (g_NetworkRunning)
     {
+        // 매 프레임마다 최신 내 인덱스 가져오기
         int idx = g_MyPlayerIndex;
+
+        // 아직 서버가 내 인덱스를 안 알려줬으면 일단 0번으로 가정해서 테스트 가능
+        if (idx < 0 || idx >= 3)
+            idx = 0;
+
         Player* myPlayer = players[idx];
-        // 내 입력을 서버로 보냄 (0번 플레이어 기준)
+
         if (myPlayer)
         {
             if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)

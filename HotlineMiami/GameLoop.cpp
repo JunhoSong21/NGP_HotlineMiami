@@ -86,6 +86,8 @@ void GameLoop::Update()
 	if (timer) deltaTime = timer->getDeltaTime();
 	// 내 인덱스 계산
 	int myIdx = g_MyPlayerIndex;
+	if (myIdx < 0 || myIdx >= 3)
+		myIdx = 0;
 
 
 	if (players[myIdx])
@@ -209,12 +211,16 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	{
-		if (!player || !bullet)
+		// 내 인덱스 계산
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3)
+			myIdx = 0;
+		if (!players[myIdx] || !bullet)
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
 		int mouseY = GET_Y_LPARAM(lParam);
 		// 플레이어 위치
-		Gdiplus::PointF playerPos = player->GetPosition();
+		Gdiplus::PointF playerPos = players[myIdx]->GetPosition();
 		// 방향벡터
 		float dx = static_cast<float>(mouseX) - playerPos.X;
 		float dy = static_cast<float>(mouseY) - playerPos.Y;
@@ -234,7 +240,9 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 	{
 		// 내 인덱스 계산
-		int myIdx =  g_MyPlayerIndex;
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3)
+			myIdx = 0;
 
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
 		if (!players[myIdx] || !grenade)
