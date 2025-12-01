@@ -7,6 +7,7 @@ constexpr float PI = 3.1415;
 #include "Player.h"
 
 using std::unique_ptr;
+using std::make_unique;
 using std::lock_guard;
 using std::mutex;
 
@@ -21,6 +22,11 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandlePlayerMoveEvent(std::move(moveEvent));
 		break;
 	}
+	case GameEvent::Type::PLAYER_UPDATE: {
+		unique_ptr<PlayerUpdate> playerUpdateEvent(static_cast<PlayerUpdate*>(event.release()));
+		HandlePlayerUpdateEvent(std::move(playerUpdateEvent));
+		break;
+	}
 	default:
 		break;
 	}
@@ -28,7 +34,7 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 
 void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 {
-	lock_guard<mutex> lock(playerUpdateMutex);
+	lock_guard<mutex> lock(playerMoveMutex);
 
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player) {
@@ -38,6 +44,13 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 			event->angleX, event->angleY, event->destX, event->destY);
 	}
 	printf("playerMoveEvent 처리 완료\n");
+}
+
+void PopEvent::HandlePlayerUpdateEvent(unique_ptr<PlayerUpdate> event)
+{
+	lock_guard<mutex> lock(playerUpdateMutex);
+
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)
