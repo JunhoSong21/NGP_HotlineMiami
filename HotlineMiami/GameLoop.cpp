@@ -28,8 +28,10 @@ void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
 	
+	// 사운드 로딩
 	SoundManager::Get().LoadSound("bgm", "Resource/Sound/BGM.wav");
 	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
+	SoundManager::Get().LoadSound("death", "Resource/Sound/Death.wav");
 	SoundManager::Get().PlayBGM("bgm");
 
 	backGround = new BackGround();
@@ -196,6 +198,12 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+
+	// 플레이어 사망 시 입력 방지
+	if (player->IsDead()) {
+		return;
+	}
+
 	switch (Msg)
 	{
 	case WM_RBUTTONDOWN:

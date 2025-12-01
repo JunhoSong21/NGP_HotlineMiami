@@ -5,6 +5,14 @@
 #include <map>
 
 #include "ImageManager.h"
+#include "SoundManager.h"
+
+// Player State
+enum PLAYER_STATE
+{
+	PLAYER_IDLE = 0,
+	PLAYER_DEATH   // 사망 상태
+};
 
 class Player {
 private:
@@ -45,4 +53,6 @@ public:
 	float CalculateAtan2MouseAtPos(HWND hWnd);
 
 	void ApplyDamage(float amount);
+	void SpriteDeathRender(Gdiplus::Graphics& graphics, ImageManager& imgManager); 
+	bool IsDead() const { return hp <= 0.0f; }		// 죽었는지 상태 체크
 };
