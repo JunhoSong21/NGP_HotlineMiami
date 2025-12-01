@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "ImageManager.h"
+#include "SoundManager.h"
 #include <vector>
 
 class Player;

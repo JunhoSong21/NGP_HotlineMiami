@@ -7,6 +7,42 @@
 SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
 int    g_MyPlayerIndex = -1;
+extern GrenadeRequest g_GrenadeReq{ false, 0.0f }; // 수류탄 요청
+
+// 수류탄 패킷 전송 함수
+static int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
+{
+    CS_GRENADE_THROW pkt{};
+    pkt.dirRadAngle = dirRadAngle;
+
+    PacketHeader header{};
+    header.packetType = PN::CS_GRENADE_THROW;
+    header.packetSize = sizeof(pkt);
+
+    // 헤더 전송
+    int sent = send(
+        sock,
+        reinterpret_cast<const char*>(&header),
+        static_cast<int>(sizeof(header)),
+        0
+    );
+    if (sent == SOCKET_ERROR) {
+        return SOCKET_ERROR;
+    }
+
+    // 본문 전송
+    sent = send(
+        sock,
+        reinterpret_cast<const char*>(&pkt),
+        static_cast<int>(sizeof(pkt)),
+        0
+    );
+    if (sent == SOCKET_ERROR) {
+        return SOCKET_ERROR;
+    }
+
+    return static_cast<int>(sizeof(header) + sizeof(pkt));
+}
 
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 {
@@ -53,6 +89,14 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     );
     if (sent == SOCKET_ERROR)
         return SOCKET_ERROR;
+
+    // 수류탄 요청이 있으면 같이 보내기 
+    if (g_GrenadeReq.requested) {
+        if (Send_GrenadeThrow(sock, g_GrenadeReq.dirRadAngle) == SOCKET_ERROR) {
+            return SOCKET_ERROR;
+        }
+        g_GrenadeReq.requested = false;
+    }
 
     OutputDebugStringA("send!\n");
 

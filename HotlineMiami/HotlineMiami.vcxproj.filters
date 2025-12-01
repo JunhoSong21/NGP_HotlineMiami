@@ -12,10 +12,9 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Wall.cpp" />
-
     <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="HUD.cpp" />
-
+    <ClCompile Include="SoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
@@ -29,9 +28,8 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wall.h" />
-
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="HUD.h" />
-
+    <ClInclude Include="SoundManager.h" />
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@
 
 
 #include "ImageManager.h"
+#include "SoundManager.h"
 
 class GameLoop {
 private:
