@@ -190,7 +190,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	{
-		if(!player || !bullet)
+		if (!player || !bullet)
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
 		int mouseY = GET_Y_LPARAM(lParam);
@@ -209,6 +209,8 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		// 총알 초기화
 		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+		break;
+	}
 	case WM_RBUTTONDOWN:
 	{
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
