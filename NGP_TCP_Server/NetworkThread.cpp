@@ -107,7 +107,7 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 void NetworkThread::SendQueueInput(int eventNum)
 {
 	switch (eventNum) {
-	case GameEvent::Type::PLAYER_MOVE:
+	case GameEvent::Type::PLAYER_UPDATE:
 		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
 		break;
 	default:
