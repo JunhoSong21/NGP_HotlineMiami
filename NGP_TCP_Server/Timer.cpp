@@ -31,8 +31,11 @@ void Timer::TimerLoop()
 
 	for (int i = 0; i < 3; ++i) {
 		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
+			lock_guard<mutex> lock(timerMutex);
 			// ÆøÅº ÅÍÁü.
 			isGrenadeExist[i] = false;
+			unique_ptr<GameEvent> grenadeExplosion = make_unique<GrenadeExplosion>(i);
+			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
 		}
 	}
 }
@@ -45,6 +48,7 @@ bool Timer::AddGrenade(int id)
 	}
 	else {
 		isGrenadeExist[id] = true;
+		grenadeArray[id] = system_clock::now();
 		return true;
 	}
 }

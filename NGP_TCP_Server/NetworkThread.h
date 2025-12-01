@@ -28,4 +28,5 @@ public:
 	void SendQueueInput(int eventNum);
 
 	void SendPlayerMove();
+	void SendGrenadeState();
 };

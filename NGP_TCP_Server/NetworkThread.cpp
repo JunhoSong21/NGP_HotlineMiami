@@ -71,7 +71,7 @@ void NetworkThread::ThreadFunc()
 			sendPacketHeader.packetType = eventNum;
 
 			switch (sendPacketHeader.packetType) {
-			case PN::SC_PLAYER_MOVE:
+			case PN::SC_PLAYER_MOVE: {
 				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
 				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
 				if (retValue == SOCKET_ERROR)
@@ -79,6 +79,16 @@ void NetworkThread::ThreadFunc()
 				else
 					SendPlayerMove();
 				break;
+			}
+			case PN::SC_GRENADE_STATE: {
+				sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
+				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+				if (retValue == SOCKET_ERROR)
+					printf("send() SC_GRENADE_STATE() Error\n");
+				else
+					SendGrenadeState();
+				break;
+			}
 			default:
 				break;
 			}
@@ -121,6 +131,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	case GameEvent::Type::PLAYER_UPDATE:
 		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
 		break;
+	case GameEvent::Type::GRENADE_EXPLOSION:
+		sendQueue.enqueue(PN::SC_GRENADE_STATE);
+		break;
 	default:
 		break;
 	}
@@ -144,4 +157,18 @@ void NetworkThread::SendPlayerMove()
 		else
 			printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
 	}
+}
+
+void NetworkThread::SendGrenadeState()
+{
+	int retValue = 0;
+	SC_GRENADE_STATE grenadeStatePacket{};
+
+	grenadeStatePacket.isExploded = true;
+	
+	retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("grenadeStatePacket Send() Error\n");
+	else
+		printf("grenadeStatePacket Send() Complete\n");
 }
