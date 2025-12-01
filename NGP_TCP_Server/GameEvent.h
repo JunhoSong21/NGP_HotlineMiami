@@ -77,10 +77,10 @@ struct BulletCollision : GameEvent {
 	}
 };
 
-//struct GrenadeThrow : GameEvent {
-//
-//};
-//
+struct GrenadeThrow : GameEvent {
+
+};
+
 //struct GrenadeUpdate : GameEvent {
 //
 //};
