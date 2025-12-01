@@ -15,7 +15,7 @@ private:
 	mutable std::mutex threadMutex;
 	std::atomic<int> threadId;
 
-	ThreadManager() = default;
+	ThreadManager();
 	ThreadManager(const ThreadManager&) = delete;
 	ThreadManager& operator=(const ThreadManager&) = delete;
 
@@ -28,4 +28,7 @@ public:
 
 	void AddThread(SOCKET clientSock);
 	void RemoveThread(int id);
+	int ThreadCount();
+
+	void BroadcastEvent(std::unique_ptr<GameEvent> event);
 };
