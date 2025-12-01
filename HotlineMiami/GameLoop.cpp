@@ -28,6 +28,10 @@ void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
 	
+	SoundManager::Get().LoadSound("bgm", "Resource/Sound/BGM.wav");
+	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
+	SoundManager::Get().PlayBGM("bgm");
+
 	backGround = new BackGround();
         
 	map = new Map();
@@ -58,7 +62,6 @@ void GameLoop::Init(HWND hwnd)
 	grenade = new Grenade();
 	grenade->Init();
 	grenade->LoadGrenadeImage(imgManager);
-	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
 
 	// 수류탄에 벽 정보 넘겨주기
 	if (wall && grenade)
@@ -80,6 +83,8 @@ void GameLoop::Init(HWND hwnd)
 
 void GameLoop::Update()
 {
+	SoundManager::Get().Update();   // 재생 끝난 SFX 보이스 정리
+
 	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
 	if (player)
