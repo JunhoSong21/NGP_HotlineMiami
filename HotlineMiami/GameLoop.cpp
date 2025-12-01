@@ -269,7 +269,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
 		{
 			// 플레이어 기준 마우스 방향 (라디안)
-			float dirRad = player->CalculateAtan2MouseAtPos(hWnd);
+			float dirRad = players[myIdx]->CalculateAtan2MouseAtPos(hWnd);
 
 			g_GrenadeReq.requested = true;
 			g_GrenadeReq.dirRadAngle = dirRad;
