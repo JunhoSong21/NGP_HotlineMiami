@@ -3,7 +3,7 @@
 
 Player::Player() :
 	playerState(L"PLAYER_IDLE"),
-	playerPos{0.0f, 0.0f},
+	playerPos{300.0f, 500.0f},
 	playerSpriteFrameNum(0),
 	spriteOriginWidth(50),
 	spriteOriginHeight(32),
