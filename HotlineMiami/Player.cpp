@@ -12,6 +12,8 @@ Player::Player() :
 	vectorY(0.0f),
 	playerSpeed(100.0f),
 	frameTimeAccumulate(0.0f),
+	hp(100.0f)
+	, maxHp(100.0f),
 	hWnd(nullptr),
 	hBitmap(nullptr)
 {
@@ -24,6 +26,21 @@ Player::~Player()
 bool Player::Init()
 {
 	return true;
+}
+
+// hp 바 확인용 데미지 함수
+void Player::ApplyDamage(float amount)
+{
+	if (amount <= 0.0f) {
+		return;
+	}
+
+	hp -= amount;
+	if (hp < 0.0f) {
+		hp = 0.0f;
+	}
+
+	// TODO: 나중에 여기서 hp <= 0일 때 사망 처리 넣으면 됨
 }
 
 void Player::Update(float deltaTime)
@@ -40,9 +57,44 @@ void Player::Update(float deltaTime)
 	InputProcessing(deltaTime);
 }
 
+void Player::RenderHpBar(Gdiplus::Graphics& g)
+{
+	if (maxHp <= 0.0f) {
+		return;
+	}
+
+	float ratio = hp / maxHp;
+	if (ratio < 0.0f) {
+		ratio = 0.0f;
+	}
+	if (ratio > 1.0f) {
+		ratio = 1.0f;
+	}
+
+	// HP 바 크기
+	const float barWidth = 40.0f; // 전체 길이
+	const float barHeight = 5.0f;  // 높이
+	const float offsetY = -35.0f; // 플레이어 머리 위로 조금 띄우기
+
+	float barX = playerPos.X - barWidth * 0.5f - 15.0f;
+	float barY = playerPos.Y + offsetY;
+
+	// 바 배경 (살짝 반투명 검정)
+	Gdiplus::RectF backRect(barX, barY, barWidth, barHeight);
+	// 남은 체력 부분 (빨간색)
+	Gdiplus::RectF hpRect(barX, barY, barWidth * ratio, barHeight);
+
+	Gdiplus::SolidBrush backBrush(Gdiplus::Color(160, 0, 0, 0));      // 반투명 검정
+	Gdiplus::SolidBrush hpBrush(Gdiplus::Color(255, 255, 0, 0));      // 빨간색
+
+	g.FillRectangle(&backBrush, backRect);
+	g.FillRectangle(&hpBrush, hpRect);
+}
+
 void Player::Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
 	SpriteDivideAndRotateRender(hWnd, graphics, imgManager);
+	RenderHpBar(graphics);
 }
 
 void Player::InputProcessing(float deltaTime)

@@ -232,6 +232,17 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
+	// 12.02 나중에 지우기
+	case WM_KEYDOWN:
+	{
+		// H 키 눌렀을 때 체력 감소 테스트
+		if (wParam == 'H') {
+			if (player) {
+				player->ApplyDamage(0.5f);
+			}
+		}
+		break;
+	}
 	default:
 		break;
 	}

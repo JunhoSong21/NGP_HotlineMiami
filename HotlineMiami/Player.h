@@ -20,6 +20,9 @@ private:
 	float		playerSpeed;
 	float		frameTimeAccumulate;
 
+	float hp;      // 현재 체력 (0.0 ~ 100.0)
+	float maxHp;   // 최대 체력 (기본 100.0)
+
 	HWND		hWnd;
 	HBITMAP		hBitmap;
 
@@ -31,6 +34,7 @@ public:
 	bool Init();
 	void Update(float deltaTime);
 	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
+	void RenderHpBar(Gdiplus::Graphics& g);		// 
 	void InputProcessing(float deltaTime);
 	
 	// 플레이어 위치 (Send_Input 에서 사용)
@@ -39,4 +43,6 @@ public:
 	void LoadPlayerImages(ImageManager& imgManager);
 	void SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
 	float CalculateAtan2MouseAtPos(HWND hWnd);
+
+	void ApplyDamage(float amount);
 };
