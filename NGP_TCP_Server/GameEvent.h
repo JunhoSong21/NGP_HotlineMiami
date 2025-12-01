@@ -78,7 +78,11 @@ struct BulletCollision : GameEvent {
 };
 
 struct GrenadeThrow : GameEvent {
-
+	GrenadeThrow(int threadId)
+	{
+		type = GameEvent::Type::GRENADE_THROW;
+		networkThreadId = threadId;
+	}
 };
 
 //struct GrenadeUpdate : GameEvent {

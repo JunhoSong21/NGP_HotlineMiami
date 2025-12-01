@@ -27,7 +27,13 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandlePlayerUpdateEvent(std::move(playerUpdateEvent));
 		break;
 	}
+	case GameEvent::Type::GRENADE_THROW: {
+		unique_ptr<GrenadeThrow> grenadeThrowEvent(static_cast<GrenadeThrow*>(event.release()));
+		HandleGrenadeThrowEvent(std::move(grenadeThrowEvent));
+		break;
+	}
 	default:
+		printf("Undefine Event Type\n");
 		break;
 	}
 }
@@ -51,6 +57,16 @@ void PopEvent::HandlePlayerUpdateEvent(unique_ptr<PlayerUpdate> event)
 	lock_guard<mutex> lock(playerUpdateMutex);
 
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
+}
+
+void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
+{
+	lock_guard<mutex> lock(grenadeThrowMutex);
+
+	//auto newGrenade = make_unique<Grenade>(
+		//event->networkThreadId, event->)
+		
+	//		= DataManager::GetInstance().AddGrenade();
 }
 
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)
