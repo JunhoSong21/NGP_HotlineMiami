@@ -12,6 +12,7 @@ Player::Player() :
 	vectorY(0.0f),
 	playerSpeed(100.0f),
 	frameTimeAccumulate(0.0f),
+	radianAngle(0.0f),
 	hWnd(nullptr),
 	hBitmap(nullptr)
 {
@@ -38,6 +39,8 @@ void Player::Update(float deltaTime)
 	}
 
 	InputProcessing(deltaTime);
+
+	radianAngle = CalculateAtan2MouseAtPos(hWnd);
 }
 
 void Player::Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
@@ -73,7 +76,6 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics,
 	Gdiplus::Matrix originMatrix;
 	graphics.GetTransform(&originMatrix);
 
-	float radianAngle = CalculateAtan2MouseAtPos(hWnd);
 	float degreeAngle = radianAngle * 180.0f / PI;
 
 	int scaleWidth = spriteOriginWidth * spriteScaleMag;
@@ -106,6 +108,13 @@ float Player::CalculateAtan2MouseAtPos(HWND hWnd)
 								static_cast<float>(mousePos.x) - playerPos.X);
 
 	return radianAngle;
+}
+
+void Player::SetPosition(float x, float y, float rad)
+{
+	playerPos.X = x;
+	playerPos.Y = y;
+	radianAngle = rad;
 }
 
 Gdiplus::PointF& Player::GetPos()

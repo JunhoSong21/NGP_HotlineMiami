@@ -23,7 +23,7 @@ private:
 	BackGround* backGround;
 	Map* map;
 	Timer* timer;
-	Player* player;
+	Player* players[3];
 	Wall* wall;
 
 	Grenade* grenade;
@@ -43,6 +43,7 @@ public:
 	void Update();
 	void Render();
 	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
-	Player* GetPlayer() { return player; } // Gammeloop에서 player 꺼낼 수 있도록
+	
 	Bullet* GetBullet() { return bullet; }
+	Player** GetPlayers() { return players; }
 };

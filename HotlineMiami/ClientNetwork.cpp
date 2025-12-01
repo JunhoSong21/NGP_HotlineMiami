@@ -6,6 +6,7 @@
 
 SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
+int    g_MyPlayerIndex = -1;
 
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 {
@@ -59,21 +60,64 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 
 }
 
-void RecvProcess(SOCKET sock)
+void RecvProcess(SOCKET sock, Player** players)
 {
     PacketHeader header{};
     int retValue = recv(sock, (char*)&header, sizeof(header), 0);
-    if (retValue == SOCKET_ERROR) {}; // 오류시 처리코드 추가 필요
+    if (retValue <= 0)
+        return;
+
+    if (header.packetSize < sizeof(PacketHeader))
+        return;
+    int bodySize = static_cast<int>(header.packetSize - sizeof(PacketHeader));
 
     switch (header.packetType) {
     case PN::SC_PLAYER_MOVE: {
+        if (bodySize != sizeof(SC_PLAYER_MOVE))
+        {
+            // 크기 안 맞으면 bodySize만큼 읽어서 버리기
+            char dummy[256];
+            int remain = bodySize;
+            while (remain > 0)
+            {
+                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
+                int r = recv(sock, dummy, chunk, 0);
+                if (r <= 0) return;
+                remain -= r;
+            }
+            return;
+        }
+
         SC_PLAYER_MOVE playerMovePacket{};
         retValue = recv(sock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
-        if (retValue == SOCKET_ERROR) {}; // 오류시 처리코드 추가 필요
+        if (retValue <= 0)
+            return;
 
-        // playerMovePacket에 담긴 데이터로 플레이어 객체 업데이트
-        // 기본적으로 클라이언트가 3개라는 가정을 하고 전체적인 구조를 수정 할 필요가 있음
-        // Player 클래스 내부에 포지션을 변경할 수 있는 내부 함수 구현 필요
+        int idx = static_cast<int>(playerMovePacket.targetNum);
+        g_MyPlayerIndex = idx;
+        if (idx >= 0 && idx < 3 && players[idx])
+        {
+            players[idx]->SetPosition(
+                playerMovePacket.posX,
+                playerMovePacket.posY,
+                playerMovePacket.angle 
+            );
+        }
+
+        break;
+    }
+    default:
+    {
+        // 아직 처리 안 하는 패킷은 bodySize만큼 읽어서 버리기
+        char dummy[256];
+        int remain = bodySize;
+        while (remain > 0)
+        {
+            int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
+            int r = recv(sock, dummy, chunk, 0);
+            if (r <= 0) return;
+            remain -= r;
+        }
         break;
     }
     }
@@ -122,16 +166,21 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
 {
     NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
     HWND    hWnd = p->hWnd;
-    Player* player = p->player;
 	Bullet* bullet = p->bullet;
+    Player** players = p->players;
 
     while (g_NetworkRunning)
     {
-        // 입력을 서버에 보냄
-        if (Send_Input(g_ClientSock, hWnd, *player) == SOCKET_ERROR)
+        int idx = g_MyPlayerIndex;
+        Player* myPlayer = players[idx];
+        // 내 입력을 서버로 보냄 (0번 플레이어 기준)
+        if (myPlayer)
         {
-            g_NetworkRunning = false;
-            break;
+            if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
+            {
+                g_NetworkRunning = false;
+                break;
+            }
         }
         
         // RecvProcess();
@@ -142,6 +191,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
         }
 
 
+        RecvProcess(g_ClientSock, players);
         Sleep(16);
     }
 
