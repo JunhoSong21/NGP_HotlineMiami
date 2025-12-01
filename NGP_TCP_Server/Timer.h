@@ -8,14 +8,19 @@
 
 class Timer {
 private:
-	std::chrono::time_point<std::chrono::system_clock> moveEventCount;
+	std::chrono::time_point<std::chrono::system_clock> moveEventPoint;
 
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;
 
-	void TimerLoop();
-
 public:
 	Timer();
 
+	static Timer& GetInstance()
+	{
+		static Timer instance;
+		return instance;
+	}
+
+	void TimerLoop();
 };

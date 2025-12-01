@@ -123,7 +123,7 @@ void NetworkThread::SendPlayerMove()
 	int retValue = 0;
 	SC_PLAYER_MOVE playerMovePacket{};
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 1; ++i) {
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		playerMovePacket.posX = sendPlayer->posX;
@@ -133,5 +133,7 @@ void NetworkThread::SendPlayerMove()
 		retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 		if (retValue == SOCKET_ERROR)
 			printf("playerMovePacket Send() Error\n");
+		else
+			printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
 	}
 }

@@ -10,19 +10,17 @@ using std::mutex;
 
 Timer::Timer()
 {
-	moveEventCount = system_clock::now();
+	moveEventPoint = system_clock::now();
 }
 
 void Timer::TimerLoop()
 {
-	while (true) {
-		timePoint = system_clock::now();
-		if (milliseconds(200) < duration_cast<milliseconds>(moveEventCount - timePoint)) {
-			lock_guard<mutex> lock(timerMutex);
-			moveEventCount = system_clock::now();
+	timePoint = system_clock::now();
+	if (milliseconds(200) < duration_cast<milliseconds>(timePoint - moveEventPoint)) {
+		lock_guard<mutex> lock(timerMutex);
+		moveEventPoint = system_clock::now();
 
-			unique_ptr<GameEvent> moveUpdate = make_unique<PlayerUpdate>();
-			EventQueue::GetInstance().PushEvent(std::move(moveUpdate));
-		}
+		unique_ptr<GameEvent> moveUpdate = make_unique<PlayerUpdate>();
+		EventQueue::GetInstance().PushEvent(std::move(moveUpdate));
 	}
 }
