@@ -3,6 +3,7 @@
 using std::chrono::system_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
+using std::chrono::seconds;
 using std::unique_ptr;
 using std::make_unique;
 using std::lock_guard;
@@ -11,6 +12,10 @@ using std::mutex;
 Timer::Timer()
 {
 	moveEventPoint = system_clock::now();
+
+	for (bool i : isGrenadeExist) {
+		isGrenadeExist[i] = false;
+	}
 }
 
 void Timer::TimerLoop()
@@ -22,5 +27,24 @@ void Timer::TimerLoop()
 
 		unique_ptr<GameEvent> moveUpdate = make_unique<PlayerUpdate>();
 		EventQueue::GetInstance().PushEvent(std::move(moveUpdate));
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
+			// ÆøÅº ÅÍÁü.
+			isGrenadeExist[i] = false;
+		}
+	}
+}
+
+bool Timer::AddGrenade(int id)
+{
+	if (isGrenadeExist[id]) {
+		printf("ÆøÅºÀÌ ¼³Ä¡µÇ¾î ÀÖ´Â »óÅÂÀÔ´Ï´Ù.\n");
+		return false;
+	}
+	else {
+		isGrenadeExist[id] = true;
+		return true;
 	}
 }

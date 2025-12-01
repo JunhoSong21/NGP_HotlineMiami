@@ -63,10 +63,16 @@ void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 {
 	lock_guard<mutex> lock(grenadeThrowMutex);
 
-	//auto newGrenade = make_unique<Grenade>(
-		//event->networkThreadId, event->)
-		
-	//		= DataManager::GetInstance().AddGrenade();
+	Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
+
+	auto newGrenade = make_unique<Grenade>(
+		event->networkThreadId,
+		rootPlayer->posX,
+		rootPlayer->posY
+	);
+
+	Timer::GetInstance().AddGrenade(event->networkThreadId);
+	printf("grenadeThrowEvent 처리 완료\n");
 }
 
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)

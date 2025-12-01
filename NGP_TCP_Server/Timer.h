@@ -2,6 +2,7 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <array>
 
 #include "GameEvent.h"
 #include "EventQueue.h"
@@ -13,6 +14,8 @@ private:
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;
 
+	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> grenadeArray;
+	std::array<bool, 3> isGrenadeExist;
 public:
 	Timer();
 
@@ -23,4 +26,6 @@ public:
 	}
 
 	void TimerLoop();
+
+	bool AddGrenade(int id);
 };

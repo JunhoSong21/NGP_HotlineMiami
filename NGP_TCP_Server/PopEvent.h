@@ -4,6 +4,7 @@
 
 #include "GameEvent.h"
 #include "ThreadManager.h"
+#include "Timer.h"
 
 class PopEvent {
 public:
