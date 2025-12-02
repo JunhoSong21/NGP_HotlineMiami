@@ -2,20 +2,30 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <array>
 
 #include "GameEvent.h"
 #include "EventQueue.h"
 
 class Timer {
 private:
-	std::chrono::time_point<std::chrono::system_clock> moveEventCount;
+	std::chrono::time_point<std::chrono::system_clock> moveEventPoint;
 
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;
 
-	void TimerLoop();
-
+	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> grenadeArray;
+	std::array<bool, 3> isGrenadeExist;
 public:
 	Timer();
 
+	static Timer& GetInstance()
+	{
+		static Timer instance;
+		return instance;
+	}
+
+	void TimerLoop();
+
+	bool AddGrenade(int id);
 };

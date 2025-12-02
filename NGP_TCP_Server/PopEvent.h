@@ -4,6 +4,7 @@
 
 #include "GameEvent.h"
 #include "ThreadManager.h"
+#include "Timer.h"
 
 class PopEvent {
 public:
@@ -19,11 +20,13 @@ private:
 	std::mutex bulletUpdateMutex;
 
 	std::mutex grenadeThrowMutex;
+	std::mutex grenadeExplosionMutex;
 
 	void HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event);
 	void HandlePlayerUpdateEvent(std::unique_ptr<PlayerUpdate> event);
 
 	void HandleGrenadeThrowEvent(std::unique_ptr<GrenadeThrow> event);
+	void HandleGrenadeExplosionEvent(std::unique_ptr<GrenadeExplosion> event);
 
 	float CalculateAtan2Float(float x1, float y1, float x2, float y2);
 };
