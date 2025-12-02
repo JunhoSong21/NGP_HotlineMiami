@@ -31,5 +31,9 @@
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HotlineMiami.rc" />
   </ItemGroup>
 </Project>
