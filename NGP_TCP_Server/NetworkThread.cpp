@@ -18,10 +18,26 @@ NetworkThread::~NetworkThread()
 	closesocket(clientSock);
 }
 
+void NetworkThread::LoginProcess()
+{
+	int retValue = 0;
+	PacketHeader loginHeader{};
+
+	retValue = recv(clientSock, (char*)&loginHeader, sizeof(loginHeader), MSG_WAITALL);
+	if (retValue == SOCKET_ERROR)
+		printf("Login Packet recv() Error\n");
+
+	if (loginHeader.packetType == PN::CS_LOGIN_PACKET) {
+		CS_LOGIN_PACKET loginPacket;
+	}
+}
+
 void NetworkThread::ThreadFunc()
 {
 	int retValue = 0;
 	PacketHeader recvPacketHeader{};
+
+	LoginProcess();
 
 	while (true) {
 		retValue = recv(clientSock, (char*)&recvPacketHeader, sizeof(recvPacketHeader), MSG_WAITALL);
@@ -147,15 +163,17 @@ void NetworkThread::SendPlayerMove()
 	for (int i = 0; i < 1; ++i) {
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
-		playerMovePacket.posX = sendPlayer->posX;
-		playerMovePacket.posY = sendPlayer->posY;
-		playerMovePacket.angle = sendPlayer->angle;
+		if (sendPlayer) {
+			playerMovePacket.posX = sendPlayer->posX;
+			playerMovePacket.posY = sendPlayer->posY;
+			playerMovePacket.angle = sendPlayer->angle;
 
-		retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
-		if (retValue == SOCKET_ERROR)
-			printf("playerMovePacket Send() Error\n");
-		else
-			printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
+			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("playerMovePacket Send() Error\n");
+			else
+				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
+		}
 	}
 }
 

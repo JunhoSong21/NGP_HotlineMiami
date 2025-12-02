@@ -46,7 +46,7 @@ struct SC_GAME_END {
 
 // Client > Server
 struct CS_LOGIN_PACKET {
-	char	playerID[20];
+	char	clientIp[16];
 };
 
 struct CS_ROOM_PACKET {
