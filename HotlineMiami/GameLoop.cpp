@@ -7,20 +7,23 @@ GameLoop::GameLoop() :
 	map(nullptr),
 	wall(nullptr),
 	timer(nullptr),
-	player(nullptr),
 	grenade(nullptr),
 	hud(nullptr),
 	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr)
 {
+	for (int i = 0; i < 3; ++i)
+		players[i] = nullptr;
 }
 
 GameLoop::~GameLoop()
 {
-	if (player) {
-		delete player;
-		player = nullptr;
+	for (int i = 0; i < 3; ++i) {
+		if (players[i]) {
+			delete players[i];
+			players[i] = nullptr;
+		}
 	}
 }
 
@@ -57,9 +60,12 @@ void GameLoop::Init(HWND hwnd)
 
 	timer = new Timer();
 
-	player = new Player();
-	player->Init();
-	player->LoadPlayerImages(imgManager);
+	for (int i = 0; i < 3; ++i)
+	{
+		players[i] = new Player();
+		players[i]->Init();
+		players[i]->LoadPlayerImages(imgManager);
+	}
 
 	grenade = new Grenade();
 	grenade->Init();
@@ -71,15 +77,12 @@ void GameLoop::Init(HWND hwnd)
 
 	hud = new HUD();
 	hud->Init(imgManager);
-	player->LoadPlayerImages(imgManager);    
+	players[0]->LoadPlayerImages(imgManager);
 
 	bullet = new Bullet();
 	bullet->LoadBulletImages(imgManager);
-	bullet->Init(
-		640.0f, 360.0f,   // 시작 위치
-		1.0f, 0.0f,       // 진행 방향 (오른쪽)
-		0                 // ownerID
-	);
+	bullet->SetVisible(false);
+
 	OutputDebugStringA("Init!\n");
 }
 
@@ -89,31 +92,41 @@ void GameLoop::Update()
 
 	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
-	if (player)
+	// 내 인덱스 계산
+	int myIdx = g_MyPlayerIndex;
+	if (myIdx < 0 || myIdx >= 3)
+		myIdx = 0;
+
+
+	if (players[myIdx])
 	{
-		Gdiplus::PointF oldPos = player->GetPos();
+		Gdiplus::PointF oldPos = players[myIdx]->GetPos();
 
-		player->Update(deltaTime);
+		players[myIdx]->Update(deltaTime);
 
-		Gdiplus::PointF newPos = player->GetPos();
+		Gdiplus::PointF newPos = players[myIdx]->GetPos();
 		Gdiplus::PointF delta(newPos.X - oldPos.X,
 			newPos.Y - oldPos.Y);
 
 		Gdiplus::SizeF playerAabb(50.0f, 50.0f);
-
 		Gdiplus::PointF resolvedPos = oldPos;
 
 		if (wall)
 			wall->ResolveMove(resolvedPos, playerAabb, delta);
 
-		player->GetPos() = resolvedPos;
+		players[myIdx]->GetPos() = resolvedPos;
 	}
+
 	if (grenade) {
 		grenade->Update(deltaTime);
-		// 파편 충돌 처리 (벽 + 플레이어)
-		grenade->Collision(deltaTime, player);
+
+		// 파편 충돌: 내 플레이어 기준
+		if (players[myIdx])
+			grenade->Collision(deltaTime, players[myIdx]);
 	}
-	if (bullet)     bullet->Update(deltaTime);
+
+	if (bullet)
+		bullet->Update(deltaTime);
 }
 
 void GameLoop::Render()
@@ -171,7 +184,11 @@ void GameLoop::Render()
 			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
-			if (player) player->Render(hWnd, g, imgManager);
+			for (int i = 0; i < 3; ++i)
+			{
+				if (players[i])
+					players[i]->Render(hWnd, g, imgManager);
+			}
 			g.Restore(s);
 		}
 
@@ -206,17 +223,50 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	switch (Msg)
 	{
+	case WM_LBUTTONDOWN:
+	{
+		// 내 인덱스 계산
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3)
+			myIdx = 0;
+		if (!players[myIdx] || !bullet)
+			break;
+		int mouseX = GET_X_LPARAM(lParam);
+		int mouseY = GET_Y_LPARAM(lParam);
+		// 플레이어 위치
+		Gdiplus::PointF playerPos = players[myIdx]->GetPosition();
+		// 방향벡터
+		float dx = static_cast<float>(mouseX) - playerPos.X;
+		float dy = static_cast<float>(mouseY) - playerPos.Y;
+
+		float len = std::sqrt(dx * dx + dy * dy);
+		if (len > 0.0f)
+		{
+			dx /= len;
+			dy /= len;
+		}
+
+		// 총알 초기화
+		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+		break;
+	}
+
 	case WM_RBUTTONDOWN:
 	{
+		// 내 인덱스 계산
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3)
+			myIdx = 0;
+
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
-		if (!player || !grenade)
+		if (!players[myIdx] || !grenade)
 			return;
 
 		// 마우스 클릭 지점 (클라이언트 좌표계)
 		int mouseX = static_cast<short>(LOWORD(lParam));
 		int mouseY = static_cast<short>(HIWORD(lParam));
 
-		Gdiplus::PointF startPos = player->GetPos();                 // 플레이어 중심
+		Gdiplus::PointF startPos = players[myIdx]->GetPos();                 // 플레이어 중심
 		Gdiplus::PointF targetPos(
 			static_cast<float>(mouseX),
 			static_cast<float>(mouseY)
@@ -232,7 +282,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
 		{
 			// 플레이어 기준 마우스 방향 (라디안)
-			float dirRad = player->CalculateAtan2MouseAtPos(hWnd);
+			float dirRad = players[myIdx]->CalculateAtan2MouseAtPos(hWnd);
 
 			g_GrenadeReq.requested = true;
 			g_GrenadeReq.dirRadAngle = dirRad;

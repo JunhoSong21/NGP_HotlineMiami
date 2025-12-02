@@ -45,4 +45,7 @@ public:
 
     float GetX() const { return x; }
     float GetY() const { return y; }
+
+    void SetPosition(float nx, float ny) { x = nx; y = ny; }
+    void SetDirection(float dx, float dy) { dirX = dx; dirY = dy; }
 };
