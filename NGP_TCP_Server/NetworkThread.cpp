@@ -34,15 +34,21 @@ void NetworkThread::LoginProcess()
 
 	if (loginHeader.packetType == PN::CS_LOGIN_PACKET) {
 		CS_LOGIN_PACKET loginPacket;
+		retValue = recv(clientSock, (char*)&loginPacket, sizeof(loginPacket), MSG_WAITALL);
+		if (retValue == SOCKET_ERROR)
+			printf("loginPacket recv Error\n");
+
+		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
+		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
 	}
 }
 
 void NetworkThread::ThreadFunc()
 {
+	LoginProcess();
+
 	int retValue = 0;
 	PacketHeader recvPacketHeader{};
-
-	LoginProcess();
 
 	while (true) {
 		retValue = recv(clientSock, (char*)&recvPacketHeader, sizeof(recvPacketHeader), MSG_WAITALL);
