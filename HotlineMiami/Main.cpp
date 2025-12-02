@@ -107,7 +107,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		break;
 	case WM_SETCURSOR:
-		SetCursor(nullptr);    // 기본 커서 제거
+		if (!gameLoop->IsTitle()) {
+			SetCursor(nullptr);	// 기본 커서 숨기기
+		}
 		return TRUE;
 	case WM_DESTROY:
 		g_NetworkRunning = false;

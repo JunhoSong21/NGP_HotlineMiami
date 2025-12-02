@@ -34,8 +34,9 @@ private:
 	float deltaTime;
 
 	HWND hWnd;
-
+	bool isTitle;
 	
+
 public:
 	GameLoop();
 	~GameLoop();
@@ -44,7 +45,8 @@ public:
 	void Update();
 	void Render();
 	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
-	
+	bool IsTitle() const { return isTitle; }
+
 	Bullet* GetBullet() { return bullet; }
 	Player** GetPlayers() { return players; }
 };

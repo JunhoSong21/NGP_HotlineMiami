@@ -11,7 +11,8 @@ GameLoop::GameLoop() :
 	hud(nullptr),
 	bullet(nullptr),
 	deltaTime(0.0f),
-	hWnd(nullptr)
+	hWnd(nullptr),
+	isTitle(true)
 {
 	for (int i = 0; i < 3; ++i)
 		players[i] = nullptr;
@@ -31,8 +32,13 @@ void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
 	
+	imgManager.LoadSpriteImage(
+		L"Resource/Start/StartImage.png",
+		L"StartImage"               
+	);
+
 	backGround = new BackGround();
-        
+
 	map = new Map();
 	map->LoadMapImages(imgManager);
 	map->Init();
@@ -85,6 +91,10 @@ void GameLoop::Update()
 {
 	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
+
+	if (isTitle)
+		return;
+
 	// 내 인덱스 계산
 	int myIdx = g_MyPlayerIndex;
 	if (myIdx < 0 || myIdx >= 3)
@@ -143,6 +153,24 @@ void GameLoop::Render()
 	{
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
+
+		//title screen
+		if (isTitle)
+		{
+			Gdiplus::Bitmap* titleBmp = imgManager.GetImage(L"StartImage");
+			if (titleBmp)
+			{
+				g.DrawImage(titleBmp, 0, 0, width, height);
+			}
+			
+			Gdiplus::Graphics screen(hDC);
+			screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
+			screen.DrawImage(backBufferBitmap, 0, 0, width, height);
+
+			delete backBufferBitmap;
+			ReleaseDC(hWnd, hDC);
+			return;   
+		}
 
 		// 1) backGround
 		{
@@ -212,6 +240,33 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	{
+		if (isTitle)
+		{
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+			int width = rc.right - rc.left;
+			int height = rc.bottom - rc.top;
+
+			float sx = width / 1920.0f;
+			float sy = height / 1200.0f;
+
+			int btnLeft = (int)(260 * sx);
+			int btnRight = (int)(760 * sx);
+			int btnTop = (int)(550 * sy);
+			int btnBottom = (int)(840 * sy);
+
+			int mouseX = GET_X_LPARAM(lParam);
+			int mouseY = GET_Y_LPARAM(lParam);
+
+			if (mouseX >= btnLeft && mouseX <= btnRight &&
+				mouseY >= btnTop && mouseY <= btnBottom)
+			{
+				isTitle = false; 
+			}
+
+			return; 
+		}
+
 		// 내 인덱스 계산
 		int myIdx = g_MyPlayerIndex;
 		if (myIdx < 0 || myIdx >= 3)
