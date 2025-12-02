@@ -8,6 +8,11 @@ NetworkThread::NetworkThread(int id, SOCKET clientSock) :
 {
 	networkThread = std::thread(&NetworkThread::ThreadFunc, this);
 	printf("Client %d Thread Start\n", threadId);
+
+	// Nagle Algorithm
+	int optValue = 1;
+	setsockopt(clientSock, IPPROTO_TCP, TCP_NODELAY, (const char*)& optValue, sizeof(optValue));
+	printf("Client %d Nalge Algorithm Off\n", threadId);
 }
 
 NetworkThread::~NetworkThread()
