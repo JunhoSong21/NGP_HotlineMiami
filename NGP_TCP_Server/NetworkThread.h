@@ -1,11 +1,14 @@
 #pragma once
 #include <thread>
+#include <memory>
 
 #include "Common.h"
 #include "Packet.h"
 #include "EventQueue.h"
 #include "concurrentqueue.h"
 #include "DataManager.h"
+
+#include "Player.h"
 
 class NetworkThread {
 private:
@@ -30,5 +33,6 @@ public:
 	void SendQueueInput(int eventNum);
 
 	void SendPlayerMove();
+	void SendBulletState();
 	void SendGrenadeState();
 };

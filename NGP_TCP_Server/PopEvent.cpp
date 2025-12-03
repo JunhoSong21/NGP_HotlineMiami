@@ -27,6 +27,16 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandlePlayerUpdateEvent(std::move(playerUpdateEvent));
 		break;
 	}
+	case GameEvent::Type::BULLET_TRIGGER: {
+		unique_ptr<BulletTrigger> bulletTriggerEvent(static_cast<BulletTrigger*>(event.release()));
+		HandleBulletTriggerEvent(std::move(bulletTriggerEvent));
+		break;
+	}
+	case GameEvent::Type::BULLET_UPDATE: {
+		unique_ptr<BulletUpdate> bulletUpdateEvent(static_cast<BulletUpdate*>(event.release()));
+		HandleBulletUpdateEvent(std::move(bulletUpdateEvent));
+		break;
+	}
 	case GameEvent::Type::GRENADE_THROW: {
 		unique_ptr<GrenadeThrow> grenadeThrowEvent(static_cast<GrenadeThrow*>(event.release()));
 		HandleGrenadeThrowEvent(std::move(grenadeThrowEvent));
@@ -66,6 +76,30 @@ void PopEvent::HandlePlayerUpdateEvent(unique_ptr<PlayerUpdate> event)
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 
+void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
+{
+	lock_guard<mutex> lock(bulletTriggerMutex);
+
+	Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
+
+	auto newBullet = make_unique<Bullet>(
+		event->networkThreadId,
+		rootPlayer->posX,
+		rootPlayer->posY,
+		rootPlayer->angle
+	);
+
+	DataManager::GetInstance().AddBullet(std::move(newBullet));
+	printf("bulletTriggerEvent 贸府 肯丰\n");
+}
+
+void PopEvent::HandleBulletUpdateEvent(unique_ptr<BulletUpdate> event)
+{
+	lock_guard<mutex> lock(bulletUpdateMutex);
+
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
+}
+
 void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 {
 	lock_guard<mutex> lock(grenadeThrowMutex);
@@ -78,6 +112,7 @@ void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 		rootPlayer->posY
 	);
 
+	DataManager::GetInstance().AddGrenade(std::move(newGrenade));
 	Timer::GetInstance().AddGrenade(event->networkThreadId);
 	printf("grenadeThrowEvent 贸府 肯丰\n");
 }

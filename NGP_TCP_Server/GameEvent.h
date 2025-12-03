@@ -56,13 +56,10 @@ struct BulletTrigger : GameEvent {
 };
 
 struct BulletUpdate : GameEvent {
-	float destX, destY;
-
-	BulletUpdate(int threadId, float x, float y) :
-		destX(x), destY(y)
+	BulletUpdate()
 	{
 		type = GameEvent::Type::BULLET_UPDATE;
-		networkThreadId = threadId;
+		networkThreadId = 0;
 	}
 };
 

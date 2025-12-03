@@ -10,9 +10,13 @@
 class Timer {
 private:
 	std::chrono::time_point<std::chrono::system_clock> moveEventPoint;
+	std::chrono::time_point<std::chrono::system_clock> bulletEventPoint;
 
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;
+
+	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> bulletArray;
+	std::array<bool, 3> isBulletExist;
 
 	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> grenadeArray;
 	std::array<bool, 3> isGrenadeExist;
@@ -27,5 +31,6 @@ public:
 
 	void TimerLoop();
 
+	bool AddBullet(int id);
 	bool AddGrenade(int id);
 };

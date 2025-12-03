@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "GameLoop.h"
 #include "ClientNetwork.h"
-
+#include "resource.h"
 ULONG_PTR gdiplusToken = 0;
 
 HINSTANCE hInst;
@@ -11,8 +11,7 @@ LPCTSTR IpszWindowName = L"Hotline Miami.exe";
 GameLoop* gameLoop = nullptr;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
-
-
+INT_PTR CALLBACK IdDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdParam, int nCmdShow)
 {
@@ -48,6 +47,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 
 	gameLoop = new GameLoop();
 	gameLoop->Init(hWnd);
+	INT_PTR ret = DialogBox(
+		hInst,
+		MAKEINTRESOURCE(IDD_DIALOG),
+		hWnd,
+		IdDlgProc
+	);
 
 	if (!InitNetwork("127.0.0.1", 9000)) {
 		MessageBox(hWnd, L"서버 연결 실패", L"Error", MB_OK);
@@ -107,7 +112,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		break;
 	case WM_SETCURSOR:
-		SetCursor(nullptr);    // 기본 커서 제거
+		if (!gameLoop->IsTitle()) {
+			SetCursor(nullptr);	// 기본 커서 숨기기
+		}
 		return TRUE;
 	case WM_DESTROY:
 		g_NetworkRunning = false;
@@ -116,4 +123,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	return (DefWindowProc(hWnd, iMessage, wParam, lParam));
+}
+
+INT_PTR CALLBACK IdDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		// 다이얼로그 뜰 때 에디트박스에 포커스
+		SetFocus(GetDlgItem(hDlg, IDC_EDIT_ID));
+		return FALSE; // 우리가 포커스 설정했으니 FALSE
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_BTN_OK:
+		{
+			char buf[16] = {};
+			GetDlgItemTextA(hDlg, IDC_EDIT_ID, buf, sizeof(buf));
+
+			if (buf[0] == '\0')
+			{
+				MessageBoxW(hDlg, L"ID를 입력하세요.", L"알림", MB_OK);
+				return TRUE;
+			}
+
+			// Send_Input에서 로그인 패킷을 보내도록 플래그 설정
+			g_LoginReq.requested = true;
+			strncpy_s(g_LoginReq.ip, buf, sizeof(g_LoginReq.ip) - 1);
+
+			EndDialog(hDlg, IDOK);
+			return TRUE;
+		}
+
+		}
+		break;
+	}
+
+	return FALSE;
 }

@@ -8,6 +8,11 @@ NetworkThread::NetworkThread(int id, SOCKET clientSock) :
 {
 	networkThread = std::thread(&NetworkThread::ThreadFunc, this);
 	printf("Client %d Thread Start\n", threadId);
+
+	// Nagle Algorithm
+	int optValue = 1;
+	setsockopt(clientSock, IPPROTO_TCP, TCP_NODELAY, (const char*)& optValue, sizeof(optValue));
+	printf("Client %d Nalge Algorithm Off\n", threadId);
 }
 
 NetworkThread::~NetworkThread()
@@ -23,21 +28,44 @@ void NetworkThread::LoginProcess()
 	int retValue = 0;
 	PacketHeader loginHeader{};
 
+	// recv
 	retValue = recv(clientSock, (char*)&loginHeader, sizeof(loginHeader), MSG_WAITALL);
 	if (retValue == SOCKET_ERROR)
 		printf("Login Packet recv() Error\n");
 
 	if (loginHeader.packetType == PN::CS_LOGIN_PACKET) {
 		CS_LOGIN_PACKET loginPacket;
+		retValue = recv(clientSock, (char*)&loginPacket, sizeof(loginPacket), MSG_WAITALL);
+		if (retValue == SOCKET_ERROR)
+			printf("loginPacket recv Error\n");
+
+		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
+		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
+#ifdef _DEBUG
+		printf("Login Packet recv() Success\n");
+#endif
 	}
+
+	// send
+	PacketHeader loginSendHeader{};
+	loginSendHeader.packetType = PN::SC_LOGIN_SUCCESS;
+	loginSendHeader.packetSize = sizeof(SC_LOGIN_SUCCESS);
+	retValue = send(clientSock, (char*)&loginSendHeader, sizeof(loginSendHeader), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("Login Success Packet Header send() Error\n");
+
+	SC_LOGIN_SUCCESS loginSuccessPacket{true, threadId};
+	retValue = send(clientSock, (char*)&loginSuccessPacket, sizeof(loginSuccessPacket), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("Login Success Packet send() Error\n");
 }
 
 void NetworkThread::ThreadFunc()
 {
+	LoginProcess();
+
 	int retValue = 0;
 	PacketHeader recvPacketHeader{};
-
-	LoginProcess();
 
 	while (true) {
 		retValue = recv(clientSock, (char*)&recvPacketHeader, sizeof(recvPacketHeader), MSG_WAITALL);
@@ -74,8 +102,6 @@ void NetworkThread::ThreadFunc()
 				GrenadeThrowPacketProcess(grenadeThrowPacket);
 			break;
 		}
-		case PN::CS_LOGIN_PACKET:
-			break;
 		case PN::CS_ROOM_PACKET:
 			break;
 		}
@@ -96,6 +122,15 @@ void NetworkThread::ThreadFunc()
 					SendPlayerMove();
 				break;
 			}
+			case PN::SC_BULLET_STATE: {
+				sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
+				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+				if (retValue == SOCKET_ERROR)
+					printf("send() SC_BULLET_STATE() Error\n");
+				else
+					SendBulletState();
+				break;
+			}
 			case PN::SC_GRENADE_STATE: {
 				sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
 				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
@@ -108,9 +143,6 @@ void NetworkThread::ThreadFunc()
 			default:
 				break;
 			}
-
-			retValue;
-
 		}
 	}
 }
@@ -127,8 +159,12 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 
 void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
 {
-	//auto bulletTriggerEvent = std::make_unique<BulletTrigger>(threadId, 0.0, 0.0);
-	//EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
+#ifdef _DEBUG
+	printf("Bullet Trigger Packet recv\n");
+#endif
+	unique_ptr<GameEvent> bulletTriggerEvent = make_unique<BulletTrigger>(
+	threadId, packet.posX, packet.posY, packet.dirRadAngle);
+	EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
 }
 
 void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
@@ -146,6 +182,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	switch (eventNum) {
 	case GameEvent::Type::PLAYER_UPDATE:
 		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
+		break;
+	case GameEvent::Type::BULLET_UPDATE:
+		sendQueue.enqueue(PN::SC_BULLET_STATE);
 		break;
 	case GameEvent::Type::GRENADE_EXPLOSION:
 		sendQueue.enqueue(PN::SC_GRENADE_STATE);
@@ -173,6 +212,30 @@ void NetworkThread::SendPlayerMove()
 				printf("playerMovePacket Send() Error\n");
 			else
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
+		}
+	}
+}
+
+void NetworkThread::SendBulletState()
+{
+	int retValue = 0;
+	SC_BULLET_STATE bulletStatePacket{};
+
+	for (int i = 0; i < 1; ++i) {
+		bulletStatePacket.targerNum = i;
+		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
+		if (sendBullet) {
+			bulletStatePacket.isActive = true;
+			bulletStatePacket.posX = sendBullet->posX;
+			bulletStatePacket.posY = sendBullet->posY;
+			bulletStatePacket.dirAngle = sendBullet->dirAngle;
+
+			retValue = send(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("bulletStatePacket send() Error\n");
+			else
+				printf("bulletStatePacket send() %f, %f, %f\n",
+					bulletStatePacket.posX, bulletStatePacket.posY, bulletStatePacket.dirAngle);
 		}
 	}
 }

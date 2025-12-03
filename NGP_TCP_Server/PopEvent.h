@@ -17,6 +17,7 @@ private:
 	std::mutex playerMoveMutex;
 	std::mutex playerUpdateMutex;
 
+	std::mutex bulletTriggerMutex;
 	std::mutex bulletUpdateMutex;
 
 	std::mutex grenadeThrowMutex;
@@ -24,6 +25,9 @@ private:
 
 	void HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event);
 	void HandlePlayerUpdateEvent(std::unique_ptr<PlayerUpdate> event);
+
+	void HandleBulletTriggerEvent(std::unique_ptr<BulletTrigger> event);
+	void HandleBulletUpdateEvent(std::unique_ptr<BulletUpdate> event);
 
 	void HandleGrenadeThrowEvent(std::unique_ptr<GrenadeThrow> event);
 	void HandleGrenadeExplosionEvent(std::unique_ptr<GrenadeExplosion> event);

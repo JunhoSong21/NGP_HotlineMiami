@@ -18,6 +18,13 @@ struct GrenadeRequest {
 
 extern GrenadeRequest g_GrenadeReq;
 
+struct LoginRequest
+{
+    bool requested;        
+    char ip[20];          
+};
+extern LoginRequest g_LoginReq;
+
 // 서버통신 스레드용 파라미터 여러 값을 보내기 위해
 struct NetworkThreadParam
 {
