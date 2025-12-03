@@ -41,7 +41,8 @@ public:
 	bool Init();
 	void Update(float deltaTime);
 	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
-	void RenderHpBar(Gdiplus::Graphics& g);		// 
+	void RenderHpBar(Gdiplus::Graphics& g);		
+	void DebugRenderCollision(Gdiplus::Graphics& g);	// 충돌영역 디버깅 함수
 	void InputProcessing(float deltaTime);
 	
 	// 플레이어 위치읽기 (Send_Input 에서 사용)

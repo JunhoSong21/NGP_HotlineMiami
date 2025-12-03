@@ -101,7 +101,7 @@ void Player::RenderHpBar(Gdiplus::Graphics& g)
 	const float barHeight = 5.0f;  // 높이
 	const float offsetY = -35.0f; // 플레이어 머리 위로 조금 띄우기
 
-	float barX = playerPos.X - barWidth * 0.5f - 15.0f;
+	float barX = playerPos.X - barWidth * 0.5f;
 	float barY = playerPos.Y + offsetY;
 
 	// 바 배경 (살짝 반투명 검정)
@@ -114,6 +114,18 @@ void Player::RenderHpBar(Gdiplus::Graphics& g)
 
 	g.FillRectangle(&backBrush, backRect);
 	g.FillRectangle(&hpBrush, hpRect);
+}
+
+void Player::DebugRenderCollision(Gdiplus::Graphics& g)
+{
+	const float aabbWidth = 35.0f;
+	const float aabbHeight = 35.0f;
+
+	float left = playerPos.X - aabbWidth * 0.5f;
+	float top = playerPos.Y - aabbHeight * 0.5f;
+
+	Gdiplus::Pen pen(Gdiplus::Color(255, 255, 0, 0), 1.0f);
+	g.DrawRectangle(&pen, left, top, aabbWidth, aabbHeight);
 }
 
 void Player::SpriteDeathRender(Gdiplus::Graphics& graphics, ImageManager& imgManager)
