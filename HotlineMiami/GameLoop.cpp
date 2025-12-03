@@ -303,6 +303,10 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		// 총알 초기화
 		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+
+		float angle = atan2f(dy, dx);
+		g_BulletReq.requested = true;
+		g_BulletReq.dirRadAngle = angle;
 		break;
 	}
 
