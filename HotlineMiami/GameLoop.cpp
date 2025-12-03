@@ -131,7 +131,7 @@ void GameLoop::Update()
 	{
 		Gdiplus::PointF oldPos = players[myIdx]->GetPos();
 
-		players[myIdx]->Update(deltaTime);
+		players[myIdx]->Update(deltaTime, hWnd, camera);
 
 		Gdiplus::PointF newPos = players[myIdx]->GetPos();
 		Gdiplus::PointF delta(newPos.X - oldPos.X,

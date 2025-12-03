@@ -49,7 +49,7 @@ void Player::ApplyDamage(float amount)
 	}
 }
 
-void Player::Update(float deltaTime)
+void Player::Update(float deltaTime, HWND hWnd, Camera* camera)
 {
 	if (playerState == L"PLAYER_DEATH") {
 		// death 스프라이트는 4프레임
@@ -79,7 +79,7 @@ void Player::Update(float deltaTime)
 
 	InputProcessing(deltaTime);
 
-	radianAngle = CalculateAtan2MouseAtPos(hWnd);
+	radianAngle = CalculateAtan2MouseAtPos(hWnd, camera);
 }
 
 void Player::RenderHpBar(Gdiplus::Graphics& g)
@@ -278,14 +278,25 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics,
 	graphics.SetTransform(&originMatrix);
 }
 
-float Player::CalculateAtan2MouseAtPos(HWND hWnd)
+float Player::CalculateAtan2MouseAtPos(HWND hWnd, Camera* camera)
 {
 	POINT mousePos;
 	GetCursorPos(&mousePos);
 	ScreenToClient(hWnd, &mousePos);
 
-	float radianAngle = atan2f(static_cast<float>(mousePos.y) - playerPos.Y,
-								static_cast<float>(mousePos.x) - playerPos.X);
+	Gdiplus::PointF worldMouse(
+		static_cast<float>(mousePos.x),
+		static_cast<float>(mousePos.y)
+	);
+
+	if (camera) {
+		worldMouse = camera->ScreenToWorld(mousePos);
+	}
+
+	float radianAngle = atan2f(
+		worldMouse.Y - playerPos.Y,
+		worldMouse.X - playerPos.X
+	);
 
 	return radianAngle;
 }

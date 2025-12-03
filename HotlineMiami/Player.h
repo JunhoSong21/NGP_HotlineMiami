@@ -6,6 +6,7 @@
 
 #include "ImageManager.h"
 #include "SoundManager.h"
+#include "Camera.h" 
 
 // Player State
 enum PLAYER_STATE
@@ -40,7 +41,7 @@ public:
 	
 	Gdiplus::PointF& GetPos();
 	bool Init();
-	void Update(float deltaTime);
+	void Update(float deltaTime, HWND hWnd, Camera* camera);
 	void Render(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
 	void RenderHpBar(Gdiplus::Graphics& g);		
 	void DebugRenderCollision(Gdiplus::Graphics& g);	// 충돌영역 디버깅 함수
@@ -54,7 +55,7 @@ public:
 
 	void LoadPlayerImages(ImageManager& imgManager);
 	void SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
-	float CalculateAtan2MouseAtPos(HWND hWnd);
+	float CalculateAtan2MouseAtPos(HWND hWnd, Camera* camera);
 
 	void ApplyDamage(float amount);
 	void SpriteDeathRender(Gdiplus::Graphics& graphics, ImageManager& imgManager); 
