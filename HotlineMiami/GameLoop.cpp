@@ -12,7 +12,7 @@ GameLoop::GameLoop() :
 	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr),
-	camera(nullptr)
+	camera(nullptr),
 	isTitle(true)
 
 {
