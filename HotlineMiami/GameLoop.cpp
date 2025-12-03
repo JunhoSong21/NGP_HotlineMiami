@@ -11,7 +11,8 @@ GameLoop::GameLoop() :
 	hud(nullptr),
 	bullet(nullptr),
 	deltaTime(0.0f),
-	hWnd(nullptr)
+	hWnd(nullptr),
+	camera(nullptr)
 {
 	for (int i = 0; i < 3; ++i)
 		players[i] = nullptr;
@@ -24,6 +25,11 @@ GameLoop::~GameLoop()
 			delete players[i];
 			players[i] = nullptr;
 		}
+	}
+
+	if (camera) {
+		delete camera;
+		camera = nullptr;
 	}
 }
 
@@ -83,6 +89,29 @@ void GameLoop::Init(HWND hwnd)
 	bullet->LoadBulletImages(imgManager);
 	bullet->SetVisible(false);
 
+	// 카메라 세팅
+	if (not camera) {
+		camera = new Camera();
+
+		// 윈도우 클라이언트 크기 기준
+		RECT rc{};
+		GetClientRect(hWnd, &rc);
+		int width = rc.right - rc.left;
+		int height = rc.bottom - rc.top;
+		if (width <= 0) width = 1280;
+		if (height <= 0) height = 800;
+
+		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
+
+		// 시작 타겟: 내 플레이어 위치
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3) myIdx = 0;
+		if (players[myIdx]) {
+			camera->SetTarget(players[myIdx]->GetPos());
+			camera->Update(0.0f);
+		}
+	}
+
 	OutputDebugStringA("Init!\n");
 }
 
@@ -117,6 +146,11 @@ void GameLoop::Update()
 		players[myIdx]->GetPos() = resolvedPos;
 	}
 
+	if (camera && players[myIdx]) {
+		camera->SetTarget(players[myIdx]->GetPos());
+		camera->Update(deltaTime);
+	}
+
 	if (grenade) {
 		grenade->Update(deltaTime);
 
@@ -140,7 +174,11 @@ void GameLoop::Render()
 	int width = clientRect.right - clientRect.left;
 	int height = clientRect.bottom - clientRect.top;
 	if (width <= 0 || height <= 0)
-		DEBUG_MSG(L"width È¤Àº height °ªÀÌ 0 ÀÌÇÏÀÔ´Ï´Ù");
+		DEBUG_MSG(L"[ClientRect Error] : width 또는 height 값이 0 이하");
+
+	if (camera) {
+		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
+	}
 
 	Gdiplus::Bitmap* backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 	if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
@@ -160,6 +198,13 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
+		{
+			auto sWorld = g.Save();
+
+			if (camera) {
+				camera->Apply(g);    // 여기서부터는 전부 월드 좌표 기준
+			}
+
 		// 2) map
 		{
 			auto s = g.Save();
@@ -172,12 +217,11 @@ void GameLoop::Render()
 		}
 
 		// 3) Wall 
-		if (wall) wall->Render(g);     
+		if (wall) wall->Render(g);
+		// 4) Grenade 
 		if (grenade) grenade->Render(g, imgManager);
-		if (hud) hud->Render(hWnd, g, imgManager);
 
-
-		// 3) player
+		// 5) player
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
@@ -197,7 +241,7 @@ void GameLoop::Render()
 			g.Restore(s);
 		}
 
-		// 5) 총알 렌더링
+		// 6) bullet
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
@@ -206,6 +250,9 @@ void GameLoop::Render()
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 			if (bullet) bullet->Render(hWnd, g, imgManager);
 			g.Restore(s);
+		}
+
+		g.Restore(sWorld);
 		}
 	}
 
