@@ -36,6 +36,12 @@ void GameLoop::Init(HWND hwnd)
 		L"Resource/Start/StartImage.png",
 		L"StartImage"               
 	);
+	// 사운드 로딩
+	SoundManager::Get().LoadSound("bgm", "Resource/Sound/BGM.wav");
+	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
+	SoundManager::Get().LoadSound("death", "Resource/Sound/Death.wav");
+	SoundManager::Get().PlayBGM("bgm");
+
 
 	backGround = new BackGround();
 
@@ -70,7 +76,6 @@ void GameLoop::Init(HWND hwnd)
 	grenade = new Grenade();
 	grenade->Init();
 	grenade->LoadGrenadeImage(imgManager);
-	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
 
 	// 수류탄에 벽 정보 넘겨주기
 	if (wall && grenade)
@@ -89,6 +94,8 @@ void GameLoop::Init(HWND hwnd)
 
 void GameLoop::Update()
 {
+	SoundManager::Get().Update();   // 재생 끝난 SFX 보이스 정리
+
 	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
 
@@ -236,6 +243,12 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+
+	// 플레이어 사망 시 입력 방지
+	if (player->IsDead()) {
+		return;
+	}
+
 	switch (Msg)
 	{
 	case WM_LBUTTONDOWN:
@@ -332,7 +345,17 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
-
+	// 12.02 나중에 지우기
+	case WM_KEYDOWN:
+	{
+		// H 키 눌렀을 때 체력 감소 테스트
+		if (wParam == 'H') {
+			if (player) {
+				player->ApplyDamage(15.0f);
+			}
+		}
+		break;
+	}
 	default:
 		break;
 	}

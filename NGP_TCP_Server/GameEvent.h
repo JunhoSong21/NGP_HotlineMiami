@@ -56,13 +56,10 @@ struct BulletTrigger : GameEvent {
 };
 
 struct BulletUpdate : GameEvent {
-	float destX, destY;
-
-	BulletUpdate(int threadId, float x, float y) :
-		destX(x), destY(y)
+	BulletUpdate()
 	{
 		type = GameEvent::Type::BULLET_UPDATE;
-		networkThreadId = threadId;
+		networkThreadId = 0;
 	}
 };
 
@@ -78,7 +75,10 @@ struct BulletCollision : GameEvent {
 };
 
 struct GrenadeThrow : GameEvent {
-	GrenadeThrow(int threadId)
+	float dirAngle;
+
+	GrenadeThrow(int threadId, float angle) :
+		dirAngle(angle)
 	{
 		type = GameEvent::Type::GRENADE_THROW;
 		networkThreadId = threadId;
@@ -88,11 +88,18 @@ struct GrenadeThrow : GameEvent {
 //struct GrenadeUpdate : GameEvent {
 //
 //};
-//
-//struct GrenadeExplosion : GameEvent {
-//
-//};
-//
+
+struct GrenadeExplosion : GameEvent {
+	bool isActive;
+
+	GrenadeExplosion(int threadId) :
+		isActive(false)
+	{
+		type = GameEvent::Type::GRENADE_EXPLOSION;
+		networkThreadId = threadId;
+	}
+};
+
 //struct LoginTry : GameEvent {
 //
 //};

@@ -88,11 +88,12 @@ int main()
 	}
 
 	PopEvent gameLoop;
-	Timer timer;
 	while (true) {
 		unique_ptr<GameEvent> event;
 		if (EventQueue::GetInstance().PopEvent(event))
 			gameLoop.HandleEvent(std::move(event));
+
+		Timer::GetInstance().TimerLoop();
 	}
 	
 	WSACleanup();
