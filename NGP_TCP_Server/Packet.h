@@ -38,6 +38,7 @@ struct SC_GRENADE_STATE {
 
 struct SC_LOGIN_SUCCESS {
 	bool	isSuccess;
+	int		targetNum;
 };
 
 struct SC_GAME_END {
@@ -56,13 +57,15 @@ struct CS_ROOM_PACKET {
 
 struct CS_KEY_INPUT {
 	uint16_t flags;
-	float posX;
-	float posY;
-	float mouseX;
-	float mouseY;
+	float	posX;
+	float	posY;
+	float	mouseX;
+	float	mouseY;
 };
 
 struct CS_BULLET_TRIGGER {
+	float	posX;
+	float	posY;
 	float	dirRadAngle;
 };
 

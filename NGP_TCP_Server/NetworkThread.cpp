@@ -28,6 +28,7 @@ void NetworkThread::LoginProcess()
 	int retValue = 0;
 	PacketHeader loginHeader{};
 
+	// recv
 	retValue = recv(clientSock, (char*)&loginHeader, sizeof(loginHeader), MSG_WAITALL);
 	if (retValue == SOCKET_ERROR)
 		printf("Login Packet recv() Error\n");
@@ -41,6 +42,19 @@ void NetworkThread::LoginProcess()
 		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
 		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
 	}
+
+	// send
+	PacketHeader loginSendHeader{};
+	loginSendHeader.packetType = PN::SC_LOGIN_SUCCESS;
+	loginSendHeader.packetSize = sizeof(SC_LOGIN_SUCCESS);
+	retValue = send(clientSock, (char*)&loginSendHeader, sizeof(loginSendHeader), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("Login Success Packet Header send() Error\n");
+
+	SC_LOGIN_SUCCESS loginSuccessPacket{true, threadId};
+	retValue = send(clientSock, (char*)&loginSuccessPacket, sizeof(loginSuccessPacket), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("Login Success Packet send() Error\n");
 }
 
 void NetworkThread::ThreadFunc()
@@ -85,8 +99,6 @@ void NetworkThread::ThreadFunc()
 				GrenadeThrowPacketProcess(grenadeThrowPacket);
 			break;
 		}
-		case PN::CS_LOGIN_PACKET:
-			break;
 		case PN::CS_ROOM_PACKET:
 			break;
 		}
@@ -138,8 +150,12 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 
 void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
 {
-	//auto bulletTriggerEvent = std::make_unique<BulletTrigger>(threadId, 0.0, 0.0);
-	//EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
+#ifdef _DEBUG
+	printf("Bullet Trigger Packet recv\n");
+#endif
+	unique_ptr<GameEvent> bulletTriggerEvent = make_unique<BulletTrigger>(
+	threadId, packet.posX, packet.posY, packet.dirRadAngle);
+	EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
 }
 
 void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)

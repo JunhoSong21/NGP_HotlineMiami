@@ -17,7 +17,13 @@ void DataManager::AddPlayer(unique_ptr<Player> player)
 
 void DataManager::AddBullet(unique_ptr<Bullet> bullet)
 {
-
+	lock_guard<mutex> lock(bulletMapMutex);
+	if (bullet) {
+		bulletData[bullet->bulletId] = std::move(bullet);
+		printf("bullet 추가 완료\n");
+	}
+	else
+		printf("bullet 데이터 nullptr\n");
 }
 
 void DataManager::AddGrenade(unique_ptr<Grenade> grenade)
