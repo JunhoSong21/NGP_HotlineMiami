@@ -15,6 +15,7 @@
 
 #include "ImageManager.h"
 #include "SoundManager.h"
+#include "Camera.h"
 
 class GameLoop {
 private:
@@ -34,7 +35,7 @@ private:
 	float deltaTime;
 
 	HWND hWnd;
-
+	Camera* camera;
 	
 public:
 	GameLoop();

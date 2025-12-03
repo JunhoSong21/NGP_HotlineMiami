@@ -167,7 +167,7 @@ void GameLoop::Render()
 {
 	HDC hDC = GetDC(hWnd);
 	if (!hDC)
-		DEBUG_MSG(L"È­¸é HDC È¹µæ ½ÇÆÐ");
+		DEBUG_MSG(L"[GetDC Error] : 화면 HDC 획득 실패");
 
 	RECT clientRect;
 	GetClientRect(this->hWnd, &clientRect);
@@ -182,13 +182,12 @@ void GameLoop::Render()
 
 	Gdiplus::Bitmap* backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 	if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
-		DEBUG_MSG(L"¹é ¹öÆÛ Bitmap »ý¼º ½ÇÆÐ");
+		DEBUG_MSG(L"[BackBufferBitmap Error] : 백버퍼 Bitmap 생성 실패");
 	}
 
 	{
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
-
 		// 1) backGround
 		{
 			auto s = g.Save();
@@ -220,7 +219,7 @@ void GameLoop::Render()
 		if (wall) wall->Render(g);
 		// 4) Grenade 
 		if (grenade) grenade->Render(g, imgManager);
-
+		
 		// 5) player
 		{
 			auto s = g.Save();
@@ -251,8 +250,14 @@ void GameLoop::Render()
 			if (bullet) bullet->Render(hWnd, g, imgManager);
 			g.Restore(s);
 		}
-
 		g.Restore(sWorld);
+		}
+
+		{
+			auto s = g.Save();
+			// 여기서는 Transform 적용 안 함 → 순수 화면 좌표 기준
+			if (hud) hud->Render(hWnd, g, imgManager);
+			g.Restore(s);
 		}
 	}
 
@@ -285,11 +290,18 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
 		int mouseY = GET_Y_LPARAM(lParam);
+
+		Gdiplus::PointF mouseWorld(static_cast<float>(mouseX), static_cast<float>(mouseY));
+		if (camera) {
+			POINT pt{ mouseX, mouseY };
+			mouseWorld = camera->ScreenToWorld(pt);
+		}
+
 		// 플레이어 위치
 		Gdiplus::PointF playerPos = players[myIdx]->GetPosition();
 		// 방향벡터
-		float dx = static_cast<float>(mouseX) - playerPos.X;
-		float dy = static_cast<float>(mouseY) - playerPos.Y;
+		float dx = mouseWorld.X - playerPos.X;
+		float dy = mouseWorld.Y - playerPos.Y;
 
 		float len = std::sqrt(dx * dx + dy * dy);
 		if (len > 0.0f)
@@ -324,6 +336,11 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			static_cast<float>(mouseY)
 		);
 
+		if (camera) {
+			POINT pt{ mouseX, mouseY };
+			targetPos = camera->ScreenToWorld(pt);
+		}
+
 		// 기존 활성 상태 저장
 		bool wasActive = grenade->IsActive();
 
@@ -333,8 +350,9 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		// 이번 클릭에서 새로 활성화된 경우에만 서버에 알림
 		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
 		{
-			// 플레이어 기준 마우스 방향 (라디안)
-			float dirRad = players[myIdx]->CalculateAtan2MouseAtPos(hWnd);
+			float dx = targetPos.X - startPos.X;
+			float dy = targetPos.Y - startPos.Y;
+			float dirRad = atan2f(dy, dx);
 
 			g_GrenadeReq.requested = true;
 			g_GrenadeReq.dirRadAngle = dirRad;
