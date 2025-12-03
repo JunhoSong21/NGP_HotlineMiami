@@ -22,8 +22,7 @@ struct SC_BULLET_STATE {
 	bool	isActive;
 	float	posX;
 	float	posY;
-	float	dirX;
-	float	dirY;
+	float	dirAngle;
 };
 
 struct SC_GRENADE_STATE {

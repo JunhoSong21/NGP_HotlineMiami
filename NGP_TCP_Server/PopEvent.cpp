@@ -32,6 +32,11 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandleBulletTriggerEvent(std::move(bulletTriggerEvent));
 		break;
 	}
+	case GameEvent::Type::BULLET_UPDATE: {
+		unique_ptr<BulletUpdate> bulletUpdateEvent(static_cast<BulletUpdate*>(event.release()));
+		HandleBulletUpdateEvent(std::move(bulletUpdateEvent));
+		break;
+	}
 	case GameEvent::Type::GRENADE_THROW: {
 		unique_ptr<GrenadeThrow> grenadeThrowEvent(static_cast<GrenadeThrow*>(event.release()));
 		HandleGrenadeThrowEvent(std::move(grenadeThrowEvent));
@@ -86,6 +91,13 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 
 	DataManager::GetInstance().AddBullet(std::move(newBullet));
 	printf("bulletTriggerEvent 처리 완료\n");
+}
+
+void PopEvent::HandleBulletUpdateEvent(unique_ptr<BulletUpdate> event)
+{
+	lock_guard<mutex> lock(bulletUpdateMutex);
+
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 
 void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)

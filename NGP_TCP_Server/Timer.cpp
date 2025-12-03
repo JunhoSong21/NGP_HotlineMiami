@@ -21,12 +21,22 @@ Timer::Timer()
 void Timer::TimerLoop()
 {
 	timePoint = system_clock::now();
+	// Player Pos Update
 	if (milliseconds(200) < duration_cast<milliseconds>(timePoint - moveEventPoint)) {
 		lock_guard<mutex> lock(timerMutex);
 		moveEventPoint = system_clock::now();
 
 		unique_ptr<GameEvent> moveUpdate = make_unique<PlayerUpdate>();
 		EventQueue::GetInstance().PushEvent(std::move(moveUpdate));
+	}
+
+	// Bullet Pos Update
+	if (milliseconds(200) < duration_cast<milliseconds>(timePoint - bulletEventPoint)) {
+		lock_guard<mutex> lock(timerMutex);
+		bulletEventPoint = system_clock::now();
+
+		unique_ptr<GameEvent> bulletUpdate = make_unique<BulletUpdate>();
+		EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
 	}
 
 	for (int i = 0; i < 3; ++i) {
@@ -37,6 +47,19 @@ void Timer::TimerLoop()
 			unique_ptr<GameEvent> grenadeExplosion = make_unique<GrenadeExplosion>(i);
 			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
 		}
+	}
+}
+
+bool Timer::AddBullet(int id)
+{
+	if (isBulletExist[id]) {
+		printf("총알이 발사중인 상태입니다.\n");
+		return false;
+	}
+	else {
+		isBulletExist[id] = true;
+		bulletArray[id] = system_clock::now();
+		return true;
 	}
 }
 

@@ -119,6 +119,15 @@ void NetworkThread::ThreadFunc()
 					SendPlayerMove();
 				break;
 			}
+			case PN::SC_BULLET_STATE: {
+				sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
+				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+				if (retValue == SOCKET_ERROR)
+					printf("send() SC_BULLET_STATE() Error\n");
+				else
+					SendBulletState();
+				break;
+			}
 			case PN::SC_GRENADE_STATE: {
 				sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
 				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
@@ -131,9 +140,6 @@ void NetworkThread::ThreadFunc()
 			default:
 				break;
 			}
-
-			retValue;
-
 		}
 	}
 }
@@ -174,6 +180,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	case GameEvent::Type::PLAYER_UPDATE:
 		sendQueue.enqueue(PN::SC_PLAYER_MOVE);
 		break;
+	case GameEvent::Type::BULLET_UPDATE:
+		sendQueue.enqueue(PN::SC_BULLET_STATE);
+		break;
 	case GameEvent::Type::GRENADE_EXPLOSION:
 		sendQueue.enqueue(PN::SC_GRENADE_STATE);
 		break;
@@ -200,6 +209,30 @@ void NetworkThread::SendPlayerMove()
 				printf("playerMovePacket Send() Error\n");
 			else
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
+		}
+	}
+}
+
+void NetworkThread::SendBulletState()
+{
+	int retValue = 0;
+	SC_BULLET_STATE bulletStatePacket{};
+
+	for (int i = 0; i < 1; ++i) {
+		bulletStatePacket.targerNum = i;
+		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
+		if (sendBullet) {
+			bulletStatePacket.isActive = true;
+			bulletStatePacket.posX = sendBullet->posX;
+			bulletStatePacket.posY = sendBullet->posY;
+			bulletStatePacket.dirAngle = sendBullet->dirAngle;
+
+			retValue = send(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("bulletStatePacket send() Error\n");
+			else
+				printf("bulletStatePacket send() %f, %f, %f\n",
+					bulletStatePacket.posX, bulletStatePacket.posY, bulletStatePacket.dirAngle);
 		}
 	}
 }
