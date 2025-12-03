@@ -21,7 +21,7 @@ extern GrenadeRequest g_GrenadeReq;
 struct LoginRequest
 {
     bool requested;        
-    char id[20];          
+    char ip[20];          
 };
 extern LoginRequest g_LoginReq;
 

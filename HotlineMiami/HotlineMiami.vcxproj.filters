@@ -36,4 +36,7 @@
   <ItemGroup>
     <ResourceCompile Include="HotlineMiami.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\Sprite\Jacket.bmp" />
+  </ItemGroup>
 </Project>

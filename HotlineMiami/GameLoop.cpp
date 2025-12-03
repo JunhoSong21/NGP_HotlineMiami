@@ -243,9 +243,13 @@ void GameLoop::Render()
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	// 내 인덱스 계산
+	int myIdx = g_MyPlayerIndex;
+	if (myIdx < 0 || myIdx >= 3)
+		myIdx = 0;
 
 	// 플레이어 사망 시 입력 방지
-	if (player->IsDead()) {
+	if (players[myIdx]->IsDead()) {
 		return;
 	}
 
@@ -280,10 +284,6 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			return; 
 		}
 
-		// 내 인덱스 계산
-		int myIdx = g_MyPlayerIndex;
-		if (myIdx < 0 || myIdx >= 3)
-			myIdx = 0;
 		if (!players[myIdx] || !bullet)
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
@@ -308,10 +308,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_RBUTTONDOWN:
 	{
-		// 내 인덱스 계산
-		int myIdx = g_MyPlayerIndex;
-		if (myIdx < 0 || myIdx >= 3)
-			myIdx = 0;
+		
 
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
 		if (!players[myIdx] || !grenade)
@@ -350,8 +347,8 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 		// H 키 눌렀을 때 체력 감소 테스트
 		if (wParam == 'H') {
-			if (player) {
-				player->ApplyDamage(15.0f);
+			if (players[myIdx]) {
+				players[myIdx]->ApplyDamage(15.0f);
 			}
 		}
 		break;

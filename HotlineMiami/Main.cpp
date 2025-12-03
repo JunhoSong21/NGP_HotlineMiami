@@ -139,7 +139,7 @@ INT_PTR CALLBACK IdDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 		{
 		case IDC_BTN_OK:
 		{
-			char buf[20] = {};
+			char buf[16] = {};
 			GetDlgItemTextA(hDlg, IDC_EDIT_ID, buf, sizeof(buf));
 
 			if (buf[0] == '\0')
@@ -150,7 +150,7 @@ INT_PTR CALLBACK IdDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 
 			// Send_Input에서 로그인 패킷을 보내도록 플래그 설정
 			g_LoginReq.requested = true;
-			strncpy_s(g_LoginReq.id, buf, sizeof(g_LoginReq.id) - 1);
+			strncpy_s(g_LoginReq.ip, buf, sizeof(g_LoginReq.ip) - 1);
 
 			EndDialog(hDlg, IDOK);
 			return TRUE;

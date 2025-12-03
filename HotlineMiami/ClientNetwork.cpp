@@ -96,7 +96,7 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     if (g_LoginReq.requested)
     {
         CS_LOGIN_PACKET lpkt{};
-        strncpy_s(lpkt.playerID, g_LoginReq.id, sizeof(lpkt.playerID) - 1);
+        strncpy_s(lpkt.clientIp, g_LoginReq.ip, sizeof(lpkt.clientIp) - 1);
 
         PacketHeader lheader{};
         lheader.packetType = PN::CS_LOGIN_PACKET;
