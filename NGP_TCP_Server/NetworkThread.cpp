@@ -203,9 +203,9 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.posX = sendPlayer->posX;
-			playerMovePacket.posY = sendPlayer->posY;
-			playerMovePacket.angle = sendPlayer->angle;
+			playerMovePacket.posX = sendPlayer->GetPosX();
+			playerMovePacket.posY = sendPlayer->GetPosY();
+			playerMovePacket.angle = sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
