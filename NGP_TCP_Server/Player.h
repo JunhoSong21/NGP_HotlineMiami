@@ -1,17 +1,27 @@
 #pragma once
+#include <atomic>
 
 class Player {
 public:
+	int playerId;
+
+private:
+	std::atomic<int> hp;
+
+	bool isAlive;
+
 	float posX;
 	float posY;
 	float angle;
 
 public:
-	int playerId;
+	Player(int id);
 
-	Player(int id) :
-		posX(0.f), posY(0.f), angle(0.f)
-	{
-		playerId = id;
-	}
+	void CollisionBullet();
+	void CollisionGrenade();
+
+	void SetPos(float x, float y);
+
+	float GetPosX();
+	float GetPosY();
 };
