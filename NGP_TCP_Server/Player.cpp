@@ -41,12 +41,22 @@ void Player::SetPos(float x, float y)
 	posY = y;
 }
 
-float Player::GetPosX()
+void Player::SetAngle(float x)
+{
+	angle = x;
+}
+
+float Player::GetPosX() const
 {
 	return posX;
 }
 
-float Player::GetPosY()
+float Player::GetPosY() const
 {
 	return posY;
+}
+
+float Player::GetAngle() const
+{
+	return angle;
 }

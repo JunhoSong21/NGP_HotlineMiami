@@ -21,7 +21,9 @@ public:
 	void CollisionGrenade();
 
 	void SetPos(float x, float y);
+	void SetAngle(float x);
 
-	float GetPosX();
-	float GetPosY();
+	float GetPosX() const;
+	float GetPosY() const;
+	float GetAngle() const;
 };
