@@ -209,7 +209,7 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics,
 	int scaleWidth = spriteOriginWidth * spriteScaleMag;
 	int scaleHeight = spriteOriginHeight * spriteScaleMag;
 
-	float centerX = static_cast<float>(scaleWidth) / 2.0f;
+	float centerX = static_cast<float>(scaleWidth) / 3.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
 
 	graphics.TranslateTransform(playerPos.X, playerPos.Y);

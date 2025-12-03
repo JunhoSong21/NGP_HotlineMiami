@@ -217,7 +217,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 
 	// 플레이어 사망 시 입력 방지
-	if (player->IsDead()) {
+	if (players[0]->IsDead()) {
 		return;
 	}
 
@@ -288,17 +288,6 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			g_GrenadeReq.dirRadAngle = dirRad;
 		}
 
-		break;
-	}
-	// 12.02 나중에 지우기
-	case WM_KEYDOWN:
-	{
-		// H 키 눌렀을 때 체력 감소 테스트
-		if (wParam == 'H') {
-			if (player) {
-				player->ApplyDamage(15.0f);
-			}
-		}
 		break;
 	}
 	default:
