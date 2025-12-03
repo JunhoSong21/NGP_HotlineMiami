@@ -27,10 +27,14 @@ GameLoop::~GameLoop()
 		}
 	}
 
-	if (camera) {
-		delete camera;
-		camera = nullptr;
-	}
+	if (backGround) { delete backGround; backGround = nullptr; }
+	if (map) { delete map;        map = nullptr; }
+	if (wall) { delete wall;       wall = nullptr; }
+	if (timer) { delete timer;      timer = nullptr; }
+	if (grenade) { delete grenade;    grenade = nullptr; }
+	if (hud) { delete hud;        hud = nullptr; }
+	if (bullet) { delete bullet;     bullet = nullptr; }
+	if (camera) { delete camera;     camera = nullptr; }
 }
 
 void GameLoop::Init(HWND hwnd)
