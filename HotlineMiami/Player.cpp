@@ -196,30 +196,63 @@ void Player::InputProcessing(float deltaTime)
 	if (GetAsyncKeyState('S') & 0x8000) vectorY += 1.0f;
 	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
 	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
-	OutputDebugStringA("move!\n");
+
 	playerPos.X += vectorX * deltaTime * playerSpeed;
 	playerPos.Y += vectorY * deltaTime * playerSpeed;
+
+	std::wstring newState;
+	if (vectorX == 0.0f && vectorY == 0.0f) {
+		newState = L"PLAYER_IDLE";
+	}
+	else {
+		newState = L"PLAYER_WALK";
+	}
+
+	// 상태가 바뀔 때만 애니메이션 리셋 (프레임 튀는 것 방지)
+	if (playerState != newState) {
+		playerState = newState;
+		playerSpriteFrameNum = 0;
+		frameTimeAccumulate = 0.0f;
+	}
+
+	OutputDebugStringA("move!\n");
 }
 
 void Player::LoadPlayerImages(ImageManager& imgManager)
 {
 	// Player의 스프라이트 이미지 불러오는 함수
 	// 2번째 인자로 key값을 넣어 해당 key와 playerState가 같으면 해당 스프라이트 사용
-	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"PLAYER_IDLE");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketIdle.png", L"PLAYER_IDLE");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"PLAYER_WALK");
 	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketDeath.png", L"PLAYER_DEATH");
 }
 
 void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
 	Gdiplus::Bitmap* currentBitmap = imgManager.GetImage(playerState);
+	if (!currentBitmap) {
+		return;
+	}
+
+	int originWidth = spriteOriginWidth;
+	int originHeight = spriteOriginHeight;
+
+	if (playerState == L"PLAYER_IDLE") {
+		originWidth = 32;
+		originHeight = 32;
+	}
+	else if (playerState == L"PLAYER_WALK") {
+		originWidth = 50;
+		originHeight = 32;
+	}
+
+	int scaleWidth = originWidth * spriteScaleMag;
+	int scaleHeight = originHeight * spriteScaleMag;
 
 	Gdiplus::Matrix originMatrix;
 	graphics.GetTransform(&originMatrix);
 
 	float degreeAngle = radianAngle * 180.0f / PI;
-
-	int scaleWidth = spriteOriginWidth * spriteScaleMag;
-	int scaleHeight = spriteOriginHeight * spriteScaleMag;
 
 	float centerX = static_cast<float>(scaleWidth) / 3.0f;
 	float centerY = static_cast<float>(scaleHeight) / 2.0f;
@@ -228,12 +261,19 @@ void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics,
 	graphics.RotateTransform(degreeAngle);
 	graphics.TranslateTransform(-centerX, -centerY);
 
-	int frameNum = playerSpriteFrameNum * spriteOriginWidth;
+	int frameNum = playerSpriteFrameNum * originWidth;
 
-	graphics.DrawImage(currentBitmap, 
-		Gdiplus::RectF(0, 0, scaleWidth, scaleHeight),
-		frameNum, 0, spriteOriginWidth, spriteOriginHeight,
-		Gdiplus::UnitPixel);
+	graphics.DrawImage(
+		currentBitmap,
+		Gdiplus::RectF(0.0f, 0.0f,
+			static_cast<Gdiplus::REAL>(scaleWidth),
+			static_cast<Gdiplus::REAL>(scaleHeight)),
+		static_cast<Gdiplus::REAL>(frameNum),
+		0.0f,
+		static_cast<Gdiplus::REAL>(originWidth),
+		static_cast<Gdiplus::REAL>(originHeight),
+		Gdiplus::UnitPixel
+	);
 
 	graphics.SetTransform(&originMatrix);
 }

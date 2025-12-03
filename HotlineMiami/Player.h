@@ -11,6 +11,7 @@
 enum PLAYER_STATE
 {
 	PLAYER_IDLE = 0,
+	PLAYER_WALK,
 	PLAYER_DEATH   // ╩Г╦а ╩Себ
 };
 
