@@ -8,6 +8,7 @@ SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
 int    g_MyPlayerIndex = -1;
 extern GrenadeRequest g_GrenadeReq{ false, 0.0f }; // 수류탄 요청
+BulletTriggerRequest g_BulletReq = { false, 0.0f };
 LoginRequest g_LoginReq = { false, "" };
 // 수류탄 패킷 전송 함수
 static int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
@@ -107,6 +108,8 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     );
     if (sent == SOCKET_ERROR)
         return SOCKET_ERROR;
+
+
 
 
     // 수류탄 요청이 있으면 같이 보내기 
