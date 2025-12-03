@@ -223,9 +223,9 @@ void NetworkThread::SendBulletState()
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
 			bulletStatePacket.isActive = true;
-			bulletStatePacket.posX = sendBullet->posX;
-			bulletStatePacket.posY = sendBullet->posY;
-			bulletStatePacket.dirAngle = sendBullet->dirAngle;
+			bulletStatePacket.posX = sendBullet->GetPosX();
+			bulletStatePacket.posY = sendBullet->GetPosY();
+			bulletStatePacket.dirAngle = sendBullet->GetAngle();
 
 			retValue = send(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), 0);
 			if (retValue == SOCKET_ERROR)
