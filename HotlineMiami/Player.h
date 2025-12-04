@@ -25,6 +25,7 @@ private:
 	int			spriteOriginWidth;
 	int			spriteOriginHeight;
 	int			spriteScaleMag;
+	int         selectedNum;   // 0: Jacket, 1: Alex, 2: David
 	float		vectorX;
 	float		vectorY;
 	float		playerSpeed;
@@ -54,6 +55,7 @@ public:
 	void SetPosition(float x, float y, float rad);
 
 	void LoadPlayerImages(ImageManager& imgManager);
+	int GetDeathMaxFrames() const;   // 스킨별 Death 프레임 개수
 	void SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager);
 	float CalculateAtan2MouseAtPos(HWND hWnd, Camera* camera);
 

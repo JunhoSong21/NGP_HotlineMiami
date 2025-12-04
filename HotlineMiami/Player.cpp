@@ -16,7 +16,8 @@ Player::Player() :
 	, maxHp(100.0f),
 	radianAngle(0.0f),
 	hWnd(nullptr),
-	hBitmap(nullptr)
+	hBitmap(nullptr),
+	selectedNum(0)
 {
 }
 
@@ -27,6 +28,20 @@ Player::~Player()
 bool Player::Init()
 {
 	return true;
+}
+
+int Player::GetDeathMaxFrames() const
+{
+	switch (selectedNum) {
+	case 0: // Jacket
+		return 4;
+	case 1: // Alex
+		return 11;
+	case 2: // David
+		return 11;
+	default:
+		return 4;
+	}
 }
 
 // hp 바 확인용 데미지 함수
@@ -56,11 +71,12 @@ void Player::Update(float deltaTime, HWND hWnd, Camera* camera)
 		// 약간 느리게 재생되도록 조정
 		frameTimeAccumulate += deltaTime * 6.0f;	
 
+		int maxFrames = GetDeathMaxFrames();
+
 		if (frameTimeAccumulate >= 1.0f) {
 			++playerSpriteFrameNum;
-			if (playerSpriteFrameNum >= 4) {
-				// 마지막 프레임(3번)에 고정
-				playerSpriteFrameNum = 3;
+			if (playerSpriteFrameNum >= maxFrames) {
+				playerSpriteFrameNum = maxFrames - 1;
 			}
 			frameTimeAccumulate -= 1.0f;
 		}
@@ -130,15 +146,44 @@ void Player::DebugRenderCollision(Gdiplus::Graphics& g)
 
 void Player::SpriteDeathRender(Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
-	Gdiplus::Bitmap* deathBitmap = imgManager.GetImage(L"PLAYER_DEATH");
+	std::wstring prefix;
+	switch (selectedNum) {
+	case 0: prefix = L"Jacket"; break;
+	case 1: prefix = L"Alex";   break;
+	case 2: prefix = L"David";  break;
+	default: prefix = L"Jacket"; break;
+	}
+
+	std::wstring key = prefix + L"Death";
+
+	Gdiplus::Bitmap* deathBitmap = imgManager.GetImage(key.c_str());
 	if (!deathBitmap) {
 		return;
 	}
 
-	// JacketDeath 스프라이트 정보
-	const int originWidth = 60;   // 한 프레임 너비
-	const int originHeight = 60;  // 한 프레임 높이
-	const int maxFrames = 4;      // 총 4프레임
+	int originWidth = 60;
+	int originHeight = 60;
+	int maxFrames = 4;
+
+	switch (selectedNum) {
+	case 0: // JacketDeath: 60x60, 4프레임 (기존)
+		originWidth = 60;
+		originHeight = 60;
+		maxFrames = 4;
+		break;
+
+	case 1: // AlexDeath: 880x60, 11프레임 → 80x60
+		originWidth = 80;
+		originHeight = 60;
+		maxFrames = 11;
+		break;
+
+	case 2: // DavidDeath: 770x40, 11프레임 → 70x40
+		originWidth = 70;
+		originHeight = 40;
+		maxFrames = 11;
+		break;
+	}
 
 	int frame = playerSpriteFrameNum;
 	if (frame < 0) {
@@ -148,9 +193,9 @@ void Player::SpriteDeathRender(Gdiplus::Graphics& graphics, ImageManager& imgMan
 		frame = maxFrames - 1;
 	}
 
-	// 출력 크기 60x60
-	const float drawW = 60.0f;
-	const float drawH = 60.0f;
+	// 출력 크기: 일단 원본 기준으로 렌더 (나중에 필요하면 통일)
+	float drawW = static_cast<float>(originWidth);
+	float drawH = static_cast<float>(originHeight);
 
 	float left = playerPos.X - drawW * 0.5f;
 	float top = playerPos.Y - drawH * 0.5f;
@@ -222,28 +267,73 @@ void Player::LoadPlayerImages(ImageManager& imgManager)
 {
 	// Player의 스프라이트 이미지 불러오는 함수
 	// 2번째 인자로 key값을 넣어 해당 key와 playerState가 같으면 해당 스프라이트 사용
-	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketIdle.png", L"PLAYER_IDLE");
-	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"PLAYER_WALK");
-	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketDeath.png", L"PLAYER_DEATH");
+
+	// Jacket
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketIdle.png", L"JacketIdle");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketWalk.png", L"JacketWalk");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/JacketDeath.png", L"JacketDeath");
+
+	// Alex
+	imgManager.LoadSpriteImage(L"Resource/Sprite/AlexIdle.png", L"AlexIdle");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/AlexWalk.png", L"AlexWalk");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/AlexDeath.png", L"AlexDeath");
+
+	// David
+	imgManager.LoadSpriteImage(L"Resource/Sprite/DavidIdle.png", L"DavidIdle");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/DavidWalk.png", L"DavidWalk");
+	imgManager.LoadSpriteImage(L"Resource/Sprite/DavidDeath.png", L"DavidDeath");
 }
 
 void Player::SpriteDivideAndRotateRender(HWND hWnd, Gdiplus::Graphics& graphics, ImageManager& imgManager)
 {
-	Gdiplus::Bitmap* currentBitmap = imgManager.GetImage(playerState);
+	std::wstring prefix;
+	switch (selectedNum) {
+	case 0: prefix = L"Jacket"; break;
+	case 1: prefix = L"Alex";   break;
+	case 2: prefix = L"David";  break;
+	default: prefix = L"Jacket"; break;
+	}
+
+	std::wstring suffix;
+	if (playerState == L"PLAYER_IDLE") {
+		suffix = L"Idle";
+	}
+	else if (playerState == L"PLAYER_WALK") {
+		suffix = L"Walk";
+	}
+	else {
+		// DEATH는 별도 SpriteDeathRender에서 처리
+		return;
+	}
+
+	std::wstring key = prefix + suffix;
+
+	Gdiplus::Bitmap* currentBitmap = imgManager.GetImage(key.c_str());
 	if (!currentBitmap) {
 		return;
 	}
 
-	int originWidth = spriteOriginWidth;
-	int originHeight = spriteOriginHeight;
+	// 3) state + 스킨별 1프레임 원본 크기 설정
+	int originWidth = 0;
+	int originHeight = 0;
 
 	if (playerState == L"PLAYER_IDLE") {
 		originWidth = 32;
 		originHeight = 32;
 	}
 	else if (playerState == L"PLAYER_WALK") {
-		originWidth = 50;
-		originHeight = 32;
+		if (selectedNum == 0) {            // JacketWalk: 50x32 
+			originWidth = 50;
+			originHeight = 32;
+		}
+		else if (selectedNum == 1) {       // AlexWalk: 256x32 8프레임  32x32
+			originWidth = 32;
+			originHeight = 32;
+		}
+		else if (selectedNum == 2) {       // DavidWalk: 480x60 8프레임  60x60
+			originWidth = 60;
+			originHeight = 60;
+		}
 	}
 
 	int scaleWidth = originWidth * spriteScaleMag;
