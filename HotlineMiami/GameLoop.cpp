@@ -133,9 +133,8 @@ void GameLoop::Update()
 {
 	SoundManager::Get().Update();   // 재생 끝난 SFX 보이스 정리
 
-	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
-
+	if (backGround) backGround->Update(deltaTime);	
 	if (isTitle)
 		return;
 
