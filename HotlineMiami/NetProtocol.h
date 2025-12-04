@@ -38,6 +38,7 @@ struct SC_GRENADE_STATE {
 
 struct SC_LOGIN_SUCCESS {
 	bool	isSuccess;
+	int		targetNum;
 };
 
 struct SC_GAME_END {
