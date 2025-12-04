@@ -60,9 +60,8 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player) {
 		player->SetPos(event->destX, event->destY);
-		player->SetAngle(CalculateAtan2Float(
-			event->angleX, event->angleY, event->destX, event->destY
-		));
+		player->SetAngle(
+			CalculateAtan2Float(event->angleX, event->angleY, event->destX, event->destY));
 	}
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");

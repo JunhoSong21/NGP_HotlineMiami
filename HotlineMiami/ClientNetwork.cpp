@@ -62,6 +62,21 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
         send(sock, (char*)&lheader, sizeof(lheader), 0);
         send(sock, (char*)&lpkt, sizeof(lpkt), 0);
 
+        // 수정 부분
+        //////////////////////////////
+        PacketHeader loginRecvPacketHeader{};
+        
+        int retValue = 0;
+        retValue = recv(sock, (char*)&loginRecvPacketHeader, sizeof(loginRecvPacketHeader), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR || loginRecvPacketHeader.packetType != PN::SC_LOGIN_SUCCESS)
+            return false;
+
+        SC_LOGIN_SUCCESS loginSuccessPacket;
+        retValue = recv(sock, (char*)&loginSuccessPacket, sizeof(loginSuccessPacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR || loginSuccessPacket.isSuccess == false)
+            return false;
+        ///////////////////////////////
+
         g_LoginReq.requested = false;
     }
 
@@ -113,6 +128,7 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 
 
     // 수류탄 요청이 있으면 같이 보내기 
+    // 수류탄 패킷을 여기에서 Send하면 Send Recv 반복 구조에 어긋나는 것인지?
     if (g_GrenadeReq.requested) {
         if (Send_GrenadeThrow(sock, g_GrenadeReq.dirRadAngle) == SOCKET_ERROR) {
             return SOCKET_ERROR;
@@ -123,15 +139,12 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     OutputDebugStringA("send!\n");
 
     return static_cast<int>(sizeof(header) + sizeof(pkt));
-
 }
 
 void RecvProcess(SOCKET sock, Player** players)
 {
     PacketHeader header{};
-    OutputDebugStringA("[PlayerRecv] recv header START\n");
-    int retValue = recv(sock, (char*)&header, sizeof(header), 0);
-    OutputDebugStringA("[PlayerRecv] recv header END\n");
+    int retValue = recv(sock, (char*)&header, sizeof(header), MSG_WAITALL);
     if (retValue <= 0)
         return;
 
@@ -237,8 +250,6 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
 	Bullet* bullet = p->bullet;
     Player** players = p->players;
 
-    OutputDebugStringA("[NET] Thread START\n");
-
     while (g_NetworkRunning)
     {
         // 매 프레임마다 최신 내 인덱스 가져오기
@@ -254,26 +265,24 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
         {
             if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
             {
-                OutputDebugStringA("[NET] Send_Input failed -> g_NetworkRunning = false\n");
                 g_NetworkRunning = false;
                 break;
             }
         }
         
         // RecvProcess();
-       if (RecvProcess(g_ClientSock, bullet) == -1)
+        if (RecvProcess(g_ClientSock, bullet) == -1)
         {
-            OutputDebugStringA("[NET] Bullet Recv failed (returned -1) -> g_NetworkRunning = false\n");
             g_NetworkRunning = false;
             break;
         }
+
 
         RecvProcess(g_ClientSock, players);
         Sleep(16);
     }
 
     delete p; // 동적 할당했던 param delete
-    OutputDebugStringA("[NET] Client_Network_Thread EXIT\n");
     return 0;
 }
 
@@ -286,7 +295,6 @@ int Recv_BulletData(SOCKET sock, Bullet* bullet)
     SC_BULLET_STATE pkt{};
     int ret = recv(sock, reinterpret_cast<char*>(&pkt),
         sizeof(pkt), MSG_WAITALL);
-   
     if (ret <= 0)
     {
         return -1;
@@ -299,151 +307,25 @@ int Recv_BulletData(SOCKET sock, Bullet* bullet)
     return ret;
 }
 
-//int RecvProcess(SOCKET sock, Bullet* bullet)
-//{
-//    // 공통 헤더 먼저 받기
-//    PacketHeader header{};
-//    int ret = recv(sock, reinterpret_cast<char*>(&header),
-//        sizeof(header), MSG_WAITALL);
-//    
-//    // debug
-//    if (ret <= 0)
-//    {
-//        OutputDebugStringA("[BulletRecv] header recv <= 0, return -1\n");
-//        return -1;  // 소켓 종료/에러
-//    }
-//
-//    if (header.packetSize < sizeof(PacketHeader)) {
-//        return 0;
-//    }
-//    int bodySize = static_cast<int>(header.packetSize - sizeof(PacketHeader));
-//
-//    // 2) 패킷 종류에 따라 분기
-//    switch (header.packetType)
-//    {
-//    case PN::SC_BULLET_STATE: 
-//    {
-//        // 먼저 사이즈 체크
-//        if (bodySize != sizeof(SC_BULLET_STATE)) {
-//            // 크기 안 맞으면 이 패킷의 바디를 끝까지 읽어서 버퍼에서 제거
-//            char dummy[256];
-//            int remain = bodySize;
-//            while (remain > 0) {
-//                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-//                int r = recv(sock, dummy, chunk, 0);
-//                if (r <= 0) return -1;
-//                remain -= r;
-//            }
-//            return 0;
-//        }
-//
-//        // 크기가 정상이라면, 실제 총알 데이터 읽기
-//        return Recv_BulletData(sock, bullet);
-//    }
-//    default: 
-//    {
-//        // bodySize만큼 dummy로 읽어서 버퍼에서 제거하고, 다음 패킷 헤더를 기다린다.
-//        char dummy[256];
-//        int remain = bodySize;
-//        while (remain > 0) {
-//            int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-//            int r = recv(sock, dummy, chunk, 0);
-//            if (r <= 0) return -1;
-//            remain -= r;
-//        }
-//        return 0;
-//    }
-//    }
-//}
-
 int RecvProcess(SOCKET sock, Bullet* bullet)
 {
-    // 1) 헤더 먼저 받기
+    // 공통 헤더 먼저 받기
     PacketHeader header{};
-    OutputDebugStringA("[BulletRecv] recv header START\n");
     int ret = recv(sock, reinterpret_cast<char*>(&header),
         sizeof(header), MSG_WAITALL);
-    OutputDebugStringA("[BulletRecv] recv header END\n");
-
-    if (ret <= 0) {
-        OutputDebugStringA("[BulletRecv] header recv <= 0, return -1\n");
-        return -1;  // 서버가 끊었거나 에러
+    if (ret <= 0)
+    {
+        return -1;  // 소켓 종료/에러
     }
 
-    char dbg[128];
-    sprintf_s(dbg, "[BulletRecv] header type=%d, size=%zu\n",
-        header.packetType, header.packetSize);
-    OutputDebugStringA(dbg);
-
-    int bodySize = static_cast<int>(header.packetSize);
-    if (bodySize < 0) {
-        OutputDebugStringA("[BulletRecv] negative bodySize, ignore packet\n");
-        return 0;
-    }
-
+    // 2) 패킷 종류에 따라 분기
     switch (header.packetType)
     {
     case PN::SC_BULLET_STATE:
-    {
-        // 크기 검사(선택)
-        if (bodySize != sizeof(SC_BULLET_STATE)) {
-            OutputDebugStringA("[BulletRecv] SC_BULLET_STATE size mismatch, consume dummy\n");
-            // 잘못된 패킷 → bodySize만큼 dummy로 소비 후 무시
-            char dummy[256];
-            int remain = bodySize;
-            while (remain > 0) {
-                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-                int r = recv(sock, dummy, chunk, 0);
-                if (r <= 0) {
-                    OutputDebugStringA("[BulletRecv] dummy recv <= 0 in BULLET_STATE, return -1\n");
-                    return -1;
-                }
-                remain -= r;
-            }
-            return 0;
-        }
-
-        // 정상 크기 → 실제 데이터 읽기
-        SC_BULLET_STATE pkt{};
-        ret = recv(sock, reinterpret_cast<char*>(&pkt),
-            sizeof(pkt), MSG_WAITALL);
-        if (ret <= 0) {
-            OutputDebugStringA("[BulletRecv] body recv <= 0 in BULLET_STATE, return -1\n");
-            return -1;
-        }
-
-        if (!bullet) return 0;
-
-        bullet->SetVisible(pkt.isActive != 0);
-        bullet->SetPosition(pkt.posX, pkt.posY);
-        // SC_BULLET_STATE가 dirAngle만 있는 구조라면 여기 맞춰서 수정 필요
-        // bullet->SetDirection(pkt.dirX, pkt.dirY); // 이 부분은 struct 정의에 맞게 조정
-
-        return 0;
-    }
+        return Recv_BulletData(sock, bullet);
 
     default:
-    {
-        if (bodySize == 0) {
-            // 바디가 없는 패킷이면 바로 리턴
-            OutputDebugStringA("[BulletRecv] default packet with bodySize=0, nothing to consume\n");
-            return 0;
-        }
-
-        OutputDebugStringA("[BulletRecv] default packet, consuming body as dummy\n");
-
-        char dummy[256];
-        int remain = bodySize;
-        while (remain > 0) {
-            int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-            int r = recv(sock, dummy, chunk, 0);
-            if (r <= 0) {
-                OutputDebugStringA("[BulletRecv] dummy recv <= 0 in default, return -1\n");
-                return -1;
-            }
-            remain -= r;
-        }
         return 0;
     }
-    }
 }
+
