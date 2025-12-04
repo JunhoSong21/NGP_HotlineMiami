@@ -278,8 +278,8 @@ void GameLoop::Render()
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
-			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
+			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
+			g.SetCompositingQuality(Gdiplus::CompositingQualityHighSpeed);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 			for (int i = 0; i < 3; ++i)
 			{
@@ -309,7 +309,6 @@ void GameLoop::Render()
 
 		{
 			auto s = g.Save();
-			// 여기서는 Transform 적용 안 함 → 순수 화면 좌표 기준
 			if (hud) hud->Render(hWnd, g, imgManager);
 			g.Restore(s);
 		}
