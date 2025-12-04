@@ -13,8 +13,10 @@ GameLoop::GameLoop() :
 	deltaTime(0.0f),
 	hWnd(nullptr),
 	camera(nullptr),
-	isTitle(true)
-
+	isTitle(true),
+	backBufferBitmap(nullptr),
+	backBufferWidth(0),
+	backBufferHeight(0)
 {
 	for (int i = 0; i < 3; ++i)
 		players[i] = nullptr;
@@ -37,6 +39,7 @@ GameLoop::~GameLoop()
 	if (hud) { delete hud;        hud = nullptr; }
 	if (bullet) { delete bullet;     bullet = nullptr; }
 	if (camera) { delete camera;     camera = nullptr; }
+	if (backBufferBitmap) { delete backBufferBitmap; backBufferBitmap = nullptr; }
 }
 
 void GameLoop::Init(HWND hwnd)
@@ -191,6 +194,24 @@ void GameLoop::Render()
 	if (width <= 0 || height <= 0)
 		DEBUG_MSG(L"[ClientRect Error] : width 또는 height 값이 0 이하");
 
+	if (!backBufferBitmap ||
+		backBufferWidth != width ||
+		backBufferHeight != height)
+	{
+		if (backBufferBitmap) {
+			delete backBufferBitmap;
+			backBufferBitmap = nullptr;
+		}
+
+		backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
+		backBufferWidth = width;
+		backBufferHeight = height;
+
+		if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
+			DEBUG_MSG(L"[BackBufferBitmap Error] : 백버퍼 Bitmap 생성 실패");
+		}
+	}
+
 	if (camera) {
 		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
 	}
@@ -299,9 +320,7 @@ void GameLoop::Render()
 	screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	screen.DrawImage(backBufferBitmap, 0, 0, width, height);
 
-	delete backBufferBitmap;
 	ReleaseDC(hWnd, hDC);
-
 }
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)

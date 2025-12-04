@@ -37,8 +37,11 @@ private:
 	HWND hWnd;
 	Camera* camera;
 	bool isTitle;
-	
 
+	Gdiplus::Bitmap* backBufferBitmap;  
+	int backBufferWidth;
+	int backBufferHeight;
+	
 public:
 	GameLoop();
 	~GameLoop();
