@@ -318,6 +318,9 @@ void GameLoop::Render()
 	screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	screen.DrawImage(backBufferBitmap, 0, 0, width, height);
 
+	if (backBufferBitmap)
+		delete backBufferBitmap;
+
 	ReleaseDC(hWnd, hDC);
 }
 
