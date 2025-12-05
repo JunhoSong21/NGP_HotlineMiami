@@ -30,6 +30,7 @@ void Timer::TimerLoop()
 		EventQueue::GetInstance().PushEvent(std::move(moveUpdate));
 	}
 
+	/*
 	// Bullet Pos Update
 	if (milliseconds(200) < duration_cast<milliseconds>(timePoint - bulletEventPoint)) {
 		lock_guard<mutex> lock(timerMutex);
@@ -48,6 +49,7 @@ void Timer::TimerLoop()
 			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
 		}
 	}
+	*/
 }
 
 bool Timer::AddBullet(int id)

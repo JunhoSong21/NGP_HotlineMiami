@@ -108,41 +108,43 @@ void NetworkThread::ThreadFunc()
 
 		// send큐에 데이터가 있다면 전송
 		int eventNum;
-		if (sendQueue.try_dequeue(eventNum)) {
-			PacketHeader sendPacketHeader{};
-			sendPacketHeader.packetType = eventNum;
+		while (sendQueue.try_dequeue(eventNum) == false) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 
-			switch (sendPacketHeader.packetType) {
-			case PN::SC_PLAYER_MOVE: {
-				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_PLAYER_MOVE() Error\n");
-				else
-					SendPlayerMove();
-				break;
-			}
-			case PN::SC_BULLET_STATE: {
-				sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_BULLET_STATE() Error\n");
-				else
-					SendBulletState();
-				break;
-			}
-			case PN::SC_GRENADE_STATE: {
-				sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_GRENADE_STATE() Error\n");
-				else
-					SendGrenadeState();
-				break;
-			}
-			default:
-				break;
-			}
+		PacketHeader sendPacketHeader{};
+		sendPacketHeader.packetType = eventNum;
+
+		switch (sendPacketHeader.packetType) {
+		case PN::SC_PLAYER_MOVE: {
+			sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_PLAYER_MOVE() Error\n");
+			else
+				SendPlayerMove();
+			break;
+		}
+		case PN::SC_BULLET_STATE: {
+			sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_BULLET_STATE() Error\n");
+			else
+				SendBulletState();
+			break;
+		}
+		case PN::SC_GRENADE_STATE: {
+			sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_GRENADE_STATE() Error\n");
+			else
+				SendGrenadeState();
+			break;
+		}
+		default:
+			break;
 		}
 	}
 }
@@ -203,9 +205,9 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.posX = sendPlayer->posX;
-			playerMovePacket.posY = sendPlayer->posY;
-			playerMovePacket.angle = sendPlayer->angle;
+			playerMovePacket.posX = sendPlayer->GetPosX();
+			playerMovePacket.posY = sendPlayer->GetPosY();
+			playerMovePacket.angle = sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
@@ -226,9 +228,9 @@ void NetworkThread::SendBulletState()
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
 			bulletStatePacket.isActive = true;
-			bulletStatePacket.posX = sendBullet->posX;
-			bulletStatePacket.posY = sendBullet->posY;
-			bulletStatePacket.dirAngle = sendBullet->dirAngle;
+			bulletStatePacket.posX = sendBullet->GetPosX();
+			bulletStatePacket.posY = sendBullet->GetPosY();
+			bulletStatePacket.dirAngle = sendBullet->GetAngle();
 
 			retValue = send(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), 0);
 			if (retValue == SOCKET_ERROR)

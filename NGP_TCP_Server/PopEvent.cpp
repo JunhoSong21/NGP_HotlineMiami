@@ -59,10 +59,9 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player) {
-		player->posX = event->destX;
-		player->posY = event->destY;
-		player->angle = CalculateAtan2Float(
-			event->angleX, event->angleY, event->destX, event->destY);
+		player->SetPos(event->destX, event->destY);
+		player->SetAngle(
+			CalculateAtan2Float(event->angleX, event->angleY, event->destX, event->destY));
 	}
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
@@ -84,9 +83,9 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 
 	auto newBullet = make_unique<Bullet>(
 		event->networkThreadId,
-		rootPlayer->posX,
-		rootPlayer->posY,
-		rootPlayer->angle
+		rootPlayer->GetPosX(),
+		rootPlayer->GetPosY(),
+		rootPlayer->GetAngle()
 	);
 
 	DataManager::GetInstance().AddBullet(std::move(newBullet));
@@ -108,8 +107,8 @@ void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 
 	auto newGrenade = make_unique<Grenade>(
 		event->networkThreadId,
-		rootPlayer->posX,
-		rootPlayer->posY
+		rootPlayer->GetPosX(),
+		rootPlayer->GetPosY()
 	);
 
 	DataManager::GetInstance().AddGrenade(std::move(newGrenade));

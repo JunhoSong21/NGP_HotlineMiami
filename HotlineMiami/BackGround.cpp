@@ -12,9 +12,16 @@ BackGround::~BackGround()
 {
 }
 
-void BackGround::Update()
+void BackGround::Update(float deltaTime)
 {
-	HSV.H = GetCurrentHue();
+	HSV.H += colorChangeSpeed * deltaTime; 
+
+	if (HSV.H >= 360.0f) {
+		HSV.H -= 360.0f;
+	}
+	else if (HSV.H < 0.0f) {
+		HSV.H += 360.0f;
+	}
 }
 
 void BackGround::Render(HWND hWnd, Gdiplus::Graphics& memoryGraphics)
@@ -56,11 +63,4 @@ COLORREF BackGround::HSVtoRGB()
 	BYTE B = static_cast<BYTE>((RGB.B + m) * 255);
 
 	return RGB(R, G, B);
-}
-
-float BackGround::GetCurrentHue()
-{
-	unsigned long long currenTime = GetTickCount64();
-
-	return fmod(currenTime * colorChangeSpeed / 1000.0f, 360.0f);
 }

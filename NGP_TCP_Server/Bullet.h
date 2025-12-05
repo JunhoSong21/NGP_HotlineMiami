@@ -2,17 +2,24 @@
 
 class Bullet {
 public:
+	int bulletId;
+
+private:
 	bool	isActive;
+
 	float	posX;
 	float	posY;
 	float	dirAngle;
 
 public:
-	int bulletId;
+	Bullet(int id, float x, float y, float angle);
 
-	Bullet(int id, float x, float y, float angle) :
-		isActive(true), posX(x), posY(y), dirAngle(angle)
-	{
-		bulletId = id;
-	}
+	void Collision();
+
+	void SetPos(float x, float y);
+	void SetAngle(float angle);
+
+	float GetPosX() const;
+	float GetPosY() const;
+	float GetAngle() const;
 };

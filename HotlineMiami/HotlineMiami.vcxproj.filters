@@ -15,6 +15,7 @@
     <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="Camare.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

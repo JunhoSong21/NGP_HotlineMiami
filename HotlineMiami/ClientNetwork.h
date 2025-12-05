@@ -3,7 +3,6 @@
 #include "Bullet.h"
 
 class Player;
-int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
 
 // 전역 네트워크 상태
 extern SOCKET g_ClientSock;
@@ -17,13 +16,6 @@ struct GrenadeRequest {
 };
 
 extern GrenadeRequest g_GrenadeReq;
-
-struct LoginRequest
-{
-    bool requested;        
-    char ip[20];          
-};
-extern LoginRequest g_LoginReq;
 
 // Bullet
 struct BulletTriggerRequest
@@ -47,8 +39,14 @@ bool InitNetwork(const char* serverIp, unsigned short port);
 void ShutdownNetwork();
 
 // 서버 통신 스레드
-void ShutdownNetwork();
 DWORD WINAPI Client_Network_Thread(LPVOID param);
-int RecvProcess(SOCKET sock, Bullet* bullet);
-int Recv_BulletData(SOCKET sock, Bullet* bullet);
-void RecvProcess(SOCKET sock, Player** players);
+
+// 추가
+void LoginProcess(SOCKET sock);
+int SendProcess(SOCKET sock, HWND hWnd, const Player& player);
+int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
+int Send_GrenadeThrow(SOCKET sock, float dirRadAngle);
+
+void RecvProcess(SOCKET sock, Player** players, Bullet* bullet);
+void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket);
+int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket);
