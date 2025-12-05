@@ -3,6 +3,9 @@
 // HotlineMiami.rc에서 사용되고 있습니다.
 //
 #define IDB_BITMAP1                     101
+#define IDD_DIALOG                      102  
+#define IDC_EDIT_ID                     1001
+#define IDC_BTN_OK                      1002
 
 // Next default values for new objects
 // 

@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Camare.cpp" />
     <ClCompile Include="ClientNetwork.cpp" />
     <ClCompile Include="GameLoop.cpp" />
     <ClCompile Include="Grenade.cpp" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ClientNetwork.h" />
     <ClInclude Include="GameLoop.h" />
     <ClInclude Include="Grenade.h" />
@@ -171,9 +173,16 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wall.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HotlineMiami.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\Sprite\Jacket.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

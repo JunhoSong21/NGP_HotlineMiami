@@ -15,6 +15,7 @@
 
 #include "ImageManager.h"
 #include "SoundManager.h"
+#include "Camera.h"
 
 class GameLoop {
 private:
@@ -34,7 +35,12 @@ private:
 	float deltaTime;
 
 	HWND hWnd;
+	Camera* camera;
+	bool isTitle;
 
+	Gdiplus::Bitmap* backBufferBitmap;  
+	int backBufferWidth;
+	int backBufferHeight;
 	
 public:
 	GameLoop();
@@ -44,7 +50,8 @@ public:
 	void Update();
 	void Render();
 	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
-	
+	bool IsTitle() const { return isTitle; }
+
 	Bullet* GetBullet() { return bullet; }
 	Player** GetPlayers() { return players; }
 };

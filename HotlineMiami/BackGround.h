@@ -23,8 +23,7 @@ public:
 	BackGround();
 	~BackGround();
 
-	void Update();
+	void Update(float deltaTime);
 	void Render(HWND hWnd, Gdiplus::Graphics& memoryGraphics);
 	COLORREF HSVtoRGB();
-	float GetCurrentHue();
 };

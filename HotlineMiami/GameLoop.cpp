@@ -11,7 +11,12 @@ GameLoop::GameLoop() :
 	hud(nullptr),
 	bullet(nullptr),
 	deltaTime(0.0f),
-	hWnd(nullptr)
+	hWnd(nullptr),
+	camera(nullptr),
+	isTitle(true),
+	backBufferBitmap(nullptr),
+	backBufferWidth(0),
+	backBufferHeight(0)
 {
 	for (int i = 0; i < 3; ++i)
 		players[i] = nullptr;
@@ -25,20 +30,35 @@ GameLoop::~GameLoop()
 			players[i] = nullptr;
 		}
 	}
+
+	if (backGround) { delete backGround; backGround = nullptr; }
+	if (map) { delete map;        map = nullptr; }
+	if (wall) { delete wall;       wall = nullptr; }
+	if (timer) { delete timer;      timer = nullptr; }
+	if (grenade) { delete grenade;    grenade = nullptr; }
+	if (hud) { delete hud;        hud = nullptr; }
+	if (bullet) { delete bullet;     bullet = nullptr; }
+	if (camera) { delete camera;     camera = nullptr; }
+	if (backBufferBitmap) { delete backBufferBitmap; backBufferBitmap = nullptr; }
 }
 
 void GameLoop::Init(HWND hwnd)
 {
 	hWnd = hwnd;
 	
+	imgManager.LoadSpriteImage(
+		L"Resource/Start/StartImage.png",
+		L"StartImage"               
+	);
 	// 사운드 로딩
 	SoundManager::Get().LoadSound("bgm", "Resource/Sound/BGM.wav");
 	SoundManager::Get().LoadSound("grenade_explosion", "Resource/Sound/GrenadeExplosion.wav");
 	SoundManager::Get().LoadSound("death", "Resource/Sound/Death.wav");
 	SoundManager::Get().PlayBGM("bgm");
 
+
 	backGround = new BackGround();
-        
+
 	map = new Map();
 	map->LoadMapImages(imgManager);
 	map->Init();
@@ -83,6 +103,29 @@ void GameLoop::Init(HWND hwnd)
 	bullet->LoadBulletImages(imgManager);
 	bullet->SetVisible(false);
 
+	// 카메라 세팅
+	if (not camera) {
+		camera = new Camera();
+
+		// 윈도우 클라이언트 크기 기준
+		RECT rc{};
+		GetClientRect(hWnd, &rc);
+		int width = rc.right - rc.left;
+		int height = rc.bottom - rc.top;
+		if (width <= 0) width = 1280;
+		if (height <= 0) height = 800;
+
+		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
+
+		// 시작 타겟: 내 플레이어 위치
+		int myIdx = g_MyPlayerIndex;
+		if (myIdx < 0 || myIdx >= 3) myIdx = 0;
+		if (players[myIdx]) {
+			camera->SetTarget(players[myIdx]->GetPos());
+			camera->Update(0.0f);
+		}
+	}
+
 	OutputDebugStringA("Init!\n");
 }
 
@@ -90,8 +133,11 @@ void GameLoop::Update()
 {
 	SoundManager::Get().Update();   // 재생 끝난 SFX 보이스 정리
 
-	if (backGround) backGround->Update();
 	if (timer) deltaTime = timer->getDeltaTime();
+	if (backGround) backGround->Update(deltaTime);	
+	if (isTitle)
+		return;
+
 	// 내 인덱스 계산
 	int myIdx = g_MyPlayerIndex;
 	if (myIdx < 0 || myIdx >= 3)
@@ -102,19 +148,24 @@ void GameLoop::Update()
 	{
 		Gdiplus::PointF oldPos = players[myIdx]->GetPos();
 
-		players[myIdx]->Update(deltaTime);
+		players[myIdx]->Update(deltaTime, hWnd, camera);
 
 		Gdiplus::PointF newPos = players[myIdx]->GetPos();
 		Gdiplus::PointF delta(newPos.X - oldPos.X,
 			newPos.Y - oldPos.Y);
 
-		Gdiplus::SizeF playerAabb(50.0f, 50.0f);
+		Gdiplus::SizeF playerAabb(35.0f, 35.0f);
 		Gdiplus::PointF resolvedPos = oldPos;
 
 		if (wall)
 			wall->ResolveMove(resolvedPos, playerAabb, delta);
 
 		players[myIdx]->GetPos() = resolvedPos;
+	}
+
+	if (camera && players[myIdx]) {
+		camera->SetTarget(players[myIdx]->GetPos());
+		camera->Update(deltaTime);
 	}
 
 	if (grenade) {
@@ -133,23 +184,63 @@ void GameLoop::Render()
 {
 	HDC hDC = GetDC(hWnd);
 	if (!hDC)
-		DEBUG_MSG(L"È­¸é HDC È¹µæ ½ÇÆÐ");
+		DEBUG_MSG(L"[GetDC Error] : 화면 HDC 획득 실패");
 
 	RECT clientRect;
 	GetClientRect(this->hWnd, &clientRect);
 	int width = clientRect.right - clientRect.left;
 	int height = clientRect.bottom - clientRect.top;
 	if (width <= 0 || height <= 0)
-		DEBUG_MSG(L"width È¤Àº height °ªÀÌ 0 ÀÌÇÏÀÔ´Ï´Ù");
+		DEBUG_MSG(L"[ClientRect Error] : width 또는 height 값이 0 이하");
+
+	if (!backBufferBitmap ||
+		backBufferWidth != width ||
+		backBufferHeight != height)
+	{
+		if (backBufferBitmap) {
+			delete backBufferBitmap;
+			backBufferBitmap = nullptr;
+		}
+
+		backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
+		backBufferWidth = width;
+		backBufferHeight = height;
+
+		if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
+			DEBUG_MSG(L"[BackBufferBitmap Error] : 백버퍼 Bitmap 생성 실패");
+		}
+	}
+
+	if (camera) {
+		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
+	}
 
 	Gdiplus::Bitmap* backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 	if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
-		DEBUG_MSG(L"¹é ¹öÆÛ Bitmap »ý¼º ½ÇÆÐ");
+		DEBUG_MSG(L"[BackBufferBitmap Error] : 백버퍼 Bitmap 생성 실패");
 	}
 
 	{
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
+
+		//title screen
+		if (isTitle)
+		{
+			Gdiplus::Bitmap* titleBmp = imgManager.GetImage(L"StartImage");
+			if (titleBmp)
+			{
+				g.DrawImage(titleBmp, 0, 0, width, height);
+			}
+			
+			Gdiplus::Graphics screen(hDC);
+			screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
+			screen.DrawImage(backBufferBitmap, 0, 0, width, height);
+
+			delete backBufferBitmap;
+			ReleaseDC(hWnd, hDC);
+			return;   
+		}
 
 		// 1) backGround
 		{
@@ -159,6 +250,13 @@ void GameLoop::Render()
 			if (backGround) backGround->Render(hWnd, g); 
 			g.Restore(s);
 		}
+
+		{
+			auto sWorld = g.Save();
+
+			if (camera) {
+				camera->Apply(g);    // 여기서부터는 전부 월드 좌표 기준
+			}
 
 		// 2) map
 		{
@@ -172,27 +270,31 @@ void GameLoop::Render()
 		}
 
 		// 3) Wall 
-		if (wall) wall->Render(g);     
+		if (wall) wall->Render(g);
+		// 4) Grenade 
 		if (grenade) grenade->Render(g, imgManager);
-		if (hud) hud->Render(hWnd, g, imgManager);
-
-
-		// 3) player
+		
+		// 5) player
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
-			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
+			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
+			g.SetCompositingQuality(Gdiplus::CompositingQualityHighSpeed);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 			for (int i = 0; i < 3; ++i)
 			{
-				if (players[i])
+				if (players[i]) {
 					players[i]->Render(hWnd, g, imgManager);
+#ifdef _DEBUG
+					players[i]->DebugRenderCollision(g);	// 충돌 영역 렌더링
+#endif
+
+				}
 			}
 			g.Restore(s);
 		}
 
-		// 5) 총알 렌더링
+		// 6) bullet
 		{
 			auto s = g.Save();
 			g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
@@ -202,22 +304,32 @@ void GameLoop::Render()
 			if (bullet) bullet->Render(hWnd, g, imgManager);
 			g.Restore(s);
 		}
+		g.Restore(sWorld);
+		}
+
+		{
+			auto s = g.Save();
+			if (hud) hud->Render(hWnd, g, imgManager);
+			g.Restore(s);
+		}
 	}
 
 	Gdiplus::Graphics screen(hDC);
 	screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	screen.DrawImage(backBufferBitmap, 0, 0, width, height);
 
-	delete backBufferBitmap;
 	ReleaseDC(hWnd, hDC);
-
 }
 
 void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	// 내 인덱스 계산
+	int myIdx = g_MyPlayerIndex;
+	if (myIdx < 0 || myIdx >= 3)
+		myIdx = 0;
 
 	// 플레이어 사망 시 입력 방지
-	if (player->IsDead()) {
+	if (players[myIdx]->IsDead()) {
 		return;
 	}
 
@@ -225,19 +337,49 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_LBUTTONDOWN:
 	{
-		// 내 인덱스 계산
-		int myIdx = g_MyPlayerIndex;
-		if (myIdx < 0 || myIdx >= 3)
-			myIdx = 0;
+		if (isTitle)
+		{
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+			int width = rc.right - rc.left;
+			int height = rc.bottom - rc.top;
+
+			float sx = width / 1920.0f;
+			float sy = height / 1200.0f;
+
+			int btnLeft = (int)(260 * sx);
+			int btnRight = (int)(760 * sx);
+			int btnTop = (int)(550 * sy);
+			int btnBottom = (int)(840 * sy);
+
+			int mouseX = GET_X_LPARAM(lParam);
+			int mouseY = GET_Y_LPARAM(lParam);
+
+			if (mouseX >= btnLeft && mouseX <= btnRight &&
+				mouseY >= btnTop && mouseY <= btnBottom)
+			{
+				isTitle = false; 
+			}
+
+			return; 
+		}
+
 		if (!players[myIdx] || !bullet)
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
 		int mouseY = GET_Y_LPARAM(lParam);
+
+		Gdiplus::PointF mouseWorld(static_cast<float>(mouseX), static_cast<float>(mouseY));
+		if (camera) {
+			POINT pt{ mouseX, mouseY };
+			mouseWorld = camera->ScreenToWorld(pt);
+		}
+
 		// 플레이어 위치
 		Gdiplus::PointF playerPos = players[myIdx]->GetPosition();
 		// 방향벡터
-		float dx = static_cast<float>(mouseX) - playerPos.X;
-		float dy = static_cast<float>(mouseY) - playerPos.Y;
+		float dx = mouseWorld.X - playerPos.X;
+		float dy = mouseWorld.Y - playerPos.Y;
 
 		float len = std::sqrt(dx * dx + dy * dy);
 		if (len > 0.0f)
@@ -248,15 +390,16 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		// 총알 초기화
 		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+
+		float angle = atan2f(dy, dx);
+		g_BulletReq.requested = true;
+		g_BulletReq.dirRadAngle = angle;
 		break;
 	}
 
 	case WM_RBUTTONDOWN:
 	{
-		// 내 인덱스 계산
-		int myIdx = g_MyPlayerIndex;
-		if (myIdx < 0 || myIdx >= 3)
-			myIdx = 0;
+		
 
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
 		if (!players[myIdx] || !grenade)
@@ -272,6 +415,11 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			static_cast<float>(mouseY)
 		);
 
+		if (camera) {
+			POINT pt{ mouseX, mouseY };
+			targetPos = camera->ScreenToWorld(pt);
+		}
+
 		// 기존 활성 상태 저장
 		bool wasActive = grenade->IsActive();
 
@@ -281,24 +429,14 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		// 이번 클릭에서 새로 활성화된 경우에만 서버에 알림
 		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
 		{
-			// 플레이어 기준 마우스 방향 (라디안)
-			float dirRad = players[myIdx]->CalculateAtan2MouseAtPos(hWnd);
+			float dx = targetPos.X - startPos.X;
+			float dy = targetPos.Y - startPos.Y;
+			float dirRad = atan2f(dy, dx);
 
 			g_GrenadeReq.requested = true;
 			g_GrenadeReq.dirRadAngle = dirRad;
 		}
 
-		break;
-	}
-	// 12.02 나중에 지우기
-	case WM_KEYDOWN:
-	{
-		// H 키 눌렀을 때 체력 감소 테스트
-		if (wParam == 'H') {
-			if (player) {
-				player->ApplyDamage(15.0f);
-			}
-		}
 		break;
 	}
 	default:

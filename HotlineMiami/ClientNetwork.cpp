@@ -8,7 +8,8 @@ SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
 int    g_MyPlayerIndex = -1;
 extern GrenadeRequest g_GrenadeReq{ false, 0.0f }; // 수류탄 요청
-
+BulletTriggerRequest g_BulletReq = { false, 0.0f };
+LoginRequest g_LoginReq = { false, "" };
 // 수류탄 패킷 전송 함수
 static int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 {
@@ -47,6 +48,39 @@ static int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 {
     OutputDebugStringA("sendready\n");
+
+    // CS_LOGIN_PACKET
+    if (g_LoginReq.requested)
+    {
+        CS_LOGIN_PACKET lpkt{};
+        strncpy_s(lpkt.clientIp, g_LoginReq.ip, sizeof(lpkt.clientIp) - 1);
+
+        PacketHeader lheader{};
+        lheader.packetType = PN::CS_LOGIN_PACKET;
+        lheader.packetSize = sizeof(PacketHeader) + sizeof(lpkt);
+
+        send(sock, (char*)&lheader, sizeof(lheader), 0);
+        send(sock, (char*)&lpkt, sizeof(lpkt), 0);
+
+        // 수정 부분
+        //////////////////////////////
+        PacketHeader loginRecvPacketHeader{};
+        
+        int retValue = 0;
+        retValue = recv(sock, (char*)&loginRecvPacketHeader, sizeof(loginRecvPacketHeader), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR || loginRecvPacketHeader.packetType != PN::SC_LOGIN_SUCCESS)
+            return false;
+
+        SC_LOGIN_SUCCESS loginSuccessPacket;
+        retValue = recv(sock, (char*)&loginSuccessPacket, sizeof(loginSuccessPacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR || loginSuccessPacket.isSuccess == false)
+            return false;
+        ///////////////////////////////
+
+        g_LoginReq.requested = false;
+    }
+
+    // CS_KEY_INPUT
     CS_KEY_INPUT pkt{};
     pkt.flags = 0;
 
@@ -90,7 +124,11 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     if (sent == SOCKET_ERROR)
         return SOCKET_ERROR;
 
+
+
+
     // 수류탄 요청이 있으면 같이 보내기 
+    // 수류탄 패킷을 여기에서 Send하면 Send Recv 반복 구조에 어긋나는 것인지?
     if (g_GrenadeReq.requested) {
         if (Send_GrenadeThrow(sock, g_GrenadeReq.dirRadAngle) == SOCKET_ERROR) {
             return SOCKET_ERROR;
@@ -101,13 +139,12 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     OutputDebugStringA("send!\n");
 
     return static_cast<int>(sizeof(header) + sizeof(pkt));
-
 }
 
 void RecvProcess(SOCKET sock, Player** players)
 {
     PacketHeader header{};
-    int retValue = recv(sock, (char*)&header, sizeof(header), 0);
+    int retValue = recv(sock, (char*)&header, sizeof(header), MSG_WAITALL);
     if (retValue <= 0)
         return;
 

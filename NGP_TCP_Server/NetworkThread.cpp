@@ -41,6 +41,9 @@ void NetworkThread::LoginProcess()
 
 		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
 		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
+#ifdef _DEBUG
+		printf("Login Packet recv() Success\n");
+#endif
 	}
 
 	// send
