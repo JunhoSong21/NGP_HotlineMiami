@@ -53,9 +53,9 @@ void ShutdownNetwork()
 DWORD WINAPI Client_Network_Thread(LPVOID param)
 {
     NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
-    HWND        hWnd    = p->hWnd;
-    Bullet*     bullet  = p->bullet;
-    Player**    players = p->players;
+    HWND        hWnd = p->hWnd;
+    Bullet* bullet = p->bullet;
+    Player** players = p->players;
 
     LoginProcess(g_ClientSock);
 
@@ -69,13 +69,13 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
 
         Player* myPlayer = players[idx];
 
-       /* if (myPlayer) {
-            if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
-            {
-                g_NetworkRunning = false;
-                break;
-            }
-        }*/
+        /* if (myPlayer) {
+             if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
+             {
+                 g_NetworkRunning = false;
+                 break;
+             }
+         }*/
         SendProcess(g_ClientSock, hWnd, *myPlayer);
 
         RecvProcess(g_ClientSock, players, bullet);
@@ -122,7 +122,7 @@ int SendProcess(SOCKET sock, HWND hWnd, const Player& player)
 {
     // 총알 요청이 있으면 총알부터
     if (g_BulletReq.requested) {
-        
+
     }
     // 수류탄 요청이 있으면 수류탄부터
     else if (g_GrenadeReq.requested) {
@@ -196,7 +196,7 @@ int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 
     PacketHeader header{};
     header.packetType = PN::CS_GRENADE_THROW;
-    header.packetSize =  sizeof(pkt);
+    header.packetSize = sizeof(pkt);
 
     // 헤더 전송
     int sent = send(
@@ -223,24 +223,20 @@ int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
     return static_cast<int>(sizeof(header) + sizeof(pkt));
 }
 
-
 // Recv 구조
 void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
-
 {
     PacketHeader header{};
     int retValue = recv(sock, (char*)&header, sizeof(header), MSG_WAITALL);
     if (retValue <= 0)
-        return -1;
-
-    int bodySize = static_cast<int>(header.packetSize);
+        return;
 
     switch (header.packetType) {
     case PN::SC_PLAYER_MOVE: {
         SC_PLAYER_MOVE playerMovePacket{};
         retValue = recv(sock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
         if (retValue <= 0)
-            return -1;
+            return;
 
         Recv_PlayerMove(players, playerMovePacket);
         break;
@@ -254,59 +250,18 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
         Recv_BulletData(bullet, bulletStatePacket);
         break;
     }
-    case PN::SC_BULLET_STATE:
-    {
-        // 크기 먼저 체크
-        if (bodySize != sizeof(SC_BULLET_STATE))
-        {
-            // 크기 안 맞으면 bodySize만큼 읽어서 버리기
-            char dummy[256];
-            int remain = bodySize;
-            while (remain > 0)
-            {
-                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-                int r = recv(sock, dummy, chunk, 0);
-                if (r <= 0) return -1;
-                remain -= r;
-            }
-            return 0;
-        }
-
-        SC_BULLET_STATE pkt{};
-        retValue = recv(sock, reinterpret_cast<char*>(&pkt),
-            sizeof(pkt), MSG_WAITALL);
-        if (retValue <= 0)
-            return -1;
-
-        if (bullet)
-        {
-            bullet->SetVisible(pkt.isActive != 0);
-            bullet->SetPosition(pkt.posX, pkt.posY); 
-            
-            float dx = cosf(pkt.dirAngle);
-            float dy = sinf(pkt.dirAngle);
-
-            bullet->SetDirection(dx, dy);
-        }
-        break;
-    }
-    case PN::SC_LOGIN_SUCCESS:
-    {
-        char dummy[256];
-        int remain = bodySize;
-        while (remain > 0)
-        {
-            int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-            int r = recv(sock, dummy, chunk, MSG_WAITALL);
-            if (r <= 0) return -1;
-            remain -= r;
-        }
-        break;
-    }
-
-
     default:
     {
+        //// 아직 처리 안 하는 패킷은 bodySize만큼 읽어서 버리기
+        //char dummy[256];
+        //int remain = bodySize;
+        //while (remain > 0)
+        //{
+        //    int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
+        //    int r = recv(sock, dummy, chunk, 0);
+        //    if (r <= 0) return;
+        //    remain -= r;
+        //}
         break;
     }
     }
@@ -314,41 +269,9 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
 
 void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket)
 {
-	// 윈속 초기화
-    WSADATA wsa;
-    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-        return false;
-	// 소켓 생성
-    g_ClientSock = socket(AF_INET, SOCK_STREAM, 0);
-    if (g_ClientSock == INVALID_SOCKET)
-        return false;
-	// connect
-    sockaddr_in server{};
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    inet_pton(AF_INET, serverIp, &server.sin_addr);
-
-    if (connect(g_ClientSock, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
-        return false;
-
-    g_LoginReq.requested = true;
-    strncpy_s(g_LoginReq.ip, serverIp, sizeof(g_LoginReq.ip) - 1);
-
-    g_NetworkRunning = true;
-    return true;
-}
-
-// 네트워크 종료
-void ShutdownNetwork()
-{
-    g_NetworkRunning = false;
-
-    if (g_ClientSock != INVALID_SOCKET)
-
     int idx = static_cast<int>(playerMovePacket.targetNum);
     g_MyPlayerIndex = idx;
     if (idx >= 0 && idx < 3 && players[idx])
-
     {
         players[idx]->SetPosition(
             playerMovePacket.posX,
@@ -356,47 +279,6 @@ void ShutdownNetwork()
             playerMovePacket.angle
         );
     }
-}
-
-DWORD WINAPI Client_Network_Thread(LPVOID param)
-{
-    NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
-    HWND    hWnd = p->hWnd;
-	Bullet* bullet = p->bullet;
-    Player** players = p->players;
-
-    while (g_NetworkRunning)
-    {
-        // 매 프레임마다 최신 내 인덱스 가져오기
-        int idx = g_MyPlayerIndex;
-
-        // 아직 서버가 내 인덱스를 안 알려줬으면 일단 0번으로 가정해서 테스트 가능
-        if (idx < 0 || idx >= 3)
-            idx = 0;
-
-        Player* myPlayer = players[idx];
-
-        if (myPlayer)
-        {
-            if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
-            {
-                g_NetworkRunning = false;
-                break;
-            }
-        }
-        
-        // RecvProcess();
-        if (RecvProcess(g_ClientSock, players, bullet) == -1)
-        {
-            g_NetworkRunning = false;
-            break;
-        }
-
-        Sleep(16);
-    }
-
-    delete p; // 동적 할당했던 param delete
-    return 0;
 }
 
 int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket)
