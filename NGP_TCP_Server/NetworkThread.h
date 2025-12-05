@@ -1,6 +1,7 @@
 #pragma once
 #include <thread>
 #include <memory>
+#include <chrono>
 
 #include "Common.h"
 #include "Packet.h"

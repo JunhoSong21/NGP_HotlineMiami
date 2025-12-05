@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	netParam->hWnd = hWnd;
 	netParam->bullet = gameLoop->GetBullet();
 	netParam->players = gameLoop->GetPlayers();
-
+	
 	HANDLE hNetThread = CreateThread(
 		nullptr,
 		0,
@@ -147,10 +147,6 @@ INT_PTR CALLBACK IdDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 				MessageBoxW(hDlg, L"ID를 입력하세요.", L"알림", MB_OK);
 				return TRUE;
 			}
-
-			// Send_Input에서 로그인 패킷을 보내도록 플래그 설정
-			g_LoginReq.requested = true;
-			strncpy_s(g_LoginReq.ip, buf, sizeof(g_LoginReq.ip) - 1);
 
 			EndDialog(hDlg, IDOK);
 			return TRUE;

@@ -108,41 +108,43 @@ void NetworkThread::ThreadFunc()
 
 		// send큐에 데이터가 있다면 전송
 		int eventNum;
-		if (sendQueue.try_dequeue(eventNum)) {
-			PacketHeader sendPacketHeader{};
-			sendPacketHeader.packetType = eventNum;
+		while (sendQueue.try_dequeue(eventNum) == false) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 
-			switch (sendPacketHeader.packetType) {
-			case PN::SC_PLAYER_MOVE: {
-				sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_PLAYER_MOVE() Error\n");
-				else
-					SendPlayerMove();
-				break;
-			}
-			case PN::SC_BULLET_STATE: {
-				sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_BULLET_STATE() Error\n");
-				else
-					SendBulletState();
-				break;
-			}
-			case PN::SC_GRENADE_STATE: {
-				sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
-				retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
-				if (retValue == SOCKET_ERROR)
-					printf("send() SC_GRENADE_STATE() Error\n");
-				else
-					SendGrenadeState();
-				break;
-			}
-			default:
-				break;
-			}
+		PacketHeader sendPacketHeader{};
+		sendPacketHeader.packetType = eventNum;
+
+		switch (sendPacketHeader.packetType) {
+		case PN::SC_PLAYER_MOVE: {
+			sendPacketHeader.packetSize = sizeof(SC_PLAYER_MOVE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_PLAYER_MOVE() Error\n");
+			else
+				SendPlayerMove();
+			break;
+		}
+		case PN::SC_BULLET_STATE: {
+			sendPacketHeader.packetSize = sizeof(SC_BULLET_STATE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_BULLET_STATE() Error\n");
+			else
+				SendBulletState();
+			break;
+		}
+		case PN::SC_GRENADE_STATE: {
+			sendPacketHeader.packetSize = sizeof(SC_GRENADE_STATE);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_GRENADE_STATE() Error\n");
+			else
+				SendGrenadeState();
+			break;
+		}
+		default:
+			break;
 		}
 	}
 }
