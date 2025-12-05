@@ -4,7 +4,7 @@
 #pragma pack(push, 1)
 struct PacketHeader {
 	int		packetType;
-	size_t	packetSize;
+	size_t 	packetSize;
 };
 
 // Server > Client

@@ -18,7 +18,7 @@ static int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 
     PacketHeader header{};
     header.packetType = PN::CS_GRENADE_THROW;
-    header.packetSize = sizeof(pkt);
+    header.packetSize =  sizeof(pkt);
 
     // 헤더 전송
     int sent = send(
@@ -57,7 +57,7 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 
         PacketHeader lheader{};
         lheader.packetType = PN::CS_LOGIN_PACKET;
-        lheader.packetSize = sizeof(PacketHeader) + sizeof(lpkt);
+        lheader.packetSize =  sizeof(lpkt);
 
         send(sock, (char*)&lheader, sizeof(lheader), 0);
         send(sock, (char*)&lpkt, sizeof(lpkt), 0);
@@ -68,7 +68,6 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     // CS_KEY_INPUT
     CS_KEY_INPUT pkt{};
     pkt.flags = 0;
-
 
     // 키보드 상태
     if (GetAsyncKeyState('W') & 0x8000) pkt.flags |= KEY_MOVE_W;
@@ -92,7 +91,7 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     // 패킷헤더 채우기
     PacketHeader header{};
     header.packetType = PN::CS_KEY_INPUT;
-    header.packetSize = sizeof(PacketHeader) + sizeof(pkt);
+    header.packetSize =  sizeof(pkt);
     
     // 헤더 먼저 보내기
     int sent = send(sock, reinterpret_cast<const char*>(&header),
@@ -109,6 +108,28 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
     if (sent == SOCKET_ERROR)
         return SOCKET_ERROR;
 
+// CS_BULLET_TRIGGER
+    if (g_BulletReq.requested)
+    {
+        float dx = mouse.x - pos.X;
+        float dy = mouse.y - pos.Y;
+        float angle = atan2f(dy, dx);
+
+        CS_BULLET_TRIGGER bpkt{};
+        bpkt.posX = pos.X;
+        bpkt.posY = pos.Y;
+
+        bpkt.dirRadAngle = angle;
+
+        PacketHeader bheader{};
+        bheader.packetType = PN::CS_BULLET_TRIGGER;
+        bheader.packetSize = sizeof(bpkt);
+
+        send(sock, (char*)&bheader, sizeof(bheader), 0);
+        send(sock, (char*)&bpkt, sizeof(bpkt), 0);
+
+        g_BulletReq.requested = false;
+    }
 
 
 
@@ -126,38 +147,23 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 
 }
 
-void RecvProcess(SOCKET sock, Player** players)
+int RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
 {
     PacketHeader header{};
-    int retValue = recv(sock, (char*)&header, sizeof(header), 0);
+    int retValue = recv(sock, (char*)&header, sizeof(header), MSG_WAITALL);
     if (retValue <= 0)
-        return;
+        return -1;
 
-    if (header.packetSize < sizeof(PacketHeader))
-        return;
-    int bodySize = static_cast<int>(header.packetSize - sizeof(PacketHeader));
+    int bodySize = static_cast<int>(header.packetSize);
 
     switch (header.packetType) {
     case PN::SC_PLAYER_MOVE: {
-        if (bodySize != sizeof(SC_PLAYER_MOVE))
-        {
-            // 크기 안 맞으면 bodySize만큼 읽어서 버리기
-            char dummy[256];
-            int remain = bodySize;
-            while (remain > 0)
-            {
-                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-                int r = recv(sock, dummy, chunk, 0);
-                if (r <= 0) return;
-                remain -= r;
-            }
-            return;
-        }
+
 
         SC_PLAYER_MOVE playerMovePacket{};
         retValue = recv(sock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
         if (retValue <= 0)
-            return;
+            return -1;
 
         int idx = static_cast<int>(playerMovePacket.targetNum);
         g_MyPlayerIndex = idx;
@@ -172,6 +178,57 @@ void RecvProcess(SOCKET sock, Player** players)
 
         break;
     }
+    case PN::SC_BULLET_STATE:
+    {
+        // 크기 먼저 체크
+        if (bodySize != sizeof(SC_BULLET_STATE))
+        {
+            // 크기 안 맞으면 bodySize만큼 읽어서 버리기
+            char dummy[256];
+            int remain = bodySize;
+            while (remain > 0)
+            {
+                int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
+                int r = recv(sock, dummy, chunk, 0);
+                if (r <= 0) return -1;
+                remain -= r;
+            }
+            return 0;
+        }
+
+        SC_BULLET_STATE pkt{};
+        retValue = recv(sock, reinterpret_cast<char*>(&pkt),
+            sizeof(pkt), MSG_WAITALL);
+        if (retValue <= 0)
+            return -1;
+
+        if (bullet)
+        {
+            bullet->SetVisible(pkt.isActive != 0);
+            bullet->SetPosition(pkt.posX, pkt.posY); 
+            
+            float dx = cosf(pkt.dirAngle);
+            float dy = sinf(pkt.dirAngle);
+
+            bullet->SetDirection(dx, dy);
+        }
+        break;
+    }
+    case PN::SC_LOGIN_SUCCESS:
+    {
+        char dummy[256];
+        int remain = bodySize;
+        while (remain > 0)
+        {
+            int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
+            int r = recv(sock, dummy, chunk, MSG_WAITALL);
+            if (r <= 0) return -1;
+            remain -= r;
+        }
+        break;
+    }
+
+
     default:
     {
         // 아직 처리 안 하는 패킷은 bodySize만큼 읽어서 버리기
@@ -181,7 +238,7 @@ void RecvProcess(SOCKET sock, Player** players)
         {
             int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
             int r = recv(sock, dummy, chunk, 0);
-            if (r <= 0) return;
+            if (r <= 0) return -1;
             remain -= r;
         }
         break;
@@ -210,6 +267,9 @@ bool InitNetwork(const char* serverIp, unsigned short port)
 
     if (connect(g_ClientSock, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
         return false;
+
+    g_LoginReq.requested = true;
+    strncpy_s(g_LoginReq.ip, serverIp, sizeof(g_LoginReq.ip) - 1);
 
     g_NetworkRunning = true;
     return true;
@@ -256,14 +316,12 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
         }
         
         // RecvProcess();
-        if (RecvProcess(g_ClientSock, bullet) == -1)
+        if (RecvProcess(g_ClientSock, players, bullet) == -1)
         {
             g_NetworkRunning = false;
             break;
         }
 
-
-        RecvProcess(g_ClientSock, players);
         Sleep(16);
     }
 
@@ -271,46 +329,4 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
     return 0;
 }
 
-// Recv 관련 함수 구현
-int Recv_BulletData(SOCKET sock, Bullet* bullet)
-{
-    if (!bullet)
-        return 0;
-
-    SC_BULLET_STATE pkt{};
-    int ret = recv(sock, reinterpret_cast<char*>(&pkt),
-        sizeof(pkt), MSG_WAITALL);
-    if (ret <= 0)
-    {
-        return -1;
-    }
-
-    bullet->SetVisible(pkt.isActive != 0);
-    bullet->SetPosition(pkt.posX, pkt.posY);
-    bullet->SetDirection(pkt.dirX, pkt.dirY);
-
-    return ret;
-}
-
-int RecvProcess(SOCKET sock, Bullet* bullet)
-{
-    // 공통 헤더 먼저 받기
-    PacketHeader header{};
-    int ret = recv(sock, reinterpret_cast<char*>(&header),
-        sizeof(header), MSG_WAITALL);
-    if (ret <= 0)
-    {
-        return -1;  // 소켓 종료/에러
-    }
-
-    // 2) 패킷 종류에 따라 분기
-    switch (header.packetType)
-    {
-    case PN::SC_BULLET_STATE:
-        return Recv_BulletData(sock, bullet);
-
-    default:
-        return 0;
-    }
-}
 

@@ -3,8 +3,8 @@
 
 #pragma pack(push, 1)
 struct PacketHeader {
-	int		packetType;
-	size_t	packetSize;
+	int32_t		packetType;
+	uint16_t 	packetSize;
 };
 
 // Server > Client
@@ -22,8 +22,7 @@ struct SC_BULLET_STATE {
 	bool	isActive;
 	float	posX;
 	float	posY;
-	float	dirX;
-	float	dirY;
+	float	dirAngle;
 };
 
 struct SC_GRENADE_STATE {
@@ -38,6 +37,7 @@ struct SC_GRENADE_STATE {
 
 struct SC_LOGIN_SUCCESS {
 	bool	isSuccess;
+	int		targetNum;
 };
 
 struct SC_GAME_END {
@@ -56,13 +56,15 @@ struct CS_ROOM_PACKET {
 
 struct CS_KEY_INPUT {
 	uint16_t flags;
-	float posX;
-	float posY;
-	float mouseX;
-	float mouseY;
+	float	posX;
+	float	posY;
+	float	mouseX;
+	float	mouseY;
 };
 
 struct CS_BULLET_TRIGGER {
+	float	posX;
+	float	posY;
 	float	dirRadAngle;
 };
 
