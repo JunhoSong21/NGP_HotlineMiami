@@ -21,7 +21,7 @@ extern GrenadeRequest g_GrenadeReq;
 struct BulletTriggerRequest
 {
     bool requested;
-    float dirRadAngle;   
+    float dirRadAngle;
 };
 
 extern BulletTriggerRequest g_BulletReq;
@@ -31,7 +31,7 @@ struct NetworkThreadParam
 {
     HWND    hWnd;
     Bullet* bullet;
-    Player**    players;
+    Player** players;
 };
 
 // 초기화 / 종료
