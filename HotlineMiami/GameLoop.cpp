@@ -215,11 +215,6 @@ void GameLoop::Render()
 		camera->SetViewSize(static_cast<float>(width), static_cast<float>(height));
 	}
 
-	Gdiplus::Bitmap* backBufferBitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
-	if (!backBufferBitmap || backBufferBitmap->GetLastStatus() != Gdiplus::Ok) {
-		DEBUG_MSG(L"[BackBufferBitmap Error] : 백버퍼 Bitmap 생성 실패");
-	}
-
 	{
 		Gdiplus::Graphics g(backBufferBitmap);
 		g.Clear(Gdiplus::Color(0, 0, 0, 0));
@@ -237,7 +232,6 @@ void GameLoop::Render()
 			screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 			screen.DrawImage(backBufferBitmap, 0, 0, width, height);
 
-			delete backBufferBitmap;
 			ReleaseDC(hWnd, hDC);
 			return;   
 		}
@@ -317,9 +311,6 @@ void GameLoop::Render()
 	Gdiplus::Graphics screen(hDC);
 	screen.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	screen.DrawImage(backBufferBitmap, 0, 0, width, height);
-
-	if (backBufferBitmap)
-		delete backBufferBitmap;
 
 	ReleaseDC(hWnd, hDC);
 }
