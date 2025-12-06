@@ -121,6 +121,10 @@ int SendProcess(SOCKET sock, HWND hWnd, const Player& player)
 {
     // 총알 요청이 있으면 총알부터
     if (g_BulletReq.requested) {
+        if (Send_BulletTrigger(sock, g_BulletReq.dirRadAngle) == SOCKET_ERROR) {
+            return SOCKET_ERROR;
+		}
+		g_BulletReq.requested = false;
 
     }
     // 수류탄 요청이 있으면 수류탄부터
@@ -222,6 +226,36 @@ int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
     return static_cast<int>(sizeof(header) + sizeof(pkt));
 }
 
+int Send_BulletTrigger(SOCKET sock, float dirRadAngle)
+{
+    CS_BULLET_TRIGGER pkt{};
+    pkt.dirRadAngle = dirRadAngle;
+    PacketHeader header{};
+    header.packetType = PN::CS_BULLET_TRIGGER;
+    header.packetSize = sizeof(pkt);
+    // 헤더 전송
+    int sent = send(
+        sock,
+        reinterpret_cast<const char*>(&header),
+        static_cast<int>(sizeof(header)),
+        0
+    );
+    if (sent == SOCKET_ERROR) {
+        return SOCKET_ERROR;
+    }
+    // 본문 전송
+    sent = send(
+        sock,
+        reinterpret_cast<const char*>(&pkt),
+        static_cast<int>(sizeof(pkt)),
+        0
+    );
+    if (sent == SOCKET_ERROR) {
+        return SOCKET_ERROR;
+    }
+    return static_cast<int>(sizeof(header) + sizeof(pkt));
+}
+
 // Recv 구조
 void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
 {
@@ -240,7 +274,7 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
         Recv_PlayerMove(players, playerMovePacket);
         break;
     }
-    case PN::SC_GRENADE_STATE: {
+    case PN::SC_BULLET_STATE: {
         SC_BULLET_STATE bulletStatePacket{};
         retValue = recv(sock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), MSG_WAITALL);
         if (retValue == SOCKET_ERROR)
@@ -286,7 +320,7 @@ int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket)
 
     bullet->SetVisible(bulletStatePacket.isActive != 0);
     bullet->SetPosition(bulletStatePacket.posX, bulletStatePacket.posY);
-    bullet->SetDirection(bulletStatePacket.dirX, bulletStatePacket.dirY);
+    bullet->SetDirection(bulletStatePacket.dirAngle);
 
     return true;
 }

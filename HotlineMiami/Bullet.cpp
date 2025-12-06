@@ -94,3 +94,17 @@ float Bullet::CalculateDirectionAngle() const
     float radianAngle = atan2f(dirY, dirX);
     return radianAngle;
 }
+
+void Bullet::SetPosition(float nx, float ny)
+{ 
+    x = nx; 
+    y = ny;
+}
+
+void Bullet::SetDirection(float angleDeg)
+{ 
+    const float rad = angleDeg * PI / 180.0f;
+
+    dirX = cosf(rad);
+    dirY = sinf(rad);
+}

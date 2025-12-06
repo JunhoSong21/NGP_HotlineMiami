@@ -46,6 +46,7 @@ void LoginProcess(SOCKET sock);
 int SendProcess(SOCKET sock, HWND hWnd, const Player& player);
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
 int Send_GrenadeThrow(SOCKET sock, float dirRadAngle);
+int Send_BulletTrigger(SOCKET sock, float dirRadAngle);
 
 void RecvProcess(SOCKET sock, Player** players, Bullet* bullet);
 void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket);
