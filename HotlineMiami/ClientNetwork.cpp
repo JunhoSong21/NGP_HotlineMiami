@@ -78,7 +78,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
         
         RecvProcess(g_ClientSock, players, bullet);
 
-        Sleep(32); // 디버그를 위한 초당 30번 전송
+        Sleep(16); // 디버그를 위한 초당 30번 전송
     }
 
     delete p; // 동적 할당했던 param delete
