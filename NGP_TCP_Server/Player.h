@@ -1,6 +1,8 @@
 #pragma once
 #include <atomic>
 
+#include "Packet.h"
+
 class Player {
 public:
 	int playerId;
@@ -10,8 +12,8 @@ private:
 
 	bool isAlive;
 
-	float posX;
-	float posY;
+	std::atomic<float> posX;
+	std::atomic<float> posY;
 	float angle;
 
 public:
@@ -20,7 +22,10 @@ public:
 	void CollisionBullet();
 	void CollisionGrenade();
 
-	void SetPos(float x, float y);
+	void CalcPosbyFlag(uint16_t flag, float x, float y);
+
+	void SetPosX(float x);
+	void SetPosY(float y);
 	void SetAngle(float x);
 
 	float GetPosX() const;

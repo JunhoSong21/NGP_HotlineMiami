@@ -242,8 +242,8 @@ void Player::InputProcessing(float deltaTime)
 	if (GetAsyncKeyState('A') & 0x8000) vectorX -= 1.0f;
 	if (GetAsyncKeyState('D') & 0x8000) vectorX += 1.0f;
 
-	playerPos.X += vectorX * deltaTime * playerSpeed;
-	playerPos.Y += vectorY * deltaTime * playerSpeed;
+	//playerPos.X += vectorX * deltaTime * playerSpeed;
+	//playerPos.Y += vectorY * deltaTime * playerSpeed;
 
 	std::wstring newState;
 	if (vectorX == 0.0f && vectorY == 0.0f) {

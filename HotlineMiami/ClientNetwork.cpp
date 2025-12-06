@@ -69,18 +69,17 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
 
         Player* myPlayer = players[idx];
 
-        /* if (myPlayer) {
-             if (Send_Input(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR)
-             {
-                 g_NetworkRunning = false;
-                 break;
-             }
-         }*/
-        SendProcess(g_ClientSock, hWnd, *myPlayer);
 
+        if (myPlayer) {
+            if (SendProcess(g_ClientSock, hWnd, *myPlayer) == SOCKET_ERROR) {
+                g_NetworkRunning = false;
+                break;
+            }
+        }
+        
         RecvProcess(g_ClientSock, players, bullet);
 
-        Sleep(32); // 디버그를 위한 초당 30번 전송
+        Sleep(16); // 디버그를 위한 초당 30번 전송
     }
 
     delete p; // 동적 할당했던 param delete
@@ -250,8 +249,7 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
         Recv_BulletData(bullet, bulletStatePacket);
         break;
     }
-    default:
-    {
+    default: {
         //// 아직 처리 안 하는 패킷은 bodySize만큼 읽어서 버리기
         //char dummy[256];
         //int remain = bodySize;
