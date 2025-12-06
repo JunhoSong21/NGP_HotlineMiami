@@ -26,13 +26,15 @@ struct GameEvent {
 };
 
 struct PlayerMove : GameEvent {
-	float destX, destY, angleX, angleY;
+	uint16_t flag;
+	float posX, posY, mouseX, mouseY;
 
-	PlayerMove(int threadId, float x, float y, float aX, float aY) :
-		destX(x), destY(y), angleX(aX), angleY(aY)
+	PlayerMove(int threadId, uint16_t keyFlag, float x, float y, float mX, float mY) :
+		posX(x), posY(y), mouseX(mX), mouseY(mY)
 	{
 		type = GameEvent::Type::PLAYER_MOVE;
 		networkThreadId = threadId;
+		flag = keyFlag;
 	}
 };
 

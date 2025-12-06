@@ -35,10 +35,33 @@ void Player::CollisionGrenade()
 	}
 }
 
-void Player::SetPos(float x, float y)
+void Player::CalcPosbyFlag(uint16_t flag, float x, float y)
 {
-	posX = x;
-	posY = y;
+	if ((flag & (KEY_MOVE_A | KEY_MOVE_D)) == (KEY_MOVE_A | KEY_MOVE_D)); // A, D
+	else if ((flag & KEY_MOVE_A) == KEY_MOVE_A) { // A 단독
+		SetPosX(x -= 0.1f);
+	}
+	else if ((flag & KEY_MOVE_D) == KEY_MOVE_D) { // D 단독
+		SetPosX(x += 0.1f);
+	}
+
+	if ((flag & (KEY_MOVE_W | KEY_MOVE_S)) == (KEY_MOVE_W | KEY_MOVE_S)); // W, S
+	else if ((flag & KEY_MOVE_W) == KEY_MOVE_W) { // W 단독
+		SetPosY(y -= 0.1f);
+	}
+	else if ((flag & KEY_MOVE_S) == KEY_MOVE_S) { // S 단독
+		SetPosX(y += 0.1f);
+	}
+}
+
+void Player::SetPosX(float x)
+{
+	posX.store(x);
+}
+
+void Player::SetPosY(float y)
+{
+	posY.store(y);
 }
 
 void Player::SetAngle(float x)
