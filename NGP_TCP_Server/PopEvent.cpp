@@ -107,8 +107,8 @@ void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 
 	auto newGrenade = make_unique<Grenade>(
 		event->networkThreadId,
-		rootPlayer->GetPosX(),
-		rootPlayer->GetPosY()
+		event->posX,
+		event->posY
 	);
 
 	DataManager::GetInstance().AddGrenade(std::move(newGrenade));
@@ -120,7 +120,12 @@ void PopEvent::HandleGrenadeExplosionEvent(unique_ptr<GrenadeExplosion> event)
 {
 	lock_guard<mutex> lock(grenadeExplosionMutex);
 
+	// 수류탄을 폭발 상태로 전환 후 이벤트 브로드캐스트
+	auto grenade = DataManager::GetInstance().GetGrenade(event->networkThreadId);
+	grenade->ChangeStateToExplode();
+
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
+	
 }
 
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)

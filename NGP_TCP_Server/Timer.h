@@ -6,6 +6,7 @@
 
 #include "GameEvent.h"
 #include "EventQueue.h"
+#include "DataManager.h"
 
 class Timer {
 private:

@@ -175,7 +175,7 @@ void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 	printf("Greanade Throw Packet recv\n");
 #endif
 	unique_ptr<GameEvent> grenadeThrowEvent = make_unique<GrenadeThrow>(
-	threadId, packet.dirRadAngle);
+	threadId, packet.posX, packet.posY, packet.dirRadAngle);
 	EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
 }
 

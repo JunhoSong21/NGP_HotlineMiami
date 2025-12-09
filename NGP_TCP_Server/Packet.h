@@ -69,6 +69,8 @@ struct CS_BULLET_TRIGGER {
 };
 
 struct CS_GRENADE_THROW {
+	float	posX;
+	float	posY;
 	float	dirRadAngle;
 };
 #pragma pack(pop)

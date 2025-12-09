@@ -39,4 +39,8 @@ public:
 	Player* GetPlayer(int id);
 	Bullet* GetBullet(int id);
 	Grenade* GetGrenade(int id);
+
+	void CollisionCheck();
+	bool PlayerToBulletCollision();
+	bool PlayerToGrenadeCollision();
 };

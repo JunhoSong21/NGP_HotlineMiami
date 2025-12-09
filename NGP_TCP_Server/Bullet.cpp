@@ -1,5 +1,7 @@
 #include "Bullet.h"
 
+constexpr float moveDistance = 1.0f;
+
 Bullet::Bullet(int id, float x, float y, float angle) :
 	posX(x), posY(y), dirAngle(angle)
 {
@@ -7,10 +9,23 @@ Bullet::Bullet(int id, float x, float y, float angle) :
 	isActive = true;
 }
 
+bool Bullet::IsActive() const
+{
+	return isActive;
+}
+
 void Bullet::Collision()
 {
 	if (isActive)
 		isActive = false;
+}
+
+void Bullet::CalcPosbyAngle()
+{
+	float newPosX, newPosY;
+
+	newPosX = posX + moveDistance * std::cos(dirAngle);
+	newPosY = posY + moveDistance * std::sin(dirAngle);
 }
 
 void Bullet::SetPos(float x, float y)
