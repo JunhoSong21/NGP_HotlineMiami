@@ -216,19 +216,20 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.hp			= sendPlayer->GetHp();
-			playerMovePacket.isAlive	= sendPlayer->GetIsAlive();
-			playerMovePacket.posX		= sendPlayer->GetPosX();
-			playerMovePacket.posY		= sendPlayer->GetPosY();
-			playerMovePacket.angle		= sendPlayer->GetAngle();
+			playerMovePacket.hp = sendPlayer->GetHp();
+			playerMovePacket.isAlive = sendPlayer->GetIsAlive();
+			playerMovePacket.posX = sendPlayer->GetPosX();
+			playerMovePacket.posY = sendPlayer->GetPosY();
+			playerMovePacket.angle = sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
 				printf("playerMovePacket Send() Error\n");
-			else
+			else {
 #ifdef _DEBUG
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
 #endif
+			}
 		}
 	}
 }
