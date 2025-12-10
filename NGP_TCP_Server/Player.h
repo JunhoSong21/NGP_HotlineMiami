@@ -1,6 +1,6 @@
 #pragma once
 #include <atomic>
-
+#include <cmath>
 #include "Packet.h"
 
 class Player {

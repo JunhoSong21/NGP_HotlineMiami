@@ -25,7 +25,7 @@ void Timer::TimerLoop()
 	timePoint = system_clock::now();
 
 	// Player Pos Update
-	if (milliseconds(20) < duration_cast<milliseconds>(timePoint - moveEventPoint)) {
+	if (milliseconds(16) < duration_cast<milliseconds>(timePoint - moveEventPoint)) {
 		lock_guard<mutex> lock(timerMutex);
 		moveEventPoint = system_clock::now();
 

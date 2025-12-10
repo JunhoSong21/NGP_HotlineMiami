@@ -59,9 +59,15 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player && (player->GetHp() > 0.0f)) {
-		player->CalcPosbyFlag(event->flag, event->posX, event->posY);
+
+		// 서버 자기 좌표를 기준으로 이동 계산
+		float x = player->GetPosX();
+		float y = player->GetPosY();
+
+		player->CalcPosbyFlag(event->flag, x, y);
+		// 회전 계산도 서버 좌표 기준으로
 		player->SetAngle(
-			atan2f(event->mouseY - event->posY, event->mouseX - event->posX));  // radian
+			CalculateAtan2Float(event->mouseX, event->mouseY, x, y));
 	}
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
@@ -133,5 +139,5 @@ void PopEvent::HandleGrenadeExplosionEvent(unique_ptr<GrenadeExplosion> event)
 
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)
 {
-	return atan2f(y2 - y1, x2 - x1) * 180.f / PI;
+	return atan2f(y2 - y1, x2 - x1);
 }

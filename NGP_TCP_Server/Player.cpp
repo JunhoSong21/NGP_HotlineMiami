@@ -37,21 +37,31 @@ void Player::CollisionGrenade()
 
 void Player::CalcPosbyFlag(uint16_t flag, float x, float y)
 {
-	if ((flag & (KEY_MOVE_A | KEY_MOVE_D)) == (KEY_MOVE_A | KEY_MOVE_D)); // A, D
-	else if ((flag & KEY_MOVE_A) == KEY_MOVE_A) { // A 단독
-		SetPosX(x -= 3.0f);
-	}
-	else if ((flag & KEY_MOVE_D) == KEY_MOVE_D) { // D 단독
-		SetPosX(x += 3.0f);
+	float dx = 0.0f;
+	float dy = 0.0f;
+	const float speed = 4.0f;
+
+	if ((flag & KEY_MOVE_A) == KEY_MOVE_A) dx -= 1.0f;
+	if ((flag & KEY_MOVE_D) == KEY_MOVE_D) dx += 1.0f;
+	if ((flag & KEY_MOVE_W) == KEY_MOVE_W) dy -= 1.0f;
+	if ((flag & KEY_MOVE_S) == KEY_MOVE_S) dy += 1.0f;
+
+	if (dx == 0.0f && dy == 0.0f) {
+		SetPosX(x);
+		SetPosY(y);
+		return;
 	}
 
-	if ((flag & (KEY_MOVE_W | KEY_MOVE_S)) == (KEY_MOVE_W | KEY_MOVE_S)); // W, S
-	else if ((flag & KEY_MOVE_W) == KEY_MOVE_W) { // W 단독
-		SetPosY(y -= 3.0f);
-	}
-	else if ((flag & KEY_MOVE_S) == KEY_MOVE_S) { // S 단독
-		SetPosY(y += 3.0f);
-	}
+	// 정규화
+	float len = std::sqrt(dx * dx + dy * dy);
+	dx /= len;
+	dy /= len;
+
+	x += dx * speed;
+	y += dy * speed;
+
+	SetPosX(x);
+	SetPosY(y);
 }
 
 void Player::SetPosX(float x)
