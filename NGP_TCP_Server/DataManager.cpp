@@ -1,4 +1,5 @@
 #include "DataManager.h"
+#include "GlobalData.h"
 
 using std::unique_ptr;
 using std::lock_guard;
@@ -6,7 +7,6 @@ using std::mutex;
 using std::hypot;
 
 constexpr float PLAYER_HITBOX_DISTANCE = 1.0f;
-constexpr int MAX_CLIENT_NUM = 1;
 
 void DataManager::AddPlayer(unique_ptr<Player> player)
 {

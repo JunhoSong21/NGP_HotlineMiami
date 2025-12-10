@@ -127,6 +127,7 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="EventQueue.cpp" />
+    <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Grenade.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NetworkThread.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="GameEvent.h" />
+    <ClInclude Include="GlobalData.h" />
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="NetworkThread.h" />
     <ClInclude Include="Packet.h" />

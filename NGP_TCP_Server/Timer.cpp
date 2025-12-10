@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include "GlobalData.h"
 
 using std::chrono::system_clock;
 using std::chrono::duration_cast;
@@ -8,8 +9,6 @@ using std::unique_ptr;
 using std::make_unique;
 using std::lock_guard;
 using std::mutex;
-
-constexpr int MAX_CLIENT_NUM = 1;
 
 Timer::Timer()
 {
