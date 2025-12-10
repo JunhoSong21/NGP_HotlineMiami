@@ -84,14 +84,19 @@ Grenade* DataManager::GetGrenade(int id)
 
 void DataManager::CollisionCheck()
 {
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < 1; ++i) {
+		for (int j = 0; j < 1; ++j) {
 			if (i == j)
 				continue;
 
 			Player* player = GetPlayer(i);
 			Bullet* bullet = GetBullet(j);
 			//Grenade* grenade = GetGrenade(j);
+
+			if (!player)
+				continue;
+			if (!bullet)
+				continue;
 
 			if (PlayerToBulletCollision(player, bullet)) {
 				player->CollisionBullet();

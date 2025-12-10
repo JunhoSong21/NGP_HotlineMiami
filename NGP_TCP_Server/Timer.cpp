@@ -23,6 +23,7 @@ Timer::Timer()
 void Timer::TimerLoop()
 {
 	timePoint = system_clock::now();
+
 	// Player Pos Update
 	if (milliseconds(20) < duration_cast<milliseconds>(timePoint - moveEventPoint)) {
 		lock_guard<mutex> lock(timerMutex);
@@ -37,21 +38,21 @@ void Timer::TimerLoop()
 		lock_guard<mutex> lock(timerMutex);
 		bulletEventPoint = system_clock::now();
 
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 1; ++i) {
 			auto bullet = DataManager::GetInstance().GetBullet(i);
-			if (bullet->IsActive()) {
+			if (bullet && bullet->IsActive()) {
 				bullet->CalcPosbyAngle();
 			}
 		}
 
 		unique_ptr<GameEvent> bulletUpdate = make_unique<BulletUpdate>();
-		EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
+		//EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
 	}
 
-	DataManager::GetInstance().CollisionCheck();
+	//DataManager::GetInstance().CollisionCheck();
 
 	// Grenade Time Limit
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 1; ++i) {
 		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
 			lock_guard<mutex> lock(timerMutex);
 			// ÆøÅº ÅÍÁü.
@@ -91,4 +92,14 @@ bool Timer::AddGrenade(int id)
 void Timer::SetBulletArray(int i)
 {
 	isBulletExist[i] = false;
+}
+
+bool Timer::GetBulletArray(int i)
+{
+	return isBulletExist[i];
+}
+
+bool Timer::GetGrenadeArray(int i)
+{
+	return isGrenadeExist[i];
 }

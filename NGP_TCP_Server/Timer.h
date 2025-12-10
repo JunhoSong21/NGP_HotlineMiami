@@ -3,6 +3,7 @@
 #include <memory>
 #include <mutex>
 #include <array>
+#include <algorithm>
 
 #include "GameEvent.h"
 #include "EventQueue.h"
@@ -36,4 +37,7 @@ public:
 	bool AddGrenade(int id);
 
 	void SetBulletArray(int i);
+
+	bool GetBulletArray(int i);
+	bool GetGrenadeArray(int i);
 };

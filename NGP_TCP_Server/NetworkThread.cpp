@@ -230,6 +230,9 @@ void NetworkThread::SendBulletState()
 
 	for (int i = 0; i < 1; ++i) {
 		bulletStatePacket.targerNum = i;
+		if (!Timer::GetInstance().GetBulletArray(i))
+			continue;
+
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
 			bulletStatePacket.isActive = sendBullet->GetIsActive();
@@ -252,8 +255,11 @@ void NetworkThread::SendGrenadeState()
 	int retValue = 0;
 	SC_GRENADE_STATE grenadeStatePacket{};
 	
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 1; ++i) {
 		grenadeStatePacket.targetNum = i;
+		if (!Timer::GetInstance().GetGrenadeArray(i))
+			continue;
+
 		Grenade* sendGrenade = DataManager::GetInstance().GetGrenade(i);
 		if (sendGrenade) {
 			grenadeStatePacket.isActive = sendGrenade->GetIsActive();

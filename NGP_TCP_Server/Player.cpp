@@ -4,7 +4,7 @@ constexpr float Bullet_Damage	= 15.0f;
 constexpr float Grenade_Damage	= 40.0f;
 
 Player::Player(int id) :
-	hp(100),
+	hp(100.0f),
 	isAlive(true),
 	posX(0.0f),
 	posY(0.0f),
