@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
+#include <cmath>
 
 #include "Player.h"
 #include "Bullet.h"
@@ -41,6 +42,6 @@ public:
 	Grenade* GetGrenade(int id);
 
 	void CollisionCheck();
-	bool PlayerToBulletCollision();
-	bool PlayerToGrenadeCollision();
+	bool PlayerToBulletCollision(Player* player, Bullet* bullet);
+	void PlayerToGrenadeCollision();
 };

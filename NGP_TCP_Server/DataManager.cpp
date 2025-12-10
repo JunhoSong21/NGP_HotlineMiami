@@ -3,6 +3,9 @@
 using std::unique_ptr;
 using std::lock_guard;
 using std::mutex;
+using std::hypot;
+
+constexpr float PLAYER_HITBOX_DISTANCE = 1.0f;
 
 void DataManager::AddPlayer(unique_ptr<Player> player)
 {
@@ -81,15 +84,32 @@ Grenade* DataManager::GetGrenade(int id)
 
 void DataManager::CollisionCheck()
 {
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			if (i == j)
+				continue;
 
+			Player* player = GetPlayer(i);
+			Bullet* bullet = GetBullet(j);
+			//Grenade* grenade = GetGrenade(j);
+
+			if (PlayerToBulletCollision(player, bullet)) {
+				player->CollisionBullet();
+				bullet->Collision();
+			}
+			//PlayerToGrenadeCollision();
+		}
+	}
 }
 
-bool DataManager::PlayerToBulletCollision()
+bool DataManager::PlayerToBulletCollision(Player* player, Bullet* bullet)
 {
-	
+	float distance = hypot(player->GetPosX() - bullet->GetPosX(), player->GetPosY() - bullet->GetPosY());
+
+	return PLAYER_HITBOX_DISTANCE > distance;
 }
 
-bool DataManager::PlayerToGrenadeCollision()
+void DataManager::PlayerToGrenadeCollision()
 {
 
 }

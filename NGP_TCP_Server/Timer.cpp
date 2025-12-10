@@ -48,6 +48,8 @@ void Timer::TimerLoop()
 		EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
 	}
 
+	DataManager::GetInstance().CollisionCheck();
+
 	// Grenade Time Limit
 	for (int i = 0; i < 3; ++i) {
 		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
