@@ -398,6 +398,14 @@ void Player::SetPosition(float x, float y, float rad)
 	radianAngle = rad;
 }
 
+void Player::SetStatus(bool isAlive, float lateHp)
+{
+	if (isAlive)
+		hp = lateHp;
+	else if (!isAlive)
+		playerState = PLAYER_DEATH;
+}
+
 Gdiplus::PointF& Player::GetPos()
 {
 	return playerPos;

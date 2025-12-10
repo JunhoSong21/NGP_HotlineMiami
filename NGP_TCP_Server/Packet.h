@@ -11,7 +11,7 @@ struct PacketHeader {
 struct SC_PLAYER_MOVE {
 	short	targetNum;
 
-	int		hp;
+	float	hp;
 	bool	isAlive;
 	float	posX;
 	float	posY;

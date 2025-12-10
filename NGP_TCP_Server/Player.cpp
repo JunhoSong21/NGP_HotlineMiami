@@ -1,7 +1,7 @@
 #include "Player.h"
 
-constexpr int Bullet_Damage		= 15;
-constexpr int Grenade_Damage	= 40;
+constexpr float Bullet_Damage	= 15.0f;
+constexpr float Grenade_Damage	= 40.0f;
 
 Player::Player(int id) :
 	hp(100),
@@ -69,7 +69,7 @@ void Player::SetAngle(float x)
 	angle = x;
 }
 
-int Player::GetHp() const
+float Player::GetHp() const
 {
 	return hp;
 }

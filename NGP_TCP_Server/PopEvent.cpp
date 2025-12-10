@@ -58,7 +58,7 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 	lock_guard<mutex> lock(playerMoveMutex);
 
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
-	if (player) {
+	if (player && (player->GetHp() > 0.0f)) {
 		player->CalcPosbyFlag(event->flag, event->posX, event->posY);
 		player->SetAngle(
 			CalculateAtan2Float(event->mouseX, event->mouseY, event->posX, event->posY));

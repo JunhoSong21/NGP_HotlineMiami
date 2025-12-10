@@ -30,8 +30,8 @@ private:
 	float		vectorY;
 	float		playerSpeed;
 	float		frameTimeAccumulate;
-	float hp;      // 현재 체력 (0.0 ~ 100.0)
-	float maxHp;   // 최대 체력 (기본 100.0)
+	float		hp;      // 현재 체력 (0.0 ~ 100.0)
+	float		maxHp;   // 최대 체력 (기본 100.0)
 	float 		radianAngle;
 	HWND		hWnd;
 	HBITMAP		hBitmap;
@@ -53,6 +53,9 @@ public:
 
 	// 플레이어 포지션 변경 (RecvProcess 에서 사용)
 	void SetPosition(float x, float y, float rad);
+
+	// 플레이어 상태, HP 변경
+	void SetStatus(bool isAlive, float lateHp);
 
 	void LoadPlayerImages(ImageManager& imgManager);
 	int GetDeathMaxFrames() const;   // 스킨별 Death 프레임 개수

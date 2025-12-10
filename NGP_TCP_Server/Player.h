@@ -8,7 +8,7 @@ public:
 	int playerId;
 
 private:
-	std::atomic<int> hp;
+	float hp;
 
 	bool isAlive;
 
@@ -28,7 +28,7 @@ public:
 	void SetPosY(float y);
 	void SetAngle(float x);
 
-	int GetHp() const;
+	float GetHp() const;
 	bool GetIsAlive() const;
 
 	float GetPosX() const;

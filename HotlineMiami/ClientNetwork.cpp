@@ -305,6 +305,11 @@ void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket)
     g_MyPlayerIndex = idx;
     if (idx >= 0 && idx < 3 && players[idx])
     {
+        players[idx]->SetStatus(
+            playerMovePacket.isAlive,
+            playerMovePacket.hp
+        );
+
         players[idx]->SetPosition(
             playerMovePacket.posX,
             playerMovePacket.posY,
