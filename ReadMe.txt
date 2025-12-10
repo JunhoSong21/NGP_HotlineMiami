@@ -1,9 +1,7 @@
-fetch 한 이후 솔루션에서 Debug, Release 한 번씩 실행 후
-폴더 내에 있는 Resource 폴더 복사하여 x64 폴더 내에 exe파일이 있는 곳에 붙여넣기(or 덮어쓰기)
+변수 수정해야 하는 부분
 
-디버그용 함수 DEBUG_MSG를 이용하면 실행시 Visual Studio 출력창에 오류 메시지를 띄울 수 있다.
-if(~~~)
-	DEBUG_MSG(L"~~~가 오류 발생했습니다 %d", value)
-C언어 printf처럼 %d 등의 인수를 이용해 값도 출력 가능하고 없어도 상관없다.
+총알, 수류탄 데미지 수정 - Player.cpp 상단 constexpr
+이벤트당 움직이는 좌표값 - Player.cpp CalcPosbyFlag의 SetPos 내부 값
+캐릭터 히트박스 - DataManager.cpp 상단 constexpr
 
-모르는 점은 물어보면 최대한 빠르게 답변
+접속하는 클라이언트 수 MAX_CLIENT_NUM - Timer.cpp, DataManager.cpp

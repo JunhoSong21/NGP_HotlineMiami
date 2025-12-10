@@ -9,6 +9,8 @@ using std::make_unique;
 using std::lock_guard;
 using std::mutex;
 
+constexpr int MAX_CLIENT_NUM = 1;
+
 Timer::Timer()
 {
 	moveEventPoint = system_clock::now();
@@ -38,7 +40,7 @@ void Timer::TimerLoop()
 		lock_guard<mutex> lock(timerMutex);
 		bulletEventPoint = system_clock::now();
 
-		for (int i = 0; i < 1; ++i) {
+		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 			auto bullet = DataManager::GetInstance().GetBullet(i);
 			if (bullet && bullet->IsActive()) {
 				bullet->CalcPosbyAngle();
@@ -52,7 +54,7 @@ void Timer::TimerLoop()
 	//DataManager::GetInstance().CollisionCheck();
 
 	// Grenade Time Limit
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
 			lock_guard<mutex> lock(timerMutex);
 			// ÆøÅº ÅÍÁü.

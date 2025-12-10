@@ -6,6 +6,7 @@ using std::mutex;
 using std::hypot;
 
 constexpr float PLAYER_HITBOX_DISTANCE = 1.0f;
+constexpr int MAX_CLIENT_NUM = 1;
 
 void DataManager::AddPlayer(unique_ptr<Player> player)
 {
@@ -84,8 +85,8 @@ Grenade* DataManager::GetGrenade(int id)
 
 void DataManager::CollisionCheck()
 {
-	for (int i = 0; i < 1; ++i) {
-		for (int j = 0; j < 1; ++j) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+		for (int j = 0; j < MAX_CLIENT_NUM; ++j) {
 			if (i == j)
 				continue;
 
