@@ -114,6 +114,8 @@ void LoginProcess(SOCKET sock)
     retValue = recv(sock, (char*)&loginSuccess, sizeof(loginSuccess), MSG_WAITALL);
     if (retValue == SOCKET_ERROR || loginSuccess.isSuccess == false)
         printf("로그인 실패\n");
+
+    g_MyPlayerIndex = loginSuccess.targetNum;
 }
 
 // Send 구조
@@ -302,15 +304,19 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
 void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket)
 {
     int idx = static_cast<int>(playerMovePacket.targetNum);
-    g_MyPlayerIndex = idx;
-    if (idx >= 0 && idx < 3 && players[idx])
-    {
-        players[idx]->SetStatus(
-            playerMovePacket.isAlive,
-            playerMovePacket.hp
-        );
 
-        players[idx]->SetPosition(
+    if (idx < 0 || idx >= 3 || players[idx] == nullptr)
+        return;
+
+    // 상태는 공통 업데이트
+    players[idx]->SetStatus(playerMovePacket.isAlive, playerMovePacket.hp);
+
+    // 이동은 구분
+    if (idx == g_MyPlayerIndex) {
+        players[idx]->SetPosition(playerMovePacket.posX, playerMovePacket.posY);
+    }
+    else {
+        players[idx]->SetPositionAndAngle(
             playerMovePacket.posX,
             playerMovePacket.posY,
             playerMovePacket.angle

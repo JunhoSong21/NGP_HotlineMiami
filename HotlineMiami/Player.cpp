@@ -391,11 +391,18 @@ float Player::CalculateAtan2MouseAtPos(HWND hWnd, Camera* camera)
 	return radianAngle;
 }
 
-void Player::SetPosition(float x, float y, float rad)
+void Player::SetPosition(float x, float y)
 {
 	playerPos.X = x;
 	playerPos.Y = y;
-	radianAngle = rad;
+}
+
+// 다른 플레이어의 회전을 받아옴
+void Player::SetPositionAndAngle(float x, float y, float radAngle)
+{
+	playerPos.X = x;
+	playerPos.Y = y;
+	radianAngle = radAngle;
 }
 
 void Player::SetStatus(bool isAlive, float lateHp)
