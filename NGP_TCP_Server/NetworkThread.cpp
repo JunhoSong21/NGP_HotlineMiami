@@ -188,6 +188,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	case GameEvent::Type::BULLET_UPDATE:
 		sendQueue.enqueue(PN::SC_BULLET_STATE);
 		break;
+	case GameEvent::Type::GRENADE_THROW:
+		sendQueue.enqueue(PN::SC_GRENADE_STATE);
+		break;
 	case GameEvent::Type::GRENADE_EXPLOSION:
 		sendQueue.enqueue(PN::SC_GRENADE_STATE);
 		break;
@@ -205,6 +208,8 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
+			playerMovePacket.hp = sendPlayer->GetHp();
+			playerMovePacket.isAlive = sendPlayer->GetIsAlive();
 			playerMovePacket.posX = sendPlayer->GetPosX();
 			playerMovePacket.posY = sendPlayer->GetPosY();
 			playerMovePacket.angle = sendPlayer->GetAngle();
@@ -227,7 +232,7 @@ void NetworkThread::SendBulletState()
 		bulletStatePacket.targerNum = i;
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
-			bulletStatePacket.isActive = true;
+			bulletStatePacket.isActive = sendBullet->GetIsActive();
 			bulletStatePacket.posX = sendBullet->GetPosX();
 			bulletStatePacket.posY = sendBullet->GetPosY();
 			bulletStatePacket.dirAngle = sendBullet->GetAngle();
@@ -246,12 +251,21 @@ void NetworkThread::SendGrenadeState()
 {
 	int retValue = 0;
 	SC_GRENADE_STATE grenadeStatePacket{};
-
-	grenadeStatePacket.isExploded = true;
 	
-	retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
-	if (retValue == SOCKET_ERROR)
-		printf("grenadeStatePacket Send() Error\n");
-	else
-		printf("grenadeStatePacket Send() Complete\n");
+	for (int i = 0; i < 3; ++i) {
+		grenadeStatePacket.targetNum = i;
+		Grenade* sendGrenade = DataManager::GetInstance().GetGrenade(i);
+		if (sendGrenade) {
+			grenadeStatePacket.isActive = sendGrenade->GetIsActive();
+			grenadeStatePacket.isExplode = sendGrenade->GetIsExplode();
+			grenadeStatePacket.posX = sendGrenade->GetPosX();
+			grenadeStatePacket.posY = sendGrenade->GetPosY();
+
+			retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("grenadeStatePacket Send() Error\n");
+			else
+				printf("grenadeStatePacket Send() Complete\n");
+		}
+	}
 }

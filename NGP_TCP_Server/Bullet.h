@@ -26,4 +26,6 @@ public:
 	float GetPosX() const;
 	float GetPosY() const;
 	float GetAngle() const;
+
+	bool GetIsActive() const;
 };

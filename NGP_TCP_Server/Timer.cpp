@@ -60,7 +60,6 @@ void Timer::TimerLoop()
 			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
 		}
 	}
-	
 }
 
 bool Timer::AddBullet(int id)

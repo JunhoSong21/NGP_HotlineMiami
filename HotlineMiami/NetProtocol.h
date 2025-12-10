@@ -11,6 +11,8 @@ struct PacketHeader {
 struct SC_PLAYER_MOVE {
 	short	targetNum;
 
+	int		hp;
+	bool	isAlive;
 	float	posX;
 	float	posY;
 	float	angle;
@@ -28,11 +30,10 @@ struct SC_BULLET_STATE {
 struct SC_GRENADE_STATE {
 	short	targetNum;
 
+	bool	isActive;
 	bool	isExploded;
 	float	posX;
 	float	posY;
-	float	dirX;
-	float	dirY;
 };
 
 struct SC_LOGIN_SUCCESS {

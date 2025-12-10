@@ -17,4 +17,10 @@ public:
 	void ChangeStateToDebris();
 
 	void SetPos(float x, float y);
+
+	float GetPosX() const;
+	float GetPosY() const;
+
+	bool GetIsActive() const;
+	bool GetIsExplode() const;
 };

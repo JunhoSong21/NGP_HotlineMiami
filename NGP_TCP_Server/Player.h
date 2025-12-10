@@ -28,6 +28,9 @@ public:
 	void SetPosY(float y);
 	void SetAngle(float x);
 
+	int GetHp() const;
+	bool GetIsAlive() const;
+
 	float GetPosX() const;
 	float GetPosY() const;
 	float GetAngle() const;

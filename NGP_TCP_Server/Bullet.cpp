@@ -51,3 +51,8 @@ float Bullet::GetAngle() const
 {
 	return dirAngle;
 }
+
+bool Bullet::GetIsActive() const
+{
+	return isActive;
+}

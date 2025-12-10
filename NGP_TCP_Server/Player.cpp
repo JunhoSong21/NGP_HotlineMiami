@@ -69,6 +69,16 @@ void Player::SetAngle(float x)
 	angle = x;
 }
 
+int Player::GetHp() const
+{
+	return hp;
+}
+
+bool Player::GetIsAlive() const
+{
+	return isAlive;
+}
+
 float Player::GetPosX() const
 {
 	return posX;

@@ -24,3 +24,23 @@ void Grenade::SetPos(float x, float y)
 	posX = x;
 	posY = y;
 }
+
+float Grenade::GetPosX() const
+{
+	return posX;
+}
+
+float Grenade::GetPosY() const
+{
+	return posY;
+}
+
+bool Grenade::GetIsActive() const
+{
+	return isActive;
+}
+
+bool Grenade::GetIsExplode() const
+{
+	return isExplode;
+}
