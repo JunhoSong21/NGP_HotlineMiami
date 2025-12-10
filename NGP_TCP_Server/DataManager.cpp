@@ -96,6 +96,7 @@ void DataManager::CollisionCheck()
 			if (PlayerToBulletCollision(player, bullet)) {
 				player->CollisionBullet();
 				bullet->Collision();
+				Timer::GetInstance().SetBulletArray(j);
 			}
 			//PlayerToGrenadeCollision();
 		}

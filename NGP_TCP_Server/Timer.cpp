@@ -88,3 +88,8 @@ bool Timer::AddGrenade(int id)
 		return true;
 	}
 }
+
+void Timer::SetBulletArray(int i)
+{
+	isBulletExist[i] = false;
+}

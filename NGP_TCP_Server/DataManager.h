@@ -4,6 +4,7 @@
 #include <mutex>
 #include <cmath>
 
+#include "Timer.h"
 #include "Player.h"
 #include "Bullet.h"
 #include "Grenade.h"

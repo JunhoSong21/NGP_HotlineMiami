@@ -34,4 +34,6 @@ public:
 
 	bool AddBullet(int id);
 	bool AddGrenade(int id);
+
+	void SetBulletArray(int i);
 };
