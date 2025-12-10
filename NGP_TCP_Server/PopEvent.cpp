@@ -61,7 +61,7 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 	if (player && (player->GetHp() > 0.0f)) {
 		player->CalcPosbyFlag(event->flag, event->posX, event->posY);
 		player->SetAngle(
-			CalculateAtan2Float(event->mouseX, event->mouseY, event->posX, event->posY));
+			atan2f(event->mouseY - event->posY, event->mouseX - event->posX));  // radian
 	}
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
