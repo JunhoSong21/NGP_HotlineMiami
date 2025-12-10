@@ -22,10 +22,8 @@ void Bullet::Collision()
 
 void Bullet::CalcPosbyAngle()
 {
-	float newPosX, newPosY;
-
-	newPosX = posX + moveDistance * std::cos(dirAngle);
-	newPosY = posY + moveDistance * std::sin(dirAngle);
+	posX += moveDistance * std::cos(dirAngle);
+	posY += moveDistance * std::sin(dirAngle);
 }
 
 void Bullet::SetPos(float x, float y)
