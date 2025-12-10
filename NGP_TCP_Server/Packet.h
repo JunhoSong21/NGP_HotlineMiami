@@ -69,6 +69,10 @@ struct CS_BULLET_TRIGGER {
 	float	dirRadAngle;
 };
 
+struct CS_BULLET_DESTROY {
+	bool	isDestroy;
+};
+
 struct CS_GRENADE_THROW {
 	float	posX;
 	float	posY;
@@ -86,7 +90,8 @@ namespace PN { // Packet Name
 	constexpr int CS_ROOM_PACKET	= 1006;
 	constexpr int CS_KEY_INPUT		= 1007;
 	constexpr int CS_BULLET_TRIGGER = 1008;
-	constexpr int CS_GRENADE_THROW	= 1009;
+	constexpr int CS_BULLET_DESTROY = 1009;
+	constexpr int CS_GRENADE_THROW	= 1010;
 }
 
 enum KEY_INPUT_FLAGS : uint16_t		//  키 입력 플래그 정의

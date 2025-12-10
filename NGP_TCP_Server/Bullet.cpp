@@ -22,8 +22,15 @@ void Bullet::Collision()
 
 void Bullet::CalcPosbyAngle()
 {
-	posX += moveDistance * std::cos(dirAngle);
-	posY += moveDistance * std::sin(dirAngle);
+	if (isActive) {
+		posX += moveDistance * std::cos(dirAngle);
+		posY += moveDistance * std::sin(dirAngle);
+	}
+}
+
+void Bullet::SetIsActive(bool is)
+{
+	isActive = is;
 }
 
 void Bullet::SetPos(float x, float y)
@@ -50,9 +57,4 @@ float Bullet::GetPosY() const
 float Bullet::GetAngle() const
 {
 	return dirAngle;
-}
-
-bool Bullet::GetIsActive() const
-{
-	return isActive;
 }

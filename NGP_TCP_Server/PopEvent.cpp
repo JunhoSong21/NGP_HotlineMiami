@@ -63,6 +63,7 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 		player->SetAngle(
 			CalculateAtan2Float(event->mouseX, event->mouseY, event->posX, event->posY));
 	}
+
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
 #endif
@@ -79,16 +80,26 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 {
 	lock_guard<mutex> lock(bulletTriggerMutex);
 
-	Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
+	if (DataManager::GetInstance().GetBullet(event->networkThreadId) != nullptr) {
+		// 이미 해당 클라이언트 번호로 총알이 map에 들어가 있을 경우
+		Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
+		Bullet* bullet = DataManager::GetInstance().GetBullet(event->networkThreadId);
+		bullet->SetIsActive(true);
+		bullet->SetPos(event->posX, event->posY);
+		bullet->SetAngle(event->atan2);
+	}
+	else {
+		Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
+		unique_ptr<Bullet> newBullet = make_unique<Bullet>(
+			event->networkThreadId,
+			rootPlayer->GetPosX(),
+			rootPlayer->GetPosY(),
+			rootPlayer->GetAngle()
+		);
 
-	auto newBullet = make_unique<Bullet>(
-		event->networkThreadId,
-		rootPlayer->GetPosX(),
-		rootPlayer->GetPosY(),
-		rootPlayer->GetAngle()
-	);
-
-	DataManager::GetInstance().AddBullet(std::move(newBullet));
+		DataManager::GetInstance().AddBullet(std::move(newBullet));
+	}
+	
 #ifdef _DEBUG
 	printf("bulletTriggerEvent 처리 완료\n");
 #endif

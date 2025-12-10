@@ -45,9 +45,6 @@
     <Filter Include="소스 파일\Timer">
       <UniqueIdentifier>{eaadbbbc-79eb-4f62-bac6-bcb9e71e1a9e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Headers\GlobalData">
-      <UniqueIdentifier>{7ee659f1-ee9d-4f1f-9b5b-00979abb93b9}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -82,9 +79,6 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일\Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalData.cpp">
-      <Filter>소스 파일\Headers\GlobalData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,7 +122,7 @@
       <Filter>소스 파일\Timer</Filter>
     </ClInclude>
     <ClInclude Include="GlobalData.h">
-      <Filter>소스 파일\Headers\GlobalData</Filter>
+      <Filter>소스 파일\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
