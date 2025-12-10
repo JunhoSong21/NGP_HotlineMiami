@@ -1,10 +1,10 @@
 #include "Grenade.h"
 
-Grenade::Grenade(int id, float x, float y) :
-	posX(x), posY(y)
+Grenade::Grenade(int id) :
+	posX(0.0f), posY(0.0f)
 {
 	grenadeId = id;
-	isActive = true;
+	isActive = false;
 	isExplode = false;
 }
 
@@ -17,6 +17,11 @@ void Grenade::ChangeStateToExplode()
 void Grenade::ChangeStateToDebris()
 {
 	isExplode = false;
+}
+
+void Grenade::SetIsActive()
+{
+	isActive = true;
 }
 
 void Grenade::SetPos(float x, float y)

@@ -11,11 +11,12 @@ private:
 	float	posY;
 
 public:
-	Grenade(int id, float x, float y);
+	Grenade(int id);
 
 	void ChangeStateToExplode();
 	void ChangeStateToDebris();
 
+	void SetIsActive();
 	void SetPos(float x, float y);
 
 	float GetPosX() const;

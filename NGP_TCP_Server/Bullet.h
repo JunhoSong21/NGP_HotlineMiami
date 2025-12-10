@@ -13,7 +13,7 @@ private:
 	float	dirAngle;
 
 public:
-	Bullet(int id, float x, float y, float angle);
+	Bullet(int id);
 	bool IsActive() const;
 
 	void Collision();

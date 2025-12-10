@@ -40,7 +40,7 @@ void Timer::TimerLoop()
 		bulletEventPoint = system_clock::now();
 
 		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
-			auto bullet = DataManager::GetInstance().GetBullet(i);
+			Bullet* bullet = DataManager::GetInstance().GetBullet(i);
 			if (bullet && bullet->IsActive()) {
 				bullet->CalcPosbyAngle();
 			}
@@ -50,7 +50,7 @@ void Timer::TimerLoop()
 		//EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
 	}
 
-	//DataManager::GetInstance().CollisionCheck();
+	DataManager::GetInstance().CollisionCheck();
 
 	// Grenade Time Limit
 	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {

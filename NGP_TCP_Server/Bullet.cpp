@@ -2,11 +2,11 @@
 
 constexpr float moveDistance = 1.0f;
 
-Bullet::Bullet(int id, float x, float y, float angle) :
-	posX(x), posY(y), dirAngle(angle)
+Bullet::Bullet(int id) :
+	posX(0.0f), posY(0.0f), dirAngle(0.0f)
 {
 	bulletId = id;
-	isActive = true;
+	isActive = false;
 }
 
 bool Bullet::IsActive() const
