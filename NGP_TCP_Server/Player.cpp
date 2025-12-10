@@ -1,7 +1,5 @@
 #include "Player.h"
-
-constexpr float Bullet_Damage	= 15.0f;
-constexpr float Grenade_Damage	= 40.0f;
+#include "GlobalData.h"
 
 Player::Player(int id) :
 	hp(100.0f),
@@ -16,7 +14,7 @@ Player::Player(int id) :
 void Player::CollisionBullet()
 {
 	if (isAlive)
-		hp -= Bullet_Damage;
+		hp -= BULLET_DAMAGE;
 
 	if (hp <= 0) {
 		isAlive = false;
@@ -27,7 +25,7 @@ void Player::CollisionBullet()
 void Player::CollisionGrenade()
 {
 	if (isAlive)
-		hp -= Grenade_Damage;
+		hp -= GRENADE_DAMAGE;
 
 	if (hp <= 0) {
 		isAlive = false;

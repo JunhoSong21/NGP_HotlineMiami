@@ -1,4 +1,5 @@
 #include "DataManager.h"
+#include "GlobalData.h"
 
 using std::unique_ptr;
 using std::lock_guard;
@@ -9,8 +10,6 @@ constexpr float PLAYER_HITBOX_DISTANCE = 1.0f;
 
 void DataManager::AddPlayer(unique_ptr<Player> player)
 {
-	lock_guard<mutex> lock(playerMapMutex);
-
 	if (player) {
 		playerData[player->playerId] = std::move(player);
 		printf("player 추가 완료\n");
@@ -21,8 +20,6 @@ void DataManager::AddPlayer(unique_ptr<Player> player)
 
 void DataManager::AddBullet(unique_ptr<Bullet> bullet)
 {
-	lock_guard<mutex> lock(bulletMapMutex);
-
 	if (bullet) {
 		bulletData[bullet->bulletId] = std::move(bullet);
 		printf("bullet 추가 완료\n");
@@ -33,8 +30,6 @@ void DataManager::AddBullet(unique_ptr<Bullet> bullet)
 
 void DataManager::AddGrenade(unique_ptr<Grenade> grenade)
 {
-	lock_guard<mutex> lock(grenadeMapMutex);
-
 	if (grenade) {
 		grenadeData[grenade->grenadeId] = std::move(grenade);
 		printf("Grenade 추가 완료\n");
@@ -45,8 +40,6 @@ void DataManager::AddGrenade(unique_ptr<Grenade> grenade)
 
 Player* DataManager::GetPlayer(int id)
 {
-	lock_guard<mutex> lock(playerMapMutex);
-
 	auto it = playerData.find(id);
 	if (it != playerData.end())
 		return it->second.get();
@@ -58,8 +51,6 @@ Player* DataManager::GetPlayer(int id)
 
 Bullet* DataManager::GetBullet(int id)
 {
-	lock_guard<mutex> lock(bulletMapMutex);
-
 	auto it = bulletData.find(id);
 	if (it != bulletData.end())
 		return it->second.get();
@@ -71,8 +62,6 @@ Bullet* DataManager::GetBullet(int id)
 
 Grenade* DataManager::GetGrenade(int id)
 {
-	lock_guard<mutex> lock(grenadeMapMutex);
-
 	auto it = grenadeData.find(id);
 	if (it != grenadeData.end())
 		return it->second.get();
@@ -84,8 +73,8 @@ Grenade* DataManager::GetGrenade(int id)
 
 void DataManager::CollisionCheck()
 {
-	for (int i = 0; i < 1; ++i) {
-		for (int j = 0; j < 1; ++j) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+		for (int j = 0; j < MAX_CLIENT_NUM; ++j) {
 			if (i == j)
 				continue;
 
@@ -94,9 +83,9 @@ void DataManager::CollisionCheck()
 			//Grenade* grenade = GetGrenade(j);
 
 			if (!player)
-				continue;
+				printf("nullptr Player\n");
 			if (!bullet)
-				continue;
+				printf("nullptr Bullet\n");
 
 			if (PlayerToBulletCollision(player, bullet)) {
 				player->CollisionBullet();
@@ -117,5 +106,5 @@ bool DataManager::PlayerToBulletCollision(Player* player, Bullet* bullet)
 
 void DataManager::PlayerToGrenadeCollision()
 {
-
+	return;
 }

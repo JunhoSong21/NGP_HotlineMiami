@@ -142,6 +142,7 @@
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="EventQueue.h" />
     <ClInclude Include="GameEvent.h" />
+    <ClInclude Include="GlobalData.h" />
     <ClInclude Include="Grenade.h" />
     <ClInclude Include="NetworkThread.h" />
     <ClInclude Include="Packet.h" />

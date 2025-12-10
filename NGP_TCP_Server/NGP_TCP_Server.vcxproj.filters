@@ -121,5 +121,8 @@
     <ClInclude Include="Timer.h">
       <Filter>소스 파일\Timer</Filter>
     </ClInclude>
+    <ClInclude Include="GlobalData.h">
+      <Filter>소스 파일\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

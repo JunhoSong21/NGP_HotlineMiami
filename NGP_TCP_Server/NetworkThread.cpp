@@ -1,4 +1,5 @@
 #include "NetworkThread.h"
+#include "GlobalData.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -41,6 +42,13 @@ void NetworkThread::LoginProcess()
 
 		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
 		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
+
+		unique_ptr<Bullet> newBullet = make_unique<Bullet>(threadId);
+		DataManager::GetInstance().AddBullet(std::move(newBullet));
+
+		unique_ptr<Grenade> newGrenade = make_unique<Grenade>(threadId);
+		DataManager::GetInstance().AddGrenade(std::move(newGrenade));
+
 #ifdef _DEBUG
 		printf("Login Packet recv() Success\n");
 #endif
@@ -208,17 +216,19 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.hp = sendPlayer->GetHp();
-			playerMovePacket.isAlive = sendPlayer->GetIsAlive();
-			playerMovePacket.posX = sendPlayer->GetPosX();
-			playerMovePacket.posY = sendPlayer->GetPosY();
-			playerMovePacket.angle = sendPlayer->GetAngle();
+			playerMovePacket.hp			= sendPlayer->GetHp();
+			playerMovePacket.isAlive	= sendPlayer->GetIsAlive();
+			playerMovePacket.posX		= sendPlayer->GetPosX();
+			playerMovePacket.posY		= sendPlayer->GetPosY();
+			playerMovePacket.angle		= sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
 				printf("playerMovePacket Send() Error\n");
 			else
+#ifdef _DEBUG
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
+#endif
 		}
 	}
 }
@@ -235,10 +245,10 @@ void NetworkThread::SendBulletState()
 
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
-			bulletStatePacket.isActive = sendBullet->GetIsActive();
-			bulletStatePacket.posX = sendBullet->GetPosX();
-			bulletStatePacket.posY = sendBullet->GetPosY();
-			bulletStatePacket.dirAngle = sendBullet->GetAngle();
+			bulletStatePacket.isActive	= sendBullet->IsActive();
+			bulletStatePacket.posX		= sendBullet->GetPosX();
+			bulletStatePacket.posY		= sendBullet->GetPosY();
+			bulletStatePacket.dirAngle	= sendBullet->GetAngle();
 
 			retValue = send(clientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), 0);
 			if (retValue == SOCKET_ERROR)
@@ -255,17 +265,17 @@ void NetworkThread::SendGrenadeState()
 	int retValue = 0;
 	SC_GRENADE_STATE grenadeStatePacket{};
 	
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		grenadeStatePacket.targetNum = i;
 		if (!Timer::GetInstance().GetGrenadeArray(i))
 			continue;
 
 		Grenade* sendGrenade = DataManager::GetInstance().GetGrenade(i);
 		if (sendGrenade) {
-			grenadeStatePacket.isActive = sendGrenade->GetIsActive();
-			grenadeStatePacket.isExplode = sendGrenade->GetIsExplode();
-			grenadeStatePacket.posX = sendGrenade->GetPosX();
-			grenadeStatePacket.posY = sendGrenade->GetPosY();
+			grenadeStatePacket.isActive		= sendGrenade->GetIsActive();
+			grenadeStatePacket.isExplode	= sendGrenade->GetIsExplode();
+			grenadeStatePacket.posX			= sendGrenade->GetPosX();
+			grenadeStatePacket.posY			= sendGrenade->GetPosY();
 
 			retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
 			if (retValue == SOCKET_ERROR)

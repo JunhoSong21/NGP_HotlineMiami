@@ -1,7 +1,7 @@
 #include "PopEvent.h"
 
 #include <cmath>
-constexpr float PI = 3.1415;
+constexpr double PI = 3.1415;
 
 #include "DataManager.h"
 #include "Player.h"
@@ -69,6 +69,7 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 		player->SetAngle(
 			CalculateAtan2Float(event->mouseX, event->mouseY, x, y));
 	}
+
 #ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
 #endif
@@ -85,16 +86,16 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 {
 	lock_guard<mutex> lock(bulletTriggerMutex);
 
+	if (!DataManager::GetInstance().GetBullet(event->networkThreadId))
+		return;
+	
+	// 이미 해당 클라이언트 번호로 총알이 map에 들어가 있을 경우
 	Player* rootPlayer = DataManager::GetInstance().GetPlayer(event->networkThreadId);
-
-	auto newBullet = make_unique<Bullet>(
-		event->networkThreadId,
-		rootPlayer->GetPosX(),
-		rootPlayer->GetPosY(),
-		rootPlayer->GetAngle()
-	);
-
-	DataManager::GetInstance().AddBullet(std::move(newBullet));
+	Bullet* bullet = DataManager::GetInstance().GetBullet(event->networkThreadId);
+	bullet->SetIsActive(true);
+	bullet->SetPos(event->posX, event->posY);
+	bullet->SetAngle(event->atan2);
+	
 #ifdef _DEBUG
 	printf("bulletTriggerEvent 처리 완료\n");
 #endif
@@ -102,22 +103,17 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 
 void PopEvent::HandleBulletUpdateEvent(unique_ptr<BulletUpdate> event)
 {
-	lock_guard<mutex> lock(bulletUpdateMutex);
-
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 
 void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 {
-	lock_guard<mutex> lock(grenadeThrowMutex);
+	Grenade* grenade = DataManager::GetInstance().GetGrenade(event->networkThreadId);
+	if (!grenade)
+		return;
 
-	unique_ptr<Grenade> newGrenade = make_unique<Grenade>(
-		event->networkThreadId,
-		event->posX,
-		event->posY
-	);
-
-	DataManager::GetInstance().AddGrenade(std::move(newGrenade));
+	grenade->SetIsActive();
+	grenade->SetPos(event->posX, event->posY);
 	Timer::GetInstance().AddGrenade(event->networkThreadId);
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 
