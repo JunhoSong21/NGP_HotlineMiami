@@ -306,7 +306,7 @@ void Recv_PlayerMove(Player** players)
 
         players[index]->SetStatus(playerMovePacket.isAlive, playerMovePacket.hp);
         if (index == g_MyPlayerIndex) {
-            players[index]->SetStatus(
+            players[index]->SetPosition(
                 playerMovePacket.posX,
                 playerMovePacket.posY
             );

@@ -426,8 +426,6 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_RBUTTONDOWN:
 	{
-		
-
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
 		if (!players[myIdx] || !grenades[myIdx])
 			return;
