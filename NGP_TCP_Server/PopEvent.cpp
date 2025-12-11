@@ -5,6 +5,7 @@ constexpr double PI = 3.1415;
 
 #include "DataManager.h"
 #include "Player.h"
+#include "Wall.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -60,11 +61,27 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 	Player* player = DataManager::GetInstance().GetPlayer(event->networkThreadId);
 	if (player && (player->GetHp() > 0.0f)) {
 
-		// 서버 자기 좌표를 기준으로 이동 계산
-		float x = player->GetPosX();
-		float y = player->GetPosY();
+		const float oldX = player->GetPosX();
+		const float oldY = player->GetPosY();
 
+		float x = oldX;
+		float y = oldY;
+
+		// 기존 이동 계산 (여기서 내부적으로 SetPosX/SetPosY 호출 중)
 		player->CalcPosbyFlag(event->flag, x, y);
+
+		float newX = player->GetPosX();
+		float newY = player->GetPosY();
+
+		// 클라에서 DebugRenderCollision 사각형이 35x35 이므로 반지름 17.5 정도로 사용
+		constexpr float PLAYER_RADIUS = 17.5f;
+
+		Wall::Get().ResolveMove(oldX, oldY, newX, newY, PLAYER_RADIUS);
+
+		// 최종 위치를 서버 권위 값으로 확정
+		player->SetPosX(newX);
+		player->SetPosY(newY);
+
 		// 회전 계산도 서버 좌표 기준으로
 		player->SetAngle(
 			CalculateAtan2Float(event->mouseX, event->mouseY, x, y));
