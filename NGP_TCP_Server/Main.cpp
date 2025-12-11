@@ -4,7 +4,7 @@
 #include "PopEvent.h"
 #include "Timer.h"
 
-constexpr int MAX_CLIENT_NUM = 1;
+constexpr int MAX_CLIENT_NUM = 2;
 using std::unique_ptr;
 
 int main()
