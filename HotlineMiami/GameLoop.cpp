@@ -293,9 +293,11 @@ void GameLoop::Render()
 		// 3) Wall 
 		if (wall) wall->Render(g);
 		// 4) Grenade
-		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
-			if (grenades[i])
-				grenades[i]->Render(g, imgManager);
+		if (grenades) {
+			for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+				if (grenades[i])
+					grenades[i]->Render(g, imgManager);
+			}
 		}
 		
 		// 5) player

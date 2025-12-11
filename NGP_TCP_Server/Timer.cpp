@@ -14,10 +14,9 @@ Timer::Timer()
 {
 	moveEventPoint = system_clock::now();
 
-	for (bool i : isBulletExist)
+	for (int i = 0; i < (int)isBulletExist.size(); ++i)
 		isBulletExist[i] = false;
-
-	for (bool i : isGrenadeExist)
+	for (int i = 0; i < (int)isGrenadeExist.size(); ++i)
 		isGrenadeExist[i] = false;
 }
 

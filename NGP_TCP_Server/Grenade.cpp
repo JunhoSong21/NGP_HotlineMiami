@@ -22,6 +22,7 @@ void Grenade::ChangeStateToDebris()
 void Grenade::SetIsActive()
 {
 	isActive = true;
+	isExplode = false;
 }
 
 void Grenade::SetPos(float x, float y)

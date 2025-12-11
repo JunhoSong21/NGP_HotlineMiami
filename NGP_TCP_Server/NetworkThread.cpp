@@ -299,29 +299,35 @@ void NetworkThread::SendGrenadeState()
 {
 	int retValue = 0;
 	SC_GRENADE_STATE grenadeStatePacket{};
-	
+
 	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
-		grenadeStatePacket.targetNum = i;
-		if (!Timer::GetInstance().GetGrenadeArray(i))
-			continue;
+		grenadeStatePacket.targetNum = static_cast<short>(i);
 
 		Grenade* sendGrenade = DataManager::GetInstance().GetGrenade(i);
-		if (sendGrenade) {
-			grenadeStatePacket.isActive		= sendGrenade->GetIsActive();
-			grenadeStatePacket.isExplode	= sendGrenade->GetIsExplode();
-			grenadeStatePacket.posX			= sendGrenade->GetPosX();
-			grenadeStatePacket.posY			= sendGrenade->GetPosY();
 
-			retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
-			if (retValue == SOCKET_ERROR)
-				printf("grenadeStatePacket send() Error\n");
-			else
-			#ifdef _DEBUG
-				printf("grenadeStatePacket send() Complete\n");
-			#endif
+		if (sendGrenade) {
+			grenadeStatePacket.isActive = sendGrenade->GetIsActive();
+			grenadeStatePacket.isExplode = sendGrenade->GetIsExplode();
+			grenadeStatePacket.posX = sendGrenade->GetPosX();
+			grenadeStatePacket.posY = sendGrenade->GetPosY();
 		}
+		else {
+			// 수류탄 객체가 없거나 비활성인 경우에도
+			// 클라는 바디 하나를 반드시 받아야 하므로 더미 데이터라도 보냄
+			grenadeStatePacket.isActive = false;
+			grenadeStatePacket.isExplode = false;
+			grenadeStatePacket.posX = 0.0f;
+			grenadeStatePacket.posY = 0.0f;
+		}
+
+		retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
+		if (retValue == SOCKET_ERROR)
+			printf("grenadeStatePacket Send() Error\n");
+		else
+			printf("grenadeStatePacket Send() Complete\n");
 	}
 }
+
 
 void NetworkThread::SendGameEnd()
 {
