@@ -45,14 +45,14 @@ void NetworkThread::LoginProcess()
 		{
 		case 0:
 			newPlayer->SetPosX(300.0f);
-			newPlayer->SetPosY(1300.0f);
+			newPlayer->SetPosY(700.0f);
 			break;
 		case 1:
 			newPlayer->SetPosX(300.0f);
 			newPlayer->SetPosY(550.0f);
 			break;
 		case 2:
-			newPlayer->SetPosX(1850.0f);
+			newPlayer->SetPosX(1250.0f);
 			newPlayer->SetPosY(550.0f);
 			break;
 		default:

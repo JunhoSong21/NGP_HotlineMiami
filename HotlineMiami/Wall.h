@@ -58,12 +58,6 @@ public:
         DrawMode drawMode;
     };
 
-    struct Collider {
-        Gdiplus::RectF rect;
-        bool blocksMove;
-        bool blocksProjectile;
-    };
-
 public:
     Wall() = default;
     ~Wall() = default;
@@ -76,10 +70,6 @@ public:
 
     void Render(Gdiplus::Graphics& g);
 
-    bool ResolveMove(Gdiplus::PointF& pos, Gdiplus::SizeF aabbSize, Gdiplus::PointF delta) const;
-    bool Raycast(const Gdiplus::PointF& origin, const Gdiplus::PointF& dir, float maxDist,
-        Gdiplus::PointF* hitPoint = nullptr, POINT* hitCell = nullptr) const;
-
     static POINT WorldToGrid(const Gdiplus::PointF& p);
     static Gdiplus::RectF GridToWorldRect(int gx, int gy);
 
@@ -87,17 +77,12 @@ private:
     bool IsInside(int gx, int gy) const { return (gx >= 0 && gy >= 0 && gx < COLS && gy < ROWS); }
 
     void RebuildCache();
-    void RebuildOccupancyOnly();
 
 private:
     ImageManager* imgManager{ nullptr };
 
     std::map<uint8_t, Desc> dict;
     std::vector<Instance> instances;
-
-    uint8_t grid[ROWS][COLS]{};
-    std::vector<Collider> colliders;
-    std::vector<int> colliderLUT[ROWS][COLS];
 
     std::unique_ptr<Gdiplus::Bitmap> cache;
     bool cacheDirty{ true };
