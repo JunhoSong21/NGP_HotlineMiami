@@ -41,6 +41,26 @@ void NetworkThread::LoginProcess()
 			printf("loginPacket recv Error\n");
 
 		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
+		switch (threadId)
+		{
+		case 0:
+			newPlayer->SetPosX(218.0f);
+			newPlayer->SetPosY(230.0f);
+			break;
+		case 1:
+			newPlayer->SetPosX(300.0f);
+			newPlayer->SetPosY(550.0f);
+			break;
+		case 2:
+			newPlayer->SetPosX(810.0f);
+			newPlayer->SetPosY(370.0f);
+			break;
+		default:
+			// ±âº»°ª
+			newPlayer->SetPosX(0.0f);
+			newPlayer->SetPosY(0.0f);
+			break;
+		}
 		DataManager::GetInstance().AddPlayer(std::move(newPlayer));
 
 		unique_ptr<Bullet> newBullet = make_unique<Bullet>(threadId);
@@ -216,19 +236,20 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.hp			= sendPlayer->GetHp();
-			playerMovePacket.isAlive	= sendPlayer->GetIsAlive();
-			playerMovePacket.posX		= sendPlayer->GetPosX();
-			playerMovePacket.posY		= sendPlayer->GetPosY();
-			playerMovePacket.angle		= sendPlayer->GetAngle();
+			playerMovePacket.hp = sendPlayer->GetHp();
+			playerMovePacket.isAlive = sendPlayer->GetIsAlive();
+			playerMovePacket.posX = sendPlayer->GetPosX();
+			playerMovePacket.posY = sendPlayer->GetPosY();
+			playerMovePacket.angle = sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
 				printf("playerMovePacket Send() Error\n");
-			else
+			else {
 #ifdef _DEBUG
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
 #endif
+			}
 		}
 	}
 }
