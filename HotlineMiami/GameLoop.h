@@ -28,9 +28,9 @@ private:
 	Player* players[3];
 	Wall* wall;
 
-	Grenade* grenade;
+	Grenade* grenades[3];
 
-	Bullet* bullet;
+	Bullet* bullets[3];
 
 	float deltaTime;
 
@@ -52,6 +52,7 @@ public:
 	void InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam);
 	bool IsTitle() const { return isTitle; }
 
-	Bullet* GetBullet() { return bullet; }
 	Player** GetPlayers() { return players; }
+	Bullet** GetBullets() { return bullets; }
+	Grenade** GetGrenades() { return grenades; }
 };

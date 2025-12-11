@@ -63,8 +63,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	// 서버통신 스레드 생성
 	NetworkThreadParam* netParam = new NetworkThreadParam;
 	netParam->hWnd = hWnd;
-	netParam->bullet = gameLoop->GetBullet();
 	netParam->players = gameLoop->GetPlayers();
+	netParam->bullets = gameLoop->GetBullets();
 	
 	HANDLE hNetThread = CreateThread(
 		nullptr,

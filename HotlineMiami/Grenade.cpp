@@ -188,3 +188,20 @@ void Grenade::Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targ
     (void)targetPos;
 }
 
+void Grenade::SetPosition(float x, float y)
+{
+    pos = Gdiplus::PointF(x, y);
+}
+
+void Grenade::SetIsActive(bool b)
+{
+    isActive = b;
+}
+
+void Grenade::SetIsExplode(bool b)
+{
+    if (b == true) {
+        isActive = false;
+        exploded = b;
+    }
+}

@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "Bullet.h"
 
+constexpr int MAX_CLIENT_NUM = 1;
+
 SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
 int    g_MyPlayerIndex = -1;
@@ -53,9 +55,10 @@ void ShutdownNetwork()
 DWORD WINAPI Client_Network_Thread(LPVOID param)
 {
     NetworkThreadParam* p = reinterpret_cast<NetworkThreadParam*>(param);
-    HWND        hWnd = p->hWnd;
-    Bullet* bullet = p->bullet;
-    Player** players = p->players;
+    HWND     hWnd       = p->hWnd;
+    Player** players    = p->players;
+    Bullet** bullets    = p->bullets;
+    Grenade** grenades  = p->grenades;
 
     LoginProcess(g_ClientSock);
 
@@ -77,7 +80,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param)
             }
         }
         
-        RecvProcess(g_ClientSock, players, bullet);
+        RecvProcess(g_ClientSock, players, bullets, grenades);
 
         Sleep(16); // 디버그를 위한 초당 30번 전송
     }
@@ -259,83 +262,108 @@ int Send_BulletTrigger(SOCKET sock, float dirRadAngle)
 }
 
 // Recv 구조
-void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
+void RecvProcess(SOCKET sock, Player** players, Bullet** bullets, Grenade** grenades)
 {
     PacketHeader header{};
     int retValue = recv(sock, (char*)&header, sizeof(header), MSG_WAITALL);
-    if (retValue <= 0)
+    if (retValue == SOCKET_ERROR)
         return;
 
     switch (header.packetType) {
     case PN::SC_PLAYER_MOVE: {
-        SC_PLAYER_MOVE playerMovePacket{};
-        retValue = recv(sock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
-        if (retValue <= 0)
-            return;
-
-        Recv_PlayerMove(players, playerMovePacket);
+        Recv_PlayerMove(players);
         break;
     }
     case PN::SC_BULLET_STATE: {
-        SC_BULLET_STATE bulletStatePacket{};
-        retValue = recv(sock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), MSG_WAITALL);
-        if (retValue == SOCKET_ERROR)
-            return;
-
-        Recv_BulletData(bullet, bulletStatePacket);
+        Recv_BulletData(bullets);
+        break;
+    }
+    case PN::SC_GRENADE_STATE: {
+        Recv_GrenadeData(grenades);
         break;
     }
     case PN::SC_GAME_END: {
-        SC_GAME_END gameEndPacket{};
-        retValue = recv(sock, (char*)&gameEndPacket, sizeof(gameEndPacket), MSG_WAITALL);
+        Recv_GameEnd();
+        break;
+    }
+    default:
+        // Undefined Event
+        break;
+    }
+}
+
+void Recv_PlayerMove(Player** players)
+{
+    int retValue = 0;
+    SC_PLAYER_MOVE playerMovePacket{};
+
+    for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+        retValue = recv(g_ClientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), MSG_WAITALL);
         if (retValue == SOCKET_ERROR)
             return;
 
-        Recv_GameEnd(gameEndPacket);
-        break;
-    }
-    default: {
-        break;
-    }
+        int index = static_cast<int>(playerMovePacket.targetNum);
+        if (!players[index])
+            return;
+
+        players[index]->SetStatus(playerMovePacket.isAlive, playerMovePacket.hp);
+        if (index == g_MyPlayerIndex) {
+            players[index]->SetStatus(
+                playerMovePacket.posX,
+                playerMovePacket.posY
+            );
+        }
+        else {
+            players[index]->SetPositionAndAngle(
+                playerMovePacket.posX,
+                playerMovePacket.posY,
+                playerMovePacket.angle
+            );
+        }
     }
 }
 
-void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket)
+void Recv_BulletData(Bullet** bullets)
 {
-    int idx = static_cast<int>(playerMovePacket.targetNum);
+    int retValue = 0;
+    SC_BULLET_STATE bulletStatePacket{};
 
-    if (idx < 0 || idx >= 3 || players[idx] == nullptr)
-        return;
+    for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+        retValue = recv(g_ClientSock, (char*)&bulletStatePacket, sizeof(bulletStatePacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR)
+            return;
 
-    // 상태는 공통 업데이트
-    players[idx]->SetStatus(playerMovePacket.isAlive, playerMovePacket.hp);
+        int index = static_cast<int>(bulletStatePacket.targerNum);
+        if (!bullets[index])
+            return;
 
-    // 이동은 구분
-    if (idx == g_MyPlayerIndex) {
-        players[idx]->SetPosition(playerMovePacket.posX, playerMovePacket.posY);
-    }
-    else {
-        players[idx]->SetPositionAndAngle(
-            playerMovePacket.posX,
-            playerMovePacket.posY,
-            playerMovePacket.angle
-        );
+        bullets[index]->SetVisible(bulletStatePacket.isActive);
+        bullets[index]->SetPosition(bulletStatePacket.posX, bulletStatePacket.posY);
+        bullets[index]->SetDirection(bulletStatePacket.dirAngle);
     }
 }
 
-int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket)
+void Recv_GrenadeData(Grenade** grenades)
 {
-    if (!bullet)
-        return 0;
+    int retValue = 0;
+    SC_GRENADE_STATE grenadeStatePacket{};
 
-    bullet->SetVisible(bulletStatePacket.isActive != 0);
-    bullet->SetPosition(bulletStatePacket.posX, bulletStatePacket.posY);
-    bullet->SetDirection(bulletStatePacket.dirAngle);
+    for (int i = 0; i < 3; ++i) {
+        retValue = recv(g_ClientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR)
+            return;
 
-    return true;
+        int index = static_cast<int>(grenadeStatePacket.targetNum);
+        if (!grenades[index])
+            return;
+
+        grenades[index]->SetIsActive(grenadeStatePacket.isActive);
+        grenades[index]->SetIsExplode(grenadeStatePacket.isExploded);
+        grenades[index]->SetPosition(grenadeStatePacket.posX, grenadeStatePacket.posY);
+    }
 }
 
-void Recv_GameEnd(struct SC_GAME_END gameEndPacket)
+void Recv_GameEnd()
 {
     // Game End Logic
 }

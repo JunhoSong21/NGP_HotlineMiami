@@ -42,4 +42,8 @@ public:
     void Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targetPos);
     bool IsActive() const { return isActive; }
     float GetRemainTime() const { return fuseTime; }
+
+    void SetPosition(float x, float y);
+    void SetIsActive(bool b);
+    void SetIsExplode(bool b);
 };

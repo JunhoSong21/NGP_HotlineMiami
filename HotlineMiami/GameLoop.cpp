@@ -7,9 +7,7 @@ GameLoop::GameLoop() :
 	map(nullptr),
 	wall(nullptr),
 	timer(nullptr),
-	grenade(nullptr),
 	hud(nullptr),
-	bullet(nullptr),
 	deltaTime(0.0f),
 	hWnd(nullptr),
 	camera(nullptr),
@@ -18,8 +16,11 @@ GameLoop::GameLoop() :
 	backBufferWidth(0),
 	backBufferHeight(0)
 {
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 3; ++i) {
 		players[i] = nullptr;
+		bullets[i] = nullptr;
+		grenades[i] = nullptr;
+	}
 }
 
 GameLoop::~GameLoop()
@@ -29,15 +30,21 @@ GameLoop::~GameLoop()
 			delete players[i];
 			players[i] = nullptr;
 		}
+		if (bullets[i]) {
+			delete bullets[i];
+			bullets[i] = nullptr;
+		}
+		if (grenades[i]) {
+			delete grenades[i];
+			grenades[i] = nullptr;
+		}
 	}
 
 	if (backGround) { delete backGround; backGround = nullptr; }
 	if (map) { delete map;        map = nullptr; }
 	if (wall) { delete wall;       wall = nullptr; }
 	if (timer) { delete timer;      timer = nullptr; }
-	if (grenade) { delete grenade;    grenade = nullptr; }
 	if (hud) { delete hud;        hud = nullptr; }
-	if (bullet) { delete bullet;     bullet = nullptr; }
 	if (camera) { delete camera;     camera = nullptr; }
 	if (backBufferBitmap) { delete backBufferBitmap; backBufferBitmap = nullptr; }
 }
@@ -116,19 +123,20 @@ void GameLoop::Init(HWND hwnd)
 		players[i] = new Player();
 		players[i]->Init();
 		players[i]->LoadPlayerImages(imgManager);
-	}
 
-	grenade = new Grenade();
-	grenade->Init();
-	grenade->LoadGrenadeImage(imgManager);
+		bullets[i] = new Bullet();
+		bullets[i]->LoadBulletImages(imgManager);
+		bullets[i]->SetVisible(false);
+
+		grenades[i] = new Grenade();
+		grenades[i]->Init();
+		grenades[i]->LoadGrenadeImage(imgManager);
+	}
 
 	hud = new HUD();
 	hud->Init(imgManager);
 	players[0]->LoadPlayerImages(imgManager);
 
-	bullet = new Bullet();
-	bullet->LoadBulletImages(imgManager);
-	bullet->SetVisible(false);
 
 	// 카메라 세팅
 	if (not camera) {
@@ -192,11 +200,11 @@ void GameLoop::Update()
 		camera->Update(deltaTime);
 	}
 
-	if (grenade)
-		grenade->Update(deltaTime);
+	if (grenades[myIdx])
+		grenades[myIdx]->Update(deltaTime);
 
-	if (bullet)
-		bullet->Update(deltaTime);
+	if (bullets[myIdx])
+		bullets[myIdx]->Update(deltaTime);
 }
 
 void GameLoop::Render()
@@ -284,8 +292,11 @@ void GameLoop::Render()
 
 		// 3) Wall 
 		if (wall) wall->Render(g);
-		// 4) Grenade 
-		if (grenade) grenade->Render(g, imgManager);
+		// 4) Grenade
+		for (int i = 0; i < 3; ++i) {
+			if (grenades[i])
+				grenades[i]->Render(g, imgManager);
+		}
 		
 		// 5) player
 		{
@@ -314,7 +325,10 @@ void GameLoop::Render()
 			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
-			if (bullet) bullet->Render(hWnd, g, imgManager);
+			for (int i = 0; i < 3; ++i) {
+				if (bullets[i])
+					bullets[i]->Render(hWnd, g, imgManager);
+			}
 			g.Restore(s);
 		}
 		g.Restore(sWorld);
@@ -377,7 +391,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			return; 
 		}
 
-		if (!players[myIdx] || !bullet)
+		if (!players[myIdx] || !bullets[myIdx])
 			break;
 		int mouseX = GET_X_LPARAM(lParam);
 		int mouseY = GET_Y_LPARAM(lParam);
@@ -402,7 +416,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		// 총알 초기화
-		bullet->Init(playerPos.X, playerPos.Y, dx, dy, 1);
+		bullets[myIdx]->Init(playerPos.X, playerPos.Y, dx, dy, 1);
 
 		float angle = atan2f(dy, dx);
 		g_BulletReq.requested = true;
@@ -415,7 +429,7 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		
 
 		// 플레이어/수류탄이 준비되어 있을 때만 처리
-		if (!players[myIdx] || !grenade)
+		if (!players[myIdx] || !grenades[myIdx])
 			return;
 
 		// 마우스 클릭 지점 (클라이언트 좌표계)
@@ -434,13 +448,13 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		// 기존 활성 상태 저장
-		bool wasActive = grenade->IsActive();
+		bool wasActive = grenades[myIdx]->IsActive();
 
 		// 수류탄 투척 시도 (내부에서 2발 제한 체크)
-		grenade->Throw(startPos, targetPos);
+		grenades[myIdx]->Throw(startPos, targetPos);
 
 		// 이번 클릭에서 새로 활성화된 경우에만 서버에 알림
-		if (!wasActive && grenade->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
+		if (!wasActive && grenades[myIdx]->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
 		{
 			float dx = targetPos.X - startPos.X;
 			float dy = targetPos.Y - startPos.Y;

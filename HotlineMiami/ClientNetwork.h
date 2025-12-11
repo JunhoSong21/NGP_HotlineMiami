@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Bullet.h"
+#include "Grenade.h"
 
 class Player;
 
@@ -29,9 +30,10 @@ extern BulletTriggerRequest g_BulletReq;
 // 서버통신 스레드용 파라미터 여러 값을 보내기 위해
 struct NetworkThreadParam
 {
-    HWND    hWnd;
-    Bullet* bullet;
-    Player** players;
+    HWND        hWnd;
+    Player**    players;
+    Bullet**    bullets;
+    Grenade**   grenades;
 };
 
 // 초기화 / 종료
@@ -48,7 +50,8 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
 int Send_GrenadeThrow(SOCKET sock, float dirRadAngle);
 int Send_BulletTrigger(SOCKET sock, float dirRadAngle);
 
-void RecvProcess(SOCKET sock, Player** players, Bullet* bullet);
-void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket);
-int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket);
-void Recv_GameEnd(struct SC_GAME_END gameEndPacket);
+void RecvProcess(SOCKET sock, Player** players, Bullet** bullets, Grenade** grenades);
+void Recv_PlayerMove(Player** players);
+void Recv_BulletData(Bullet** bullets);
+void Recv_GrenadeData(Grenade** grenades);
+void Recv_GameEnd();
