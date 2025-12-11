@@ -43,6 +43,7 @@ struct SC_LOGIN_SUCCESS {
 
 struct SC_GAME_END {
 	bool	isMatchEnded;
+	int		winnerTartgetNum;
 };
 
 // Client > Server

@@ -51,3 +51,4 @@ int Send_BulletTrigger(SOCKET sock, float dirRadAngle);
 void RecvProcess(SOCKET sock, Player** players, Bullet* bullet);
 void Recv_PlayerMove(Player** players, struct SC_PLAYER_MOVE playerMovePacket);
 int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket);
+void Recv_GameEnd(struct SC_GAME_END gameEndPacket);

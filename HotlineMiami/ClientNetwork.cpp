@@ -285,8 +285,16 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
         Recv_BulletData(bullet, bulletStatePacket);
         break;
     }
+    case PN::SC_GAME_END: {
+        SC_GAME_END gameEndPacket{};
+        retValue = recv(sock, (char*)&gameEndPacket, sizeof(gameEndPacket), MSG_WAITALL);
+        if (retValue == SOCKET_ERROR)
+            return;
+
+        Recv_GameEnd(gameEndPacket);
+        break;
+    }
     default: {
-        
         break;
     }
     }
@@ -327,3 +335,7 @@ int Recv_BulletData(Bullet* bullet, struct SC_BULLET_STATE bulletStatePacket)
     return true;
 }
 
+void Recv_GameEnd(struct SC_GAME_END gameEndPacket)
+{
+    // Game End Logic
+}
