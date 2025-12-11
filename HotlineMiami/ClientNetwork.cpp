@@ -286,16 +286,7 @@ void RecvProcess(SOCKET sock, Player** players, Bullet* bullet)
         break;
     }
     default: {
-        //// 아직 처리 안 하는 패킷은 bodySize만큼 읽어서 버리기
-        //char dummy[256];
-        //int remain = bodySize;
-        //while (remain > 0)
-        //{
-        //    int chunk = (remain > (int)sizeof(dummy)) ? (int)sizeof(dummy) : remain;
-        //    int r = recv(sock, dummy, chunk, 0);
-        //    if (r <= 0) return;
-        //    remain -= r;
-        //}
+        
         break;
     }
     }
