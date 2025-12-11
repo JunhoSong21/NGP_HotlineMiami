@@ -16,11 +16,8 @@ class Grenade;
 class DataManager {
 private:
 	std::unordered_map<int, std::unique_ptr<Player>>	playerData;
-	std::mutex playerMapMutex;
 	std::unordered_map<int, std::unique_ptr<Bullet>>	bulletData;
-	std::mutex bulletMapMutex;
 	std::unordered_map<int, std::unique_ptr<Grenade>>	grenadeData;
-	std::mutex grenadeMapMutex;
 
 	DataManager() = default;
 	~DataManager() = default;
