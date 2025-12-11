@@ -65,7 +65,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdPa
 	netParam->hWnd = hWnd;
 	netParam->players = gameLoop->GetPlayers();
 	netParam->bullets = gameLoop->GetBullets();
-	
+	netParam->grenades = gameLoop->GetGrenades();
+
 	HANDLE hNetThread = CreateThread(
 		nullptr,
 		0,
