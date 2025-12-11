@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+constexpr int MAX_CLIENT_NUM = 1;
+
 #pragma pack(push, 1)
 struct PacketHeader {
 	int		packetType;
@@ -78,17 +80,17 @@ struct CS_GRENADE_THROW {
 #pragma pack(pop)
 
 namespace PN { // Packet Name
-	constexpr int SC_PLAYER_MOVE = 1000;
-	constexpr int SC_BULLET_STATE = 1001;
-	constexpr int SC_GRENADE_STATE = 1002;
-	constexpr int SC_LOGIN_SUCCESS = 1003;
-	constexpr int SC_GAME_END = 1004;
-	constexpr int CS_LOGIN_PACKET = 1005;
-	constexpr int CS_ROOM_PACKET = 1006;
-	constexpr int CS_KEY_INPUT = 1007;
+	constexpr int SC_PLAYER_MOVE	= 1000;
+	constexpr int SC_BULLET_STATE	= 1001;
+	constexpr int SC_GRENADE_STATE	= 1002;
+	constexpr int SC_LOGIN_SUCCESS	= 1003;
+	constexpr int SC_GAME_END		= 1004;
+	constexpr int CS_LOGIN_PACKET	= 1005;
+	constexpr int CS_ROOM_PACKET	= 1006;
+	constexpr int CS_KEY_INPUT		= 1007;
 	constexpr int CS_BULLET_TRIGGER = 1008;
 	constexpr int CS_BULLET_DESTROY = 1009;
-	constexpr int CS_GRENADE_THROW = 1010;
+	constexpr int CS_GRENADE_THROW	= 1010;
 }
 
 enum KEY_INPUT_FLAGS : uint16_t		//  키 입력 플래그 정의

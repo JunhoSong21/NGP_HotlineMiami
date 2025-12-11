@@ -16,7 +16,7 @@ GameLoop::GameLoop() :
 	backBufferWidth(0),
 	backBufferHeight(0)
 {
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		players[i] = nullptr;
 		bullets[i] = nullptr;
 		grenades[i] = nullptr;
@@ -25,7 +25,7 @@ GameLoop::GameLoop() :
 
 GameLoop::~GameLoop()
 {
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		if (players[i]) {
 			delete players[i];
 			players[i] = nullptr;
@@ -118,7 +118,7 @@ void GameLoop::Init(HWND hwnd)
 
 	timer = new Timer();
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i)
 	{
 		players[i] = new Player();
 		players[i]->Init();
@@ -293,7 +293,7 @@ void GameLoop::Render()
 		// 3) Wall 
 		if (wall) wall->Render(g);
 		// 4) Grenade
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 			if (grenades[i])
 				grenades[i]->Render(g, imgManager);
 		}
@@ -305,7 +305,7 @@ void GameLoop::Render()
 			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighSpeed);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < MAX_CLIENT_NUM; ++i)
 			{
 				if (players[i]) {
 					players[i]->Render(hWnd, g, imgManager);
@@ -325,7 +325,7 @@ void GameLoop::Render()
 			g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 			g.SetCompositingQuality(Gdiplus::CompositingQualityHighQuality);
 			g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 				if (bullets[i])
 					bullets[i]->Render(hWnd, g, imgManager);
 			}

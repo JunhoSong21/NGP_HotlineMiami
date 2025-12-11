@@ -4,8 +4,6 @@
 #include "Player.h"
 #include "Bullet.h"
 
-constexpr int MAX_CLIENT_NUM = 1;
-
 SOCKET g_ClientSock = INVALID_SOCKET;
 bool   g_NetworkRunning = false;
 int    g_MyPlayerIndex = -1;
@@ -348,7 +346,7 @@ void Recv_GrenadeData(Grenade** grenades)
     int retValue = 0;
     SC_GRENADE_STATE grenadeStatePacket{};
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
         retValue = recv(g_ClientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), MSG_WAITALL);
         if (retValue == SOCKET_ERROR)
             return;
@@ -365,5 +363,5 @@ void Recv_GrenadeData(Grenade** grenades)
 
 void Recv_GameEnd()
 {
-    // Game End Logic
+    g_NetworkRunning = false;
 }

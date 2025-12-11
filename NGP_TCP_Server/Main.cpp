@@ -4,8 +4,8 @@
 #include "PopEvent.h"
 #include "Timer.h"
 #include "Wall.h"
+#include "GlobalData.h"
 
-constexpr int MAX_CLIENT_NUM = 1;
 using std::unique_ptr;
 
 int main()

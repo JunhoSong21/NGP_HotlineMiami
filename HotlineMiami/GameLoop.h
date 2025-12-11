@@ -16,6 +16,7 @@
 #include "ImageManager.h"
 #include "SoundManager.h"
 #include "Camera.h"
+#include "NetProtocol.h"
 
 class GameLoop {
 private:
@@ -25,12 +26,12 @@ private:
 	BackGround* backGround;
 	Map* map;
 	Timer* timer;
-	Player* players[3];
+	Player* players[MAX_CLIENT_NUM];
 	Wall* wall;
 
-	Grenade* grenades[3];
+	Grenade* grenades[MAX_CLIENT_NUM];
 
-	Bullet* bullets[3];
+	Bullet* bullets[MAX_CLIENT_NUM];
 
 	float deltaTime;
 

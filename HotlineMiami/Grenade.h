@@ -26,10 +26,10 @@ private:
 
     float fuseTime;     
     float maxFuseTime;   
+
 public:
     Grenade();
     ~Grenade() = default;
-
 
     // 수류탄 개수 초기화
     void Init();

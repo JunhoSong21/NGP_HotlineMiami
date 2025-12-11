@@ -8,6 +8,7 @@
 #include "GameEvent.h"
 #include "EventQueue.h"
 #include "DataManager.h"
+#include "GlobalData.h"
 
 class Timer {
 private:
@@ -18,11 +19,11 @@ private:
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;
 
-	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> bulletArray;
-	std::array<bool, 3> isBulletExist;
+	std::array<std::chrono::time_point<std::chrono::system_clock>, MAX_CLIENT_NUM> bulletArray;
+	std::array<bool, MAX_CLIENT_NUM> isBulletExist;
 
-	std::array<std::chrono::time_point<std::chrono::system_clock>, 3> grenadeArray;
-	std::array<bool, 3> isGrenadeExist;
+	std::array<std::chrono::time_point<std::chrono::system_clock>, MAX_CLIENT_NUM> grenadeArray;
+	std::array<bool, MAX_CLIENT_NUM> isGrenadeExist;
 public:
 	Timer();
 

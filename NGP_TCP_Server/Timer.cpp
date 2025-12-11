@@ -70,14 +70,14 @@ void Timer::TimerLoop()
 		int deathCount = 0;
 		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 			Player* player = DataManager::GetInstance().GetPlayer(i);
-			if (player->GetIsAlive() == false)
+			if (player && player->GetIsAlive() == false)
 				++deathCount;
 		}
 
-		if (deathCount == MAX_CLIENT_NUM - 1) {
+		/*if (deathCount == MAX_CLIENT_NUM - 1) {
 			unique_ptr<GameEvent> gameEnd = make_unique<GameEnd>();
 			EventQueue::GetInstance().PushEvent(std::move(gameEnd));
-		}
+		}*/
 	}
 }
 

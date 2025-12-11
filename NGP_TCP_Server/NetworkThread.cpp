@@ -38,7 +38,7 @@ void NetworkThread::LoginProcess()
 		CS_LOGIN_PACKET loginPacket;
 		retValue = recv(clientSock, (char*)&loginPacket, sizeof(loginPacket), MSG_WAITALL);
 		if (retValue == SOCKET_ERROR)
-			printf("loginPacket recv Error\n");
+			printf("loginPacket recv() Error\n");
 
 		unique_ptr<Player> newPlayer = make_unique<Player>(threadId);
 		switch (threadId)
@@ -249,11 +249,11 @@ void NetworkThread::SendPlayerMove()
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
-			playerMovePacket.hp = sendPlayer->GetHp();
-			playerMovePacket.isAlive = sendPlayer->GetIsAlive();
-			playerMovePacket.posX = sendPlayer->GetPosX();
-			playerMovePacket.posY = sendPlayer->GetPosY();
-			playerMovePacket.angle = sendPlayer->GetAngle();
+			playerMovePacket.hp			= sendPlayer->GetHp();
+			playerMovePacket.isAlive	= sendPlayer->GetIsAlive();
+			playerMovePacket.posX		= sendPlayer->GetPosX();
+			playerMovePacket.posY		= sendPlayer->GetPosY();
+			playerMovePacket.angle		= sendPlayer->GetAngle();
 
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
@@ -329,7 +329,7 @@ void NetworkThread::SendGameEnd()
 	SC_GAME_END gameEndPacket{};
 
 	int winnerTargetNum = 0;
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		Player* player = DataManager::GetInstance().GetPlayer(i);
 		if (player->GetIsAlive() == false) {
 			winnerTargetNum = i;
@@ -346,4 +346,6 @@ void NetworkThread::SendGameEnd()
 	#ifdef _DEBUG
 		printf("gameEndPacket send() %d\n", winnerTargetNum);
 	#endif
+
+	closesocket(clientSock);
 }
