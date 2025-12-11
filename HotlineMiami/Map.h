@@ -22,8 +22,8 @@ private:
     ImageManager* imgManager{ nullptr };
     std::wstring         tilesKey;
 
-    static const int cols = 30;
-    static const int rows = 20;
+    static const int cols = 40;
+    static const int rows = 30;
     int tileW = 32;  // 출력 크기
     int tileH = 32;  // 출력 크기
     int startX = 50;  // 화면 시작 위치

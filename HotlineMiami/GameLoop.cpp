@@ -67,16 +67,47 @@ void GameLoop::Init(HWND hwnd)
 	wall->LoadImages(imgManager);
 	wall->Init();
 
-	for (int i = 0; i < 10; ++i)
+	// 내벽 - 각자 플레이어 시작방벽
+	for (int i = 0; i < 10; ++i) {
+		wall->AddWall(Wall::HeavyH, i, 10, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 8; ++i) {
+		wall->AddWall(Wall::HeavyV, 10, i, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 8; ++i) {
+		wall->AddWall(Wall::CellH, i, 20, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 10; ++i) {
+		wall->AddWall(Wall::CellV, 10, 20 + i, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 5; ++i) {
+		wall->AddWall(Wall::SewerH, 33 + i, 15, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 15; ++i) {
+		wall->AddWall(Wall::SewerV, 33, i, 1, 1, Wall::DrawMode::Tiled);
+	}
+	// 외벽
+	for (int i = 0; i < 40; ++i) {
 		wall->AddWall(Wall::BrickH, i, 0, 1, 1, Wall::DrawMode::Tiled);
-
-	for (int i = 0; i < 10; ++i)
+		wall->AddWall(Wall::BrickH, i, 30, 1, 1, Wall::DrawMode::Tiled);
+	}
+	for (int i = 0; i < 30; ++i) {
 		wall->AddWall(Wall::BrickV, 0, i, 1, 1, Wall::DrawMode::Tiled);
-	
-	wall->AddWall(Wall::BarBooth, 3, 4, 1, 1, Wall::DrawMode::Sprite);
-	wall->AddWall(Wall::BossSofa, 15, 10, 3, 2, Wall::DrawMode::Sprite);
-	wall->AddWall(Wall::PoolTable, 10, 6, 2, 3, Wall::DrawMode::Sprite);
-	wall->AddWall(Wall::BigBed, 6, 10, 1, 1, Wall::DrawMode::Sprite);
+		wall->AddWall(Wall::BrickV, 40, i, 1, 1, Wall::DrawMode::Tiled);
+	}
+	// 엄폐물 wall
+	wall->AddWall(Wall::PoolTable2, 19, 8, 2, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::PoolTable2, 19, 21, 2, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::BarBooth, 20, 13, 1, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::BossSofa, 19, 17, 3, 2, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::HospitalCouch, 16, 15, 1, 2, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::PoolTable, 6, 16, 2, 3, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::BigBed, 9, 7, 1, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::BigBed, 6, 22, 1, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::BigBed, 34, 14, 1, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::DJTable, 26, 14, 3, 1, Wall::DrawMode::Sprite);
+	wall->AddWall(Wall::DJTable, 26, 17, 3, 1, Wall::DrawMode::Sprite);
+
 
 	timer = new Timer();
 

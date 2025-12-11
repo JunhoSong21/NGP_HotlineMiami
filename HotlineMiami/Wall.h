@@ -10,8 +10,8 @@
 
 class Wall final {
 public:
-    static constexpr int COLS = 30;
-    static constexpr int ROWS = 20;
+    static constexpr int COLS = 41;
+    static constexpr int ROWS = 31;
     static constexpr int TILE_W = 32;
     static constexpr int TILE_H = 32;
     static constexpr int START_X = 50;
@@ -30,7 +30,10 @@ public:
         BarBooth = 9, // 72x64 Resource/Map/sprBarBooth.png
         PoolTable = 10, // 32x68 Resource/Map/sprPoolTable.png
         BigBed = 11,    // 60x80 Resource/Map/sprBigBed.png
-        BossSofa = 12   // 128x64 Resource/Map/sprBossSofa.png
+        BossSofa = 12,   // 128x64 Resource/Map/sprBossSofa.png
+        PoolTable2 = 13, // 68x32 Resource/Map/sprPoolTable2.png
+        DJTable = 14,    // 88x23 Resource/Map/sprDJTable.png
+        HospitalCouch = 15   // 25x64 Resource/Map/sprHospitalCouch.png
     };
 
     enum class DrawMode : uint8_t { Tiled, Stretch, Sprite };
