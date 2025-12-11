@@ -13,6 +13,7 @@ class Timer {
 private:
 	std::chrono::time_point<std::chrono::system_clock> moveEventPoint;
 	std::chrono::time_point<std::chrono::system_clock> bulletEventPoint;
+	std::chrono::time_point<std::chrono::system_clock> gameEndPoint;
 
 	std::chrono::time_point<std::chrono::system_clock> timePoint;
 	std::mutex timerMutex;

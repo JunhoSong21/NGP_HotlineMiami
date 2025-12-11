@@ -14,6 +14,7 @@ struct GameEvent {
 		LOGIN_TRY,
 		ROOM_MAKE,
 		ROOM_READY,
+		GAME_END,
 	};
 
 	Type	type;
@@ -42,7 +43,7 @@ struct PlayerUpdate : GameEvent {
 	PlayerUpdate()
 	{
 		type = GameEvent::Type::PLAYER_UPDATE;
-		networkThreadId = 0;
+		networkThreadId = NULL;
 	}
 };
 
@@ -61,7 +62,7 @@ struct BulletUpdate : GameEvent {
 	BulletUpdate()
 	{
 		type = GameEvent::Type::BULLET_UPDATE;
-		networkThreadId = 0;
+		networkThreadId = NULL;
 	}
 };
 
@@ -113,3 +114,11 @@ struct GrenadeExplosion : GameEvent {
 //struct RoomReady : GameEvent {
 //
 //};
+
+struct GameEnd : GameEvent {
+	GameEnd()
+	{
+		type = GameEvent::Type::GAME_END;
+		networkThreadId = NULL;
+	}
+};

@@ -47,6 +47,11 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandleGrenadeExplosionEvent(std::move(grenadeExplosionEvent));
 		break;
 	}
+	case GameEvent::Type::GAME_END: {
+		unique_ptr<GameEnd> gameEndEvent(static_cast<GameEnd*>(event.release()));
+		HandleGameEndEvent(std::move(gameEndEvent));
+		break;
+	}
 	default:
 		printf("Undefine Event Type\n");
 		break;
@@ -70,9 +75,9 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 			CalculateAtan2Float(event->mouseX, event->mouseY, x, y));
 	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("playerMoveEvent 처리 완료\n");
-#endif
+	#endif
 }
 
 void PopEvent::HandlePlayerUpdateEvent(unique_ptr<PlayerUpdate> event)
@@ -96,9 +101,9 @@ void PopEvent::HandleBulletTriggerEvent(unique_ptr<BulletTrigger> event)
 	bullet->SetPos(event->posX, event->posY);
 	bullet->SetAngle(event->atan2);
 	
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("bulletTriggerEvent 처리 완료\n");
-#endif
+	#endif
 }
 
 void PopEvent::HandleBulletUpdateEvent(unique_ptr<BulletUpdate> event)
@@ -117,19 +122,22 @@ void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
 	Timer::GetInstance().AddGrenade(event->networkThreadId);
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("grenadeThrowEvent 처리 완료\n");
-#endif
+	#endif
 }
 
 void PopEvent::HandleGrenadeExplosionEvent(unique_ptr<GrenadeExplosion> event)
 {
-	lock_guard<mutex> lock(grenadeExplosionMutex);
-
 	// 수류탄을 폭발 상태로 전환 후 이벤트 브로드캐스트
 	Grenade* grenade = DataManager::GetInstance().GetGrenade(event->networkThreadId);
 	grenade->ChangeStateToExplode();
 
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
+}
+
+void PopEvent::HandleGameEndEvent(std::unique_ptr<GameEnd> event)
+{
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 

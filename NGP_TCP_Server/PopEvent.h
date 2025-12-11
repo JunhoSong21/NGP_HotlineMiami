@@ -32,5 +32,7 @@ private:
 	void HandleGrenadeThrowEvent(std::unique_ptr<GrenadeThrow> event);
 	void HandleGrenadeExplosionEvent(std::unique_ptr<GrenadeExplosion> event);
 
+	void HandleGameEndEvent(std::unique_ptr<GameEnd> event);
+
 	float CalculateAtan2Float(float x1, float y1, float x2, float y2);
 };

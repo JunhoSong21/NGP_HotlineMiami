@@ -35,7 +35,7 @@ void Timer::TimerLoop()
 	}
 
 	// Bullet Pos Update
-	if (milliseconds(20) < duration_cast<milliseconds>(timePoint - bulletEventPoint)) {
+	if (milliseconds(16) < duration_cast<milliseconds>(timePoint - bulletEventPoint)) {
 		lock_guard<mutex> lock(timerMutex);
 		bulletEventPoint = system_clock::now();
 
@@ -60,6 +60,23 @@ void Timer::TimerLoop()
 			isGrenadeExist[i] = false;
 			unique_ptr<GameEvent> grenadeExplosion = make_unique<GrenadeExplosion>(i);
 			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
+		}
+	}
+
+	if (seconds(1) < duration_cast<seconds>(timePoint - gameEndPoint)) {
+		lock_guard<mutex> lock(timerMutex);
+		gameEndPoint = system_clock::now();
+
+		int deathCount = 0;
+		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
+			Player* player = DataManager::GetInstance().GetPlayer(i);
+			if (player->GetIsAlive() == false)
+				++deathCount;
+		}
+
+		if (deathCount == MAX_CLIENT_NUM - 1) {
+			unique_ptr<GameEvent> gameEnd = make_unique<GameEnd>();
+			EventQueue::GetInstance().PushEvent(std::move(gameEnd));
 		}
 	}
 }

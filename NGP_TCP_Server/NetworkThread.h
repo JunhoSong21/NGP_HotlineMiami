@@ -36,4 +36,5 @@ public:
 	void SendPlayerMove();
 	void SendBulletState();
 	void SendGrenadeState();
+	void SendGameEnd();
 };

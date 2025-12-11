@@ -69,9 +69,9 @@ void NetworkThread::LoginProcess()
 		unique_ptr<Grenade> newGrenade = make_unique<Grenade>(threadId);
 		DataManager::GetInstance().AddGrenade(std::move(newGrenade));
 
-#ifdef _DEBUG
+		#ifdef _DEBUG
 		printf("Login Packet recv() Success\n");
-#endif
+		#endif
 	}
 
 	// send
@@ -171,7 +171,17 @@ void NetworkThread::ThreadFunc()
 				SendGrenadeState();
 			break;
 		}
+		case PN::SC_GAME_END: {
+			sendPacketHeader.packetSize = sizeof(SC_GAME_END);
+			retValue = send(clientSock, (char*)&sendPacketHeader, sizeof(sendPacketHeader), 0);
+			if (retValue == SOCKET_ERROR)
+				printf("send() SC_GAME_END() Error\n");
+			else
+				SendGameEnd();
+			break;
+		}
 		default:
+			printf("Undefined Event PN::Number\n");
 			break;
 		}
 	}
@@ -179,9 +189,9 @@ void NetworkThread::ThreadFunc()
 
 void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 {
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("Key Input Packet recv %f, %f\n", packet.posX, packet.posY);
-#endif
+	#endif
 	unique_ptr<GameEvent> playerMoveEvent = make_unique<PlayerMove>(
 		threadId, packet.flags, packet.posX, packet.posY, packet.mouseX, packet.mouseY);
 	EventQueue::GetInstance().PushEvent(std::move(playerMoveEvent));
@@ -189,9 +199,9 @@ void NetworkThread::KeyInputPacketProcess(struct CS_KEY_INPUT packet)
 
 void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
 {
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("Bullet Trigger Packet recv\n");
-#endif
+	#endif
 	unique_ptr<GameEvent> bulletTriggerEvent = make_unique<BulletTrigger>(
 	threadId, packet.posX, packet.posY, packet.dirRadAngle);
 	EventQueue::GetInstance().PushEvent(std::move(bulletTriggerEvent));
@@ -199,9 +209,9 @@ void NetworkThread::BulletTriggerPacketProcess(struct CS_BULLET_TRIGGER packet)
 
 void NetworkThread::GrenadeThrowPacketProcess(struct CS_GRENADE_THROW packet)
 {
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	printf("Greanade Throw Packet recv\n");
-#endif
+	#endif
 	unique_ptr<GameEvent> grenadeThrowEvent = make_unique<GrenadeThrow>(
 	threadId, packet.posX, packet.posY, packet.dirRadAngle);
 	EventQueue::GetInstance().PushEvent(std::move(grenadeThrowEvent));
@@ -222,6 +232,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	case GameEvent::Type::GRENADE_EXPLOSION:
 		sendQueue.enqueue(PN::SC_GRENADE_STATE);
 		break;
+	case GameEvent::Type::GAME_END:
+		sendQueue.enqueue(PN::SC_GAME_END);
+		break;
 	default:
 		break;
 	}
@@ -232,7 +245,7 @@ void NetworkThread::SendPlayerMove()
 	int retValue = 0;
 	SC_PLAYER_MOVE playerMovePacket{};
 
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		playerMovePacket.targetNum = i;
 		Player* sendPlayer = DataManager::GetInstance().GetPlayer(i);
 		if (sendPlayer) {
@@ -245,11 +258,10 @@ void NetworkThread::SendPlayerMove()
 			retValue = send(clientSock, (char*)&playerMovePacket, sizeof(playerMovePacket), 0);
 			if (retValue == SOCKET_ERROR)
 				printf("playerMovePacket Send() Error\n");
-			else {
-#ifdef _DEBUG
+			else
+			#ifdef _DEBUG
 				printf("playerMovePacket %f, %f\n", playerMovePacket.posX, playerMovePacket.posY);
-#endif
-			}
+			#endif
 		}
 	}
 }
@@ -259,7 +271,7 @@ void NetworkThread::SendBulletState()
 	int retValue = 0;
 	SC_BULLET_STATE bulletStatePacket{};
 
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		bulletStatePacket.targerNum = i;
 		if (!Timer::GetInstance().GetBulletArray(i))
 			continue;
@@ -275,10 +287,10 @@ void NetworkThread::SendBulletState()
 			if (retValue == SOCKET_ERROR)
 				printf("bulletStatePacket send() Error\n");
 			else
-#ifdef _DEBUG
+			#ifdef _DEBUG
 				printf("bulletStatePacket send() %f, %f, %f\n",
 					bulletStatePacket.posX, bulletStatePacket.posY, bulletStatePacket.dirAngle);
-#endif
+			#endif
 		}
 	}
 }
@@ -304,9 +316,34 @@ void NetworkThread::SendGrenadeState()
 			if (retValue == SOCKET_ERROR)
 				printf("grenadeStatePacket send() Error\n");
 			else
-#ifdef _DEBUG
+			#ifdef _DEBUG
 				printf("grenadeStatePacket send() Complete\n");
-#endif
+			#endif
 		}
 	}
+}
+
+void NetworkThread::SendGameEnd()
+{
+	int retValue = 0;
+	SC_GAME_END gameEndPacket{};
+
+	int winnerTargetNum = 0;
+	for (int i = 0; i < 3; ++i) {
+		Player* player = DataManager::GetInstance().GetPlayer(i);
+		if (player->GetIsAlive() == false) {
+			winnerTargetNum = i;
+			break;
+		}
+	}
+	gameEndPacket.isMatchEnded = true;
+	gameEndPacket.winnerTartgetNum = winnerTargetNum;
+
+	retValue = send(clientSock, (char*)&winnerTargetNum, sizeof(winnerTargetNum), 0);
+	if (retValue == SOCKET_ERROR)
+		printf("gameEndPacket send() Error\n");
+	else
+	#ifdef _DEBUG
+		printf("gameEndPacket send() %d\n", winnerTargetNum);
+	#endif
 }
