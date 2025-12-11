@@ -254,8 +254,10 @@ void NetworkThread::SendBulletState()
 			if (retValue == SOCKET_ERROR)
 				printf("bulletStatePacket send() Error\n");
 			else
+#ifdef _DEBUG
 				printf("bulletStatePacket send() %f, %f, %f\n",
 					bulletStatePacket.posX, bulletStatePacket.posY, bulletStatePacket.dirAngle);
+#endif
 		}
 	}
 }
@@ -279,9 +281,11 @@ void NetworkThread::SendGrenadeState()
 
 			retValue = send(clientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), 0);
 			if (retValue == SOCKET_ERROR)
-				printf("grenadeStatePacket Send() Error\n");
+				printf("grenadeStatePacket send() Error\n");
 			else
-				printf("grenadeStatePacket Send() Complete\n");
+#ifdef _DEBUG
+				printf("grenadeStatePacket send() Complete\n");
+#endif
 		}
 	}
 }
