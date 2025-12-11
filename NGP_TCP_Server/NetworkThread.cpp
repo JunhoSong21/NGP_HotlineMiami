@@ -273,9 +273,6 @@ void NetworkThread::SendBulletState()
 
 	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		bulletStatePacket.targerNum = i;
-		if (!Timer::GetInstance().GetBulletArray(i))
-			continue;
-
 		Bullet* sendBullet = DataManager::GetInstance().GetBullet(i);
 		if (sendBullet) {
 			bulletStatePacket.isActive	= sendBullet->IsActive();

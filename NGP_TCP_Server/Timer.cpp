@@ -35,18 +35,17 @@ void Timer::TimerLoop()
 
 	// Bullet Pos Update
 	if (milliseconds(16) < duration_cast<milliseconds>(timePoint - bulletEventPoint)) {
-		lock_guard<mutex> lock(timerMutex);
+		//lock_guard<mutex> lock(timerMutex);
 		bulletEventPoint = system_clock::now();
 
 		for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 			Bullet* bullet = DataManager::GetInstance().GetBullet(i);
-			if (bullet && bullet->IsActive()) {
+			if (bullet)
 				bullet->CalcPosbyAngle();
-			}
 		}
 
 		unique_ptr<GameEvent> bulletUpdate = make_unique<BulletUpdate>();
-		//EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
+		EventQueue::GetInstance().PushEvent(std::move(bulletUpdate));
 	}
 
 	DataManager::GetInstance().CollisionCheck();
