@@ -122,10 +122,6 @@ void GameLoop::Init(HWND hwnd)
 	grenade->Init();
 	grenade->LoadGrenadeImage(imgManager);
 
-	// 수류탄에 벽 정보 넘겨주기
-	if (wall && grenade)
-		grenade->SetWall(wall);
-
 	hud = new HUD();
 	hud->Init(imgManager);
 	players[0]->LoadPlayerImages(imgManager);
@@ -188,9 +184,6 @@ void GameLoop::Update()
 		Gdiplus::SizeF playerAabb(35.0f, 35.0f);
 		Gdiplus::PointF resolvedPos = oldPos;
 
-		if (wall)
-			wall->ResolveMove(resolvedPos, playerAabb, delta);
-
 		players[myIdx]->GetPos() = resolvedPos;
 	}
 
@@ -199,13 +192,8 @@ void GameLoop::Update()
 		camera->Update(deltaTime);
 	}
 
-	if (grenade) {
+	if (grenade)
 		grenade->Update(deltaTime);
-
-		// 파편 충돌: 내 플레이어 기준
-		if (players[myIdx])
-			grenade->Collision(deltaTime, players[myIdx]);
-	}
 
 	if (bullet)
 		bullet->Update(deltaTime);

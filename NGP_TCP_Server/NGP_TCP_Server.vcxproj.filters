@@ -45,6 +45,9 @@
     <Filter Include="소스 파일\Timer">
       <UniqueIdentifier>{eaadbbbc-79eb-4f62-bac6-bcb9e71e1a9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Object Class\Wall">
+      <UniqueIdentifier>{ac91ce2a-4286-444f-9b7f-a0cc6bc09737}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -79,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>소스 파일\Object Class\Wall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +129,9 @@
     </ClInclude>
     <ClInclude Include="GlobalData.h">
       <Filter>소스 파일\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>소스 파일\Object Class\Wall</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

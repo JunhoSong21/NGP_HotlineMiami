@@ -44,16 +44,16 @@ void NetworkThread::LoginProcess()
 		switch (threadId)
 		{
 		case 0:
-			newPlayer->SetPosX(300.0f);
-			newPlayer->SetPosY(1300.0f);
+			newPlayer->SetPosX(250.0f);
+			newPlayer->SetPosY(900.0f);
 			break;
 		case 1:
-			newPlayer->SetPosX(300.0f);
-			newPlayer->SetPosY(550.0f);
+			newPlayer->SetPosX(250.0f);
+			newPlayer->SetPosY(190.0f);
 			break;
 		case 2:
-			newPlayer->SetPosX(1850.0f);
-			newPlayer->SetPosY(550.0f);
+			newPlayer->SetPosX(1250.0f);
+			newPlayer->SetPosY(320.0f);
 			break;
 		default:
 			// ±âº»°ª

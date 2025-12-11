@@ -3,6 +3,7 @@
 #include "ThreadManager.h"
 #include "PopEvent.h"
 #include "Timer.h"
+#include "Wall.h"
 
 constexpr int MAX_CLIENT_NUM = 1;
 using std::unique_ptr;
@@ -86,6 +87,9 @@ int main()
 			break;
 		}
 	}
+
+	// 월드 콜리전 정보 세팅
+	Wall::Get().InitDefaultLayout();
 
 	PopEvent gameLoop;
 	while (true) {

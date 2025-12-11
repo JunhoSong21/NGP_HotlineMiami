@@ -134,6 +134,7 @@
     <ClCompile Include="PopEvent.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="PopEvent.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
