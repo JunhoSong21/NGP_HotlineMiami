@@ -129,7 +129,6 @@ void GameLoop::Init(HWND hwnd)
 		bullets[i]->SetVisible(false);
 
 		grenades[i] = new Grenade();
-		grenades[i]->Init();
 		grenades[i]->LoadGrenadeImage(imgManager);
 	}
 
@@ -428,15 +427,22 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_RBUTTONDOWN:
 	{
-		// 플레이어/수류탄이 준비되어 있을 때만 처리
-		if (!players[myIdx] || !grenades[myIdx])
-			return;
+		// 네트워크 안 돌면 그냥 무시
+		if (!g_NetworkRunning || g_ClientSock == INVALID_SOCKET)
+			break;
+
+		// 내 플레이어 없으면 무시
+		if (!players[myIdx])
+			break;
 
 		// 마우스 클릭 지점 (클라이언트 좌표계)
 		int mouseX = static_cast<short>(LOWORD(lParam));
 		int mouseY = static_cast<short>(HIWORD(lParam));
 
-		Gdiplus::PointF startPos = players[myIdx]->GetPos();                 // 플레이어 중심
+		// 플레이어 월드 좌표
+		Gdiplus::PointF startPos = players[myIdx]->GetPos();
+
+		// 마우스를 월드 좌표로 변환
 		Gdiplus::PointF targetPos(
 			static_cast<float>(mouseX),
 			static_cast<float>(mouseY)
@@ -447,22 +453,14 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 			targetPos = camera->ScreenToWorld(pt);
 		}
 
-		// 기존 활성 상태 저장
-		bool wasActive = grenades[myIdx]->IsActive();
+		// 방향 각도 계산 (라디안)
+		float dx = targetPos.X - startPos.X;
+		float dy = targetPos.Y - startPos.Y;
+		float dirRad = atan2f(dy, dx);
 
-		// 수류탄 투척 시도 (내부에서 2발 제한 체크)
-		grenades[myIdx]->Throw(startPos, targetPos);
-
-		// 이번 클릭에서 새로 활성화된 경우에만 서버에 알림
-		if (!wasActive && grenades[myIdx]->IsActive() && g_NetworkRunning && g_ClientSock != INVALID_SOCKET)
-		{
-			float dx = targetPos.X - startPos.X;
-			float dy = targetPos.Y - startPos.Y;
-			float dirRad = atan2f(dy, dx);
-
-			g_GrenadeReq.requested = true;
-			g_GrenadeReq.dirRadAngle = dirRad;
-		}
+		// 네트워크 스레드에 "수류탄 던져라" 요청
+		g_GrenadeReq.requested = true;
+		g_GrenadeReq.dirRadAngle = dirRad;
 
 		break;
 	}

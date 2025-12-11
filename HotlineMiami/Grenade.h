@@ -14,36 +14,29 @@ private:
     bool isActive;            // 현재 활성(날아가는 중) 여부
     bool exploded;   // 폭발 여부 (서버 상태)
     std::wstring            fragmentSpriteKey; // 파편 이미지 키
-   
+    float             fuseRemain; // 서버에서 받은 값(0~3)
+
     struct Fragment {
         Gdiplus::PointF pos;
         Gdiplus::PointF vel;
         float life;   
         bool active;
     };
-
     std::vector<Fragment> fragments;
-
-    float fuseTime;     
-    float maxFuseTime;   
-
+  
 public:
     Grenade();
     ~Grenade() = default;
 
-    // 수류탄 개수 초기화
-    void Init();
-    // 리소스 로드용
     void LoadGrenadeImage(ImageManager& imgMgr);
+    // 서버 상태 적용
+    void ApplyServerState(bool active, bool explode, float x, float y, float remainFuse);
+    // 클라에서 폭발 VFX / 파편 애니메이션만 처리
     void Update(float deltaTime);
     void Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr);
+    // 폭발 시작 순간 한 번만 호출
     void SpawnFragments();
-    // 발사 (플레이어 위치, 목표 위치)
-    void Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targetPos);
     bool IsActive() const { return isActive; }
-    float GetRemainTime() const { return fuseTime; }
-
-    void SetPosition(float x, float y);
-    void SetIsActive(bool b);
-    void SetIsExplode(bool b);
+    float GetRemainTime() const { return fuseRemain; }
+    void SetPosition(float x, float y) { pos = Gdiplus::PointF(x, y); }
 };

@@ -132,7 +132,7 @@ int SendProcess(SOCKET sock, HWND hWnd, const Player& player)
     }
     // 수류탄 요청이 있으면 수류탄부터
     else if (g_GrenadeReq.requested) {
-        if (Send_GrenadeThrow(sock, g_GrenadeReq.dirRadAngle) == SOCKET_ERROR) {
+        if (Send_GrenadeThrow(sock, hWnd, player) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
         g_GrenadeReq.requested = false;
@@ -195,38 +195,39 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 }
 
 // 수류탄 패킷 전송 함수
-int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
+int Send_GrenadeThrow(SOCKET sock, HWND hWnd, const Player& player)
 {
-    CS_GRENADE_THROW pkt{};
-    pkt.dirRadAngle = dirRadAngle;
+    const Gdiplus::PointF& pos = player.GetPosition();
+
+    POINT mouse;
+    GetCursorPos(&mouse);
+    ScreenToClient(hWnd, &mouse);
+
+    float dx = static_cast<float>(mouse.x) - pos.X;
+    float dy = static_cast<float>(mouse.y) - pos.Y;
+
+    float dirRad = std::atan2f(dy, dx); // y, x 순서 맞게
 
     PacketHeader header{};
     header.packetType = PN::CS_GRENADE_THROW;
-    header.packetSize = sizeof(pkt);
+    header.packetSize = sizeof(CS_GRENADE_THROW);
 
-    // 헤더 전송
-    int sent = send(
-        sock,
-        reinterpret_cast<const char*>(&header),
-        static_cast<int>(sizeof(header)),
-        0
-    );
+    CS_GRENADE_THROW pkt{};
+    pkt.posX = pos.X;
+    pkt.posY = pos.Y;
+    pkt.dirRadAngle = dirRad;
+
+    int sent = send(sock, reinterpret_cast<const char*>(&header), sizeof(header), 0);
     if (sent == SOCKET_ERROR) {
         return SOCKET_ERROR;
     }
 
-    // 본문 전송
-    sent = send(
-        sock,
-        reinterpret_cast<const char*>(&pkt),
-        static_cast<int>(sizeof(pkt)),
-        0
-    );
+    sent = send(sock, reinterpret_cast<const char*>(&pkt), sizeof(pkt), 0);
     if (sent == SOCKET_ERROR) {
         return SOCKET_ERROR;
     }
 
-    return static_cast<int>(sizeof(header) + sizeof(pkt));
+    return 0;
 }
 
 int Send_BulletTrigger(SOCKET sock, float dirRadAngle)
@@ -343,23 +344,43 @@ void Recv_BulletData(Bullet** bullets)
 
 void Recv_GrenadeData(Grenade** grenades)
 {
+    if (g_ClientSock == INVALID_SOCKET)
+        return;
+
     int retValue = 0;
-    SC_GRENADE_STATE grenadeStatePacket{};
+    SC_GRENADE_STATE pkt{};
 
     for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
-        retValue = recv(g_ClientSock, (char*)&grenadeStatePacket, sizeof(grenadeStatePacket), MSG_WAITALL);
-        if (retValue == SOCKET_ERROR)
+        retValue = recv(g_ClientSock,
+            reinterpret_cast<char*>(&pkt),
+            sizeof(pkt),
+            MSG_WAITALL);
+
+        // 0이면 서버가 소켓 닫은 것, 에러면 그대로 종료
+        if (retValue == 0 || retValue == SOCKET_ERROR)
             return;
 
-        int index = static_cast<int>(grenadeStatePacket.targetNum);
-        if (!grenades[index])
-            return;
+        int index = static_cast<int>(pkt.targetNum);
 
-        grenades[index]->SetIsActive(grenadeStatePacket.isActive);
-        grenades[index]->SetIsExplode(grenadeStatePacket.isExploded);
-        grenades[index]->SetPosition(grenadeStatePacket.posX, grenadeStatePacket.posY);
+        // 인덱스 범위 체크
+        if (index < 0 || index >= MAX_CLIENT_NUM)
+            continue;
+
+        Grenade* g = grenades[index];
+        if (!g)
+            continue;
+
+        // 서버 상태 적용 (렌더 전용)
+        g->ApplyServerState(
+            pkt.isActive,
+            pkt.isExploded,   // 구조체 필드 이름에 맞게
+            pkt.posX,
+            pkt.posY,
+            pkt.remainFuse   // 남은 퓨즈 시간(0.0f~3.0f)
+        );
     }
 }
+
 
 void Recv_GameEnd()
 {

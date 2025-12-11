@@ -8,6 +8,32 @@ using std::hypot;
 
 constexpr float PLAYER_HITBOX_DISTANCE = 1.0f;
 
+// DataManager.cpp
+DataManager::DataManager()
+{
+	grenadeRemain.fill(MAX_GRENADE_PER_PLAYER);
+}
+
+bool DataManager::TryConsumeGrenade(int playerId)
+{
+	if (playerId < 0 || playerId >= MAX_CLIENT_NUM) {
+		return false;
+	}
+	if (grenadeRemain[playerId] <= 0) {
+		return false;
+	}
+	--grenadeRemain[playerId];
+	return true;
+}
+
+void DataManager::ResetGrenadeCount(int playerId)
+{
+	if (playerId < 0 || playerId >= MAX_CLIENT_NUM) {
+		return;
+	}
+	grenadeRemain[playerId] = MAX_GRENADE_PER_PLAYER;
+}
+
 void DataManager::AddPlayer(unique_ptr<Player> player)
 {
 	if (player) {

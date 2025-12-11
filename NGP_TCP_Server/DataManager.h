@@ -3,12 +3,14 @@
 #include <memory>
 #include <mutex>
 #include <cmath>
-
+#include <array>
 #include "Timer.h"
 #include "Player.h"
 #include "Bullet.h"
 #include "Grenade.h"
+#include "GlobalData.h"
 
+constexpr int MAX_GRENADE_PER_PLAYER = 2;
 class Player;
 class Bullet;
 class Grenade;
@@ -18,8 +20,9 @@ private:
 	std::unordered_map<int, std::unique_ptr<Player>>	playerData;
 	std::unordered_map<int, std::unique_ptr<Bullet>>	bulletData;
 	std::unordered_map<int, std::unique_ptr<Grenade>>	grenadeData;
+	std::array<int, MAX_CLIENT_NUM> grenadeRemain{};
 
-	DataManager() = default;
+	DataManager();
 	~DataManager() = default;
 	DataManager(const DataManager&) = delete;
 	DataManager& operator=(const DataManager&) = delete;
@@ -42,4 +45,7 @@ public:
 	void CollisionCheck();
 	bool PlayerToBulletCollision(Player* player, Bullet* bullet);
 	void PlayerToGrenadeCollision();
+
+	bool TryConsumeGrenade(int playerId);
+	void ResetGrenadeCount(int playerId);
 };

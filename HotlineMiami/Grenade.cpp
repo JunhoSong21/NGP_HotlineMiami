@@ -16,19 +16,8 @@ Grenade::Grenade()
     , isActive(false)
     , exploded(false)
     , fragmentSpriteKey(L"sprGrenadeFragment")
-    , fuseTime(0.0f)
-    , maxFuseTime(GRENADE_FUSE_TIME)
+    , fuseRemain(0.0f)
 {
-}
-
-void Grenade::Init()
-{
-    // 수류탄 상태 초기화
-    pos = Gdiplus::PointF(0.0f, 0.0f);
-    isActive = false;
-    exploded = false;
-    fuseTime = 0.0f;
-    fragments.clear();
 }
 
 void Grenade::LoadGrenadeImage(ImageManager& imgMgr)
@@ -62,59 +51,66 @@ void Grenade::SpawnFragments()
     }
 }
 
+void Grenade::ApplyServerState(bool active, bool explode, float x, float y, float remainFuse)
+{
+    // 위치 / 상태 동기화
+    pos = Gdiplus::PointF(x, y);
+    isActive = active;
+    fuseRemain = remainFuse;
+
+    // exploded 플래그가 false → true 로 변하는 순간에만 파편 생성
+    if (explode && !exploded) {
+        exploded = true;
+        SpawnFragments();
+    }
+    else if (!explode && exploded) {
+        // 서버에서 다시 초기화된 경우라면 클라 상태도 리셋
+        exploded = false;
+        fragments.clear();
+    }
+}
+
 void Grenade::Update(float deltaTime)
 {
-    if (!isActive) {
+    // 파편만 클라 로컬에서 수명 관리
+    if (!exploded) {
         return;
     }
 
-    // 아직 폭발 전이면 타이머 줄이기
-    if (!exploded) {
-        fuseTime -= deltaTime;
-        if (fuseTime <= 0.0f) {
-            fuseTime = 0.0f;
-            exploded = true;
+    bool anyActive = false;
 
-            // 폭발 시점에 파편 생성 (VFX)
-            SpawnFragments();
+    for (auto& f : fragments) {
+        if (!f.active) {
+            continue;
         }
+
+        f.life -= deltaTime;
+        if (f.life <= 0.0f) {
+            f.active = false;
+            continue;
+        }
+
+        f.pos.X += f.vel.X * deltaTime;
+        f.pos.Y += f.vel.Y * deltaTime;
+
+        anyActive = true;
     }
 
-    // 폭발 후에는 파편만 업데이트
-    if (exploded) {
-        bool anyActive = false;
-
-        for (auto& f : fragments) {
-            if (!f.active) {
-                continue;
-            }
-
-            f.life -= deltaTime;
-            if (f.life <= 0.0f) {
-                f.active = false;
-                continue;
-            }
-
-            // 단순 선형 이동
-            f.pos.X += f.vel.X * deltaTime;
-            f.pos.Y += f.vel.Y * deltaTime;
-            anyActive = true;
-        }
-
-        // 모든 파편 수명이 끝나면 수류탄 비활성화
-        if (!anyActive) {
-            isActive = false;
-        }
+    if (!anyActive) {
+        // 파편 다 사라졌으면 그레네이드 자체도 렌더링 종료
+        isActive = false;
     }
 }
 
 void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
 {
-    if (!isActive) {
+    // 아무 상태도 아니면 스킵
+    // (아직 안 던졌고, 폭발도 아닌 상태)
+    if (!isActive && !exploded) {
         return;
     }
 
-    // 1) 폭발 전: 수류탄 본체 그리기 + 남은 시간 표시 (원하면)
+    // 1) 폭발 전: 수류탄 본체 + (서버에서 내려온) 남은 시간 텍스트
     if (!exploded) {
         Gdiplus::Bitmap* bmp = imgMgr.GetImage(spriteKey);
         if (bmp) {
@@ -130,23 +126,23 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
             graphics.DrawImage(bmp, dest);
         }
 
-        // 남은 시간 텍스트(선택 사항)
-        // 필요 없으면 이 블록 통째로 지워도 됨
-        if (maxFuseTime > 0.0f) {
-            float t = fuseTime;
+        //  남은 시간 표시: 서버에서 받은 값(fuseRemain) 사용
+        //  - fuseRemain은 0.0f ~ 3.0f 범위로 클라가 ApplyServerState에서 저장해 둔 값이라고 가정
+        if (fuseRemain > 0.0f) {
+            float t = fuseRemain;
             if (t < 0.0f) t = 0.0f;
 
             WCHAR buf[16];
-            swprintf_s(buf, L"%.1f", t);
+            swprintf_s(buf, L"%.1f", t);   // 소수점 한 자리
 
-            Gdiplus::Font font(L"Consolas", 10.0f);
+            Gdiplus::Font       font(L"Consolas", 10.0f);
             Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 0, 0));
 
             Gdiplus::PointF textPos(pos.X + 10.0f, pos.Y - 20.0f);
             graphics.DrawString(buf, -1, &font, textPos, &brush);
         }
     }
-    // 2) 폭발 후: 파편만 그리기
+    // 2) 폭발 후: 파편 렌더링
     else {
         Gdiplus::Bitmap* fragBmp = imgMgr.GetImage(fragmentSpriteKey);
         if (!fragBmp) {
@@ -169,39 +165,5 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
             );
             graphics.DrawImage(fragBmp, dst);
         }
-    }
-}
-
-// 던졌다 표시만
-void Grenade::Throw(const Gdiplus::PointF& startPos, const Gdiplus::PointF& targetPos)
-{
-    // 지금은 단일 수류탄만 허용 (이미 날아가는 중이면 무시)
-    if (isActive)
-        return;
-
-    pos = startPos;
-    isActive = true;
-    exploded = false;
-    fuseTime = maxFuseTime;
-    fragments.clear();
-
-    (void)targetPos;
-}
-
-void Grenade::SetPosition(float x, float y)
-{
-    pos = Gdiplus::PointF(x, y);
-}
-
-void Grenade::SetIsActive(bool b)
-{
-    isActive = b;
-}
-
-void Grenade::SetIsExplode(bool b)
-{
-    if (b == true) {
-        isActive = false;
-        exploded = b;
     }
 }
