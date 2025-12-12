@@ -1,7 +1,7 @@
 #pragma once
 
 // int
-const int MAX_CLIENT_NUM = 1;
+const int MAX_CLIENT_NUM = 2;
 
 // float
 const float BULLET_DAMAGE = 15.0f;

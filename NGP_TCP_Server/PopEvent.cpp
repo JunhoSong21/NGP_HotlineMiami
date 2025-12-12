@@ -94,7 +94,8 @@ void PopEvent::HandlePlayerMoveEvent(unique_ptr<PlayerMove> event)
 
 		// 회전 계산도 서버 좌표 기준으로
 		player->SetAngle(
-			CalculateAtan2Float(event->mouseX, event->mouseY, x, y));
+			CalculateAtan2Float(x, y, event->mouseX, event->mouseY)
+		);
 	}
 
 	#ifdef _DEBUG
