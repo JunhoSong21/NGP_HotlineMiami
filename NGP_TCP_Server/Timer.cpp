@@ -53,6 +53,8 @@ void Timer::TimerLoop()
 
 	// 2) Grenade 이동 + 퓨즈 처리
 	constexpr float FIXED_DELTA = 0.016f; // 16ms 기준
+	bool anyGrenadeAlive = false;
+
 	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
 		Grenade* grenade = DataManager::GetInstance().GetGrenade(i);
 		if (!grenade) {
@@ -78,6 +80,12 @@ void Timer::TimerLoop()
 		if (!grenade->GetIsActive() && !grenade->GetIsExplode()) {
 			explosionSent[i] = false;
 		}
+	}
+
+	if (anyGrenadeAlive) {
+		std::unique_ptr<GameEvent> grenadeUpdate =
+			std::make_unique<GrenadeUpdate>();
+		EventQueue::GetInstance().PushEvent(std::move(grenadeUpdate));
 	}
 
 	if (seconds(1) < duration_cast<seconds>(timePoint - gameEndPoint)) {

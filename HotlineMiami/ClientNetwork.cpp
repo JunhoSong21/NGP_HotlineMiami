@@ -131,7 +131,7 @@ int SendProcess(SOCKET sock, HWND hWnd, const Player& player)
 
     }
     // 수류탄 요청이 있으면 수류탄부터
-    else if (g_GrenadeReq.requested) {
+    if (g_GrenadeReq.requested) {
         if (Send_GrenadeThrow(sock, hWnd, player) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }

@@ -22,6 +22,7 @@ private:
 
 	std::mutex grenadeThrowMutex;
 	std::mutex grenadeExplosionMutex;
+	std::mutex grenadeUpdateMutex;
 
 	void HandlePlayerMoveEvent(std::unique_ptr<PlayerMove> event);
 	void HandlePlayerUpdateEvent(std::unique_ptr<PlayerUpdate> event);
@@ -31,7 +32,8 @@ private:
 
 	void HandleGrenadeThrowEvent(std::unique_ptr<GrenadeThrow> event);
 	void HandleGrenadeExplosionEvent(std::unique_ptr<GrenadeExplosion> event);
-
+	void HandleGrenadeUpdateEvent(std::unique_ptr<GrenadeUpdate> event);
+	
 	void HandleGameEndEvent(std::unique_ptr<GameEnd> event);
 
 	float CalculateAtan2Float(float x1, float y1, float x2, float y2);

@@ -15,6 +15,7 @@ Grenade::Grenade()
     , pos(0.0f, 0.0f)
     , isActive(false)
     , exploded(false)
+    , hasServerState(false)
     , fragmentSpriteKey(L"sprGrenadeFragment")
     , fuseRemain(0.0f)
 {
@@ -57,6 +58,12 @@ void Grenade::ApplyServerState(bool active, bool explode, float x, float y, floa
     pos = Gdiplus::PointF(x, y);
     isActive = active;
     fuseRemain = remainFuse;
+    hasServerState = true;
+
+    wchar_t dbg[128];
+    swprintf_s(dbg, L"[GRENADE] state: active=%d, explode=%d, x=%.1f, y=%.1f, remain=%.2f\n",
+        active ? 1 : 0, explode ? 1 : 0, x, y, remainFuse);
+    OutputDebugStringW(dbg);
 
     // exploded 플래그가 false → true 로 변하는 순간에만 파편 생성
     if (explode && !exploded) {
@@ -106,7 +113,7 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
 {
     // 아무 상태도 아니면 스킵
     // (아직 안 던졌고, 폭발도 아닌 상태)
-    if (!isActive && !exploded) {
+    if (!hasServerState && !exploded) {
         return;
     }
 
@@ -124,6 +131,18 @@ void Grenade::Render(Gdiplus::Graphics& graphics, ImageManager& imgMgr)
                 h
             );
             graphics.DrawImage(bmp, dest);
+        }
+        else {
+            // 텍스처 못 찾더라도 "여기 수류탄 있다"는 걸 보이게 만드는 디버그 렌더
+            Gdiplus::SolidBrush debugBrush(Gdiplus::Color(255, 255, 0, 0)); // 빨간 원
+            float r = 8.0f;
+            graphics.FillEllipse(
+                &debugBrush,
+                pos.X - r,
+                pos.Y - r,
+                r * 2.0f,
+                r * 2.0f
+            );
         }
 
         //  남은 시간 표시: 서버에서 받은 값(fuseRemain) 사용

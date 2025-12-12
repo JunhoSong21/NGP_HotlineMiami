@@ -48,6 +48,11 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandleGrenadeExplosionEvent(std::move(grenadeExplosionEvent));
 		break;
 	}
+	case GameEvent::Type::GRENADE_UPDATE: {                             // ¡Ú Ãß°¡
+		unique_ptr<GrenadeUpdate> grenadeUpdateEvent(static_cast<GrenadeUpdate*>(event.release()));
+		HandleGrenadeUpdateEvent(std::move(grenadeUpdateEvent));
+		break;
+	}
 	case GameEvent::Type::GAME_END: {
 		unique_ptr<GameEnd> gameEndEvent(static_cast<GameEnd*>(event.release()));
 		HandleGameEndEvent(std::move(gameEndEvent));
@@ -173,4 +178,10 @@ void PopEvent::HandleGameEndEvent(std::unique_ptr<GameEnd> event)
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)
 {
 	return atan2f(y2 - y1, x2 - x1);
+}
+
+void PopEvent::HandleGrenadeUpdateEvent(std::unique_ptr<GrenadeUpdate> event)
+{
+	std::lock_guard<std::mutex> lock(grenadeUpdateMutex);
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }

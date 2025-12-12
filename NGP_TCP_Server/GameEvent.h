@@ -88,9 +88,12 @@ struct GrenadeThrow : GameEvent {
 	}
 };
 
-//struct GrenadeUpdate : GameEvent {
-//
-//};
+struct GrenadeUpdate : GameEvent {
+	GrenadeUpdate() {
+		type = GameEvent::Type::GRENADE_UPDATE;
+		networkThreadId = 0;
+	}
+};
 
 struct GrenadeExplosion : GameEvent {
 	bool isActive;

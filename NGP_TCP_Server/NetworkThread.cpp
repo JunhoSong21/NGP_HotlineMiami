@@ -232,6 +232,9 @@ void NetworkThread::SendQueueInput(int eventNum)
 	case GameEvent::Type::GRENADE_EXPLOSION:
 		sendQueue.enqueue(PN::SC_GRENADE_STATE);
 		break;
+	case GameEvent::Type::GRENADE_UPDATE:       
+		sendQueue.enqueue(PN::SC_GRENADE_STATE);
+		break;
 	case GameEvent::Type::GAME_END:
 		sendQueue.enqueue(PN::SC_GAME_END);
 		break;
@@ -312,6 +315,12 @@ void NetworkThread::SendGrenadeState()
 		pkt.posX = g->GetPosX();
 		pkt.posY = g->GetPosY();
 		pkt.remainFuse = g->GetRemainFuse();
+
+		printf("[SendGrenadeState] i=%d active=%d explode=%d x=%.1f y=%.1f remain=%.2f\n",
+			i,
+			pkt.isActive ? 1 : 0,
+			pkt.isExplode ? 1 : 0,
+			pkt.posX, pkt.posY, pkt.remainFuse);
 
 		retValue = send(clientSock, reinterpret_cast<char*>(&pkt), sizeof(pkt), 0);
 		if (retValue == SOCKET_ERROR)

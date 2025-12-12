@@ -15,6 +15,7 @@ private:
     bool exploded;   // 폭발 여부 (서버 상태)
     std::wstring            fragmentSpriteKey; // 파편 이미지 키
     float             fuseRemain; // 서버에서 받은 값(0~3)
+    bool              hasServerState; // 서버에서 상태 패킷을 한 번이라도 받았는지 여부
 
     struct Fragment {
         Gdiplus::PointF pos;
