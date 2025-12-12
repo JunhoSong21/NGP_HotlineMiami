@@ -13,8 +13,6 @@ extern int    g_MyPlayerIndex;
 // 수류탄 요청 상태
 struct GrenadeRequest {
     bool  requested;     // true면 이번 프레임에 서버로 보내야 함
-    float posX;
-    float posY;
     float dirRadAngle;   // 플레이어 기준 마우스 방향(라디안)
 };
 
@@ -51,7 +49,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param);
 void LoginProcess(SOCKET sock);
 int SendProcess(SOCKET sock, HWND hWnd, const Player& player);
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
-int Send_GrenadeThrow(SOCKET sock, HWND hWnd, const Player& player);
+int Send_GrenadeThrow(SOCKET sock, float dirAngle);
 int Send_BulletTrigger(SOCKET sock, float dirRadAngle);
 
 void RecvProcess(SOCKET sock, Player** players, Bullet** bullets, Grenade** grenades);

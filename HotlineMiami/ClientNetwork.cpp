@@ -359,8 +359,8 @@ void Recv_GrenadeData(Grenade** grenades)
         if (!grenades[index])
             return;
 
-        grenades[index]->SetIsActive(grenadeStatePacket.isActive);
-        grenades[index]->SetIsExplode(grenadeStatePacket.isExploded);
+        //grenades[index]->SetIsActive(grenadeStatePacket.isActive);
+        //grenades[index]->SetIsExplode(grenadeStatePacket.isExploded);
         grenades[index]->SetPosition(grenadeStatePacket.posX, grenadeStatePacket.posY);
     }
 }
