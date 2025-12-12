@@ -51,7 +51,7 @@ DWORD WINAPI Client_Network_Thread(LPVOID param);
 void LoginProcess(SOCKET sock);
 int SendProcess(SOCKET sock, HWND hWnd, const Player& player);
 int Send_Input(SOCKET sock, HWND hWnd, const Player& player);
-int Send_GrenadeThrow(SOCKET sock, float dirRadAngle);
+int Send_GrenadeThrow(SOCKET sock, HWND hWnd, const Player& player);
 int Send_BulletTrigger(SOCKET sock, float dirRadAngle);
 
 void RecvProcess(SOCKET sock, Player** players, Bullet** bullets, Grenade** grenades);

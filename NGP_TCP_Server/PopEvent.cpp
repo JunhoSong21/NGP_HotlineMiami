@@ -48,6 +48,11 @@ void PopEvent::HandleEvent(unique_ptr<GameEvent> event)
 		HandleGrenadeExplosionEvent(std::move(grenadeExplosionEvent));
 		break;
 	}
+	case GameEvent::Type::GRENADE_UPDATE: {                             // ★ 추가
+		unique_ptr<GrenadeUpdate> grenadeUpdateEvent(static_cast<GrenadeUpdate*>(event.release()));
+		HandleGrenadeUpdateEvent(std::move(grenadeUpdateEvent));
+		break;
+	}
 	case GameEvent::Type::GAME_END: {
 		unique_ptr<GameEnd> gameEndEvent(static_cast<GameEnd*>(event.release()));
 		HandleGameEndEvent(std::move(gameEndEvent));
@@ -129,21 +134,33 @@ void PopEvent::HandleBulletUpdateEvent(unique_ptr<BulletUpdate> event)
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }
 
-void PopEvent::HandleGrenadeThrowEvent(unique_ptr<GrenadeThrow> event)
+void PopEvent::HandleGrenadeThrowEvent(std::unique_ptr<GrenadeThrow> event)
 {
-	Grenade* grenade = DataManager::GetInstance().GetGrenade(event->networkThreadId);
-	if (!grenade)
+	// 1) 개인당 2발 제한 체크 (DataManager에 간단한 카운터 추가를 추천)
+	if (!DataManager::GetInstance().TryConsumeGrenade(event->networkThreadId)) {
+#ifdef _DEBUG
+		printf("수류탄 개수 제한으로 인해 GRENADE_THROW 무시\n");
+#endif
 		return;
+	}
 
-	grenade->SetIsActive();
-	grenade->SetPos(event->posX, event->posY);
-	Timer::GetInstance().AddGrenade(event->networkThreadId);
+	// 2) 실제 그레네이드 객체 가져오기
+	Grenade* grenade = DataManager::GetInstance().GetGrenade(event->networkThreadId);
+	if (!grenade) {
+		return;
+	}
+
+	// 3) Throw(위치 + 각도) 호출 → 서버에서 궤도 계산
+	grenade->Throw(event->posX, event->posY, event->dirAngle);
+
+	// 4) 아직 퓨즈는 시작 안 함. (정지했을 때 내부 Update에서 퓨즈 시작)
 	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	printf("grenadeThrowEvent 처리 완료\n");
-	#endif
+#endif
 }
+
 
 void PopEvent::HandleGrenadeExplosionEvent(unique_ptr<GrenadeExplosion> event)
 {
@@ -162,4 +179,10 @@ void PopEvent::HandleGameEndEvent(std::unique_ptr<GameEnd> event)
 float PopEvent::CalculateAtan2Float(float x1, float y1, float x2, float y2)
 {
 	return atan2f(y2 - y1, x2 - x1);
+}
+
+void PopEvent::HandleGrenadeUpdateEvent(std::unique_ptr<GrenadeUpdate> event)
+{
+	std::lock_guard<std::mutex> lock(grenadeUpdateMutex);
+	ThreadManager::GetInstance().BroadcastEvent(std::move(event));
 }

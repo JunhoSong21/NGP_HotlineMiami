@@ -36,6 +36,7 @@ struct SC_GRENADE_STATE {
 	bool	isExploded;
 	float	posX;
 	float	posY;
+	float   remainFuse;
 };
 
 struct SC_LOGIN_SUCCESS {

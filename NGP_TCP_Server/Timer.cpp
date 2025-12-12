@@ -50,15 +50,41 @@ void Timer::TimerLoop()
 
 	DataManager::GetInstance().CollisionCheck();
 
-	// Grenade Time Limit
+	// 2) Grenade 이동 + 퓨즈 처리
+	constexpr float FIXED_DELTA = 0.016f; // 16ms 기준
+	bool anyGrenadeAlive = false;
+
 	for (int i = 0; i < MAX_CLIENT_NUM; ++i) {
-		if (isGrenadeExist[i] && seconds(3) < duration_cast<seconds>(timePoint - grenadeArray[i])) {
-			lock_guard<mutex> lock(timerMutex);
-			// 폭탄 터짐.
-			isGrenadeExist[i] = false;
-			unique_ptr<GameEvent> grenadeExplosion = make_unique<GrenadeExplosion>(i);
+		Grenade* grenade = DataManager::GetInstance().GetGrenade(i);
+		if (!grenade) {
+			continue;
+		}
+
+		// 날아가는 중이면 움직이고 내부에서 정지/퓨즈/폭발 처리
+		if (grenade->GetIsActive() && !grenade->GetIsExplode()) {
+			grenade->Update(FIXED_DELTA);
+		}
+
+		// 폭발 상태로 바뀐 걸 감지해서 이벤트 넣기 (한 번만)
+		static std::array<bool, MAX_CLIENT_NUM> explosionSent{};
+		if (grenade->GetIsExplode() && !explosionSent[i]) {
+			explosionSent[i] = true;
+
+			std::unique_ptr<GameEvent> grenadeExplosion =
+				std::make_unique<GrenadeExplosion>(i);
 			EventQueue::GetInstance().PushEvent(std::move(grenadeExplosion));
 		}
+
+		// 다시 던질 수 있도록 상태 초기화가 필요하다면
+		if (!grenade->GetIsActive() && !grenade->GetIsExplode()) {
+			explosionSent[i] = false;
+		}
+	}
+
+	if (anyGrenadeAlive) {
+		std::unique_ptr<GameEvent> grenadeUpdate =
+			std::make_unique<GrenadeUpdate>();
+		EventQueue::GetInstance().PushEvent(std::move(grenadeUpdate));
 	}
 
 	if (seconds(1) < duration_cast<seconds>(timePoint - gameEndPoint)) {
