@@ -198,6 +198,8 @@ int Send_Input(SOCKET sock, HWND hWnd, const Player& player)
 int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 {
     CS_GRENADE_THROW pkt{};
+    pkt.posX = g_BulletReq.posX;
+    pkt.posY = g_BulletReq.posY;
     pkt.dirRadAngle = dirRadAngle;
 
     PacketHeader header{};
@@ -232,6 +234,8 @@ int Send_GrenadeThrow(SOCKET sock, float dirRadAngle)
 int Send_BulletTrigger(SOCKET sock, float dirRadAngle)
 {
     CS_BULLET_TRIGGER pkt{};
+    pkt.posX = g_BulletReq.posX;
+    pkt.posY = g_BulletReq.posY;
     pkt.dirRadAngle = dirRadAngle;
     PacketHeader header{};
     header.packetType = PN::CS_BULLET_TRIGGER;

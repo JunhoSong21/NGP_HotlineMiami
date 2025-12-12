@@ -1,6 +1,6 @@
 #include "Bullet.h"
 
-constexpr float moveDistance = 1.0f;
+constexpr float moveDistance = 3.0f;
 
 Bullet::Bullet(int id) :
 	posX(0.0f), posY(0.0f), dirAngle(0.0f)

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-constexpr int MAX_CLIENT_NUM = 2;
+constexpr int MAX_CLIENT_NUM = 1;
 
 #pragma pack(push, 1)
 struct PacketHeader {

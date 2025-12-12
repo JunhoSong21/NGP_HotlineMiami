@@ -13,6 +13,8 @@ extern int    g_MyPlayerIndex;
 // 수류탄 요청 상태
 struct GrenadeRequest {
     bool  requested;     // true면 이번 프레임에 서버로 보내야 함
+    float posX;
+    float posY;
     float dirRadAngle;   // 플레이어 기준 마우스 방향(라디안)
 };
 
@@ -22,6 +24,8 @@ extern GrenadeRequest g_GrenadeReq;
 struct BulletTriggerRequest
 {
     bool requested;
+    float posX;
+    float posY;
     float dirRadAngle;
 };
 

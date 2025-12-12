@@ -203,8 +203,8 @@ void GameLoop::Update()
 	if (grenades[myIdx])
 		grenades[myIdx]->Update(deltaTime);
 
-	if (bullets[myIdx])
-		bullets[myIdx]->Update(deltaTime);
+	/*if (bullets[myIdx])
+		bullets[myIdx]->Update(deltaTime);*/
 }
 
 void GameLoop::Render()
@@ -422,6 +422,8 @@ void GameLoop::InputProcessing(UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		float angle = atan2f(dy, dx);
 		g_BulletReq.requested = true;
+		g_BulletReq.posX = playerPos.X;
+		g_BulletReq.posY = playerPos.Y;
 		g_BulletReq.dirRadAngle = angle;
 		break;
 	}
